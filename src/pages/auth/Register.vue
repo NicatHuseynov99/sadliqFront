@@ -24,6 +24,8 @@
           </el-radio-group>
         </el-form-item>
 
+        <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
+
         <el-button
           class="submit-btn"
           type="primary"
@@ -55,15 +57,20 @@ const form = reactive({
   fullName: '', email: '', phone: '', password: '', role: 'Customer',
 })
 const isLoading = ref(false)
+const errorMessage = ref('')
 
 const register = async () => {
   if (isLoading.value) return
 
   isLoading.value = true
+  errorMessage.value = ''
   try {
     await auth.register(form)
     ElNotification({ type: 'success', title: 'Uğurlu', message: 'Qeydiyyat tamamlandı, daxil ola bilərsiniz' })
     await router.push({ name: 'login' })
+  } catch (e) {
+    // Backend-dən gələn xəta mesajını formanın altında göstəririk
+    errorMessage.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
     isLoading.value = false
   }
@@ -100,6 +107,14 @@ const register = async () => {
   color: #999;
   margin-bottom: 28px;
   font-size: 14px;
+}
+
+.form-error {
+  color: #d93025;
+  font-size: 13px;
+  margin: 0 0 12px;
+  text-align: center;
+  white-space: pre-line;
 }
 
 .submit-btn {

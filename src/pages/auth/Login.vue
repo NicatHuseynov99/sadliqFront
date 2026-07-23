@@ -12,6 +12,8 @@
           <el-input v-model="form.password" type="password" placeholder="Şifrə" show-password />
         </el-form-item>
 
+        <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
+
         <el-button
           class="submit-btn"
           type="primary"
@@ -40,14 +42,19 @@ const auth = useAuthStore()
 
 const form = reactive({ email: '', password: '' })
 const isLoading = ref(false)
+const errorMessage = ref('')
 
 const login = async () => {
   if (isLoading.value) return
 
   isLoading.value = true
+  errorMessage.value = ''
   try {
     await auth.login(form)
     await router.push({ name: 'home' })
+  } catch (e) {
+    // Backend-dən gələn xəta mesajını formanın altında göstəririk
+    errorMessage.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
     isLoading.value = false
   }
@@ -84,6 +91,14 @@ const login = async () => {
   color: #999;
   margin-bottom: 28px;
   font-size: 14px;
+}
+
+.form-error {
+  color: #d93025;
+  font-size: 13px;
+  margin: 0 0 12px;
+  text-align: center;
+  white-space: pre-line;
 }
 
 .submit-btn {
