@@ -16,7 +16,11 @@ const routes = [
     path: '/',
     name: 'home',
     component: () => import('@/pages/Home/Home.vue'),
-    meta: { requiresAuth: true },
+  },
+  {
+    path: '/venue/:id',
+    name: 'venue-detail',
+    component: () => import('@/pages/Venue/VenueDetail.vue'),
   },
 ]
 
@@ -26,7 +30,7 @@ const router = createRouter({
   linkActiveClass: 'menu-item-active',
 })
 
-// Girişi olmayan istifadəçini login səhifəsinə yönləndirir
+// requiresAuth qoyulmuş səhifələrə girişi olmayanı login-ə, login olmuşu isə auth səhifələrindən ana səhifəyə yönləndirir
 router.beforeEach((to) => {
   const auth = useAuthStore()
 

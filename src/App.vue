@@ -1,14 +1,15 @@
 <template>
-  <div v-if="auth.isAuth">
-    <HeaderBlock />
-    <router-view />
-  </div>
-  <router-view v-else />
+  <HeaderBlock v-if="!isAuthPage" />
+  <router-view />
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import HeaderBlock from './components/HeaderBlock.vue'
-import { useAuthStore } from '@/store/auth'
 
-const auth = useAuthStore()
+const route = useRoute()
+
+// Login/Register tam ekran səhifələrdir — orada header göstərmirik
+const isAuthPage = computed(() => route.name === 'login' || route.name === 'register')
 </script>
