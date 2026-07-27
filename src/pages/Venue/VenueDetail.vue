@@ -25,8 +25,15 @@
       <div class="head-row">
         <div>
           <h1 class="venue-name">{{ venue.name }}</h1>
-          <p class="venue-loc">📍 {{ venue.address }}, {{ venue.city }}</p>
-          <p class="venue-phone">📞 {{ venue.phone }}</p>
+          <AddressLink
+            :address="venue.address"
+            :city="venue.city"
+            :latitude="venue.latitude"
+            :longitude="venue.longitude"
+          />
+          <p class="venue-phone">
+            📞 <a :href="`tel:${venue.phone.replace(/\s/g, '')}`">{{ venue.phone }}</a>
+          </p>
         </div>
         <div class="rating-box">
           <span class="rating-score">★ {{ venue.rating }}</span>
@@ -57,17 +64,38 @@
         </div>
       </div>
 
-      <!-- Menyular -->
+      <!-- Menyular — süfrə şəkli, altında tərkibi və qiyməti -->
       <h2 class="section-title">Menyular</h2>
       <div class="menu-list">
         <div v-for="m in venue.menus" :key="m.id" class="menu-card">
-          <div class="menu-head">
-            <h3>{{ m.name }}</h3>
-            <span class="price">₼{{ m.pricePerPerson }}/nəfər</span>
+          <div class="menu-cover" @click="openMenu(m)">
+            <img :src="m.coverImageUrl" :alt="`${m.name} süfrəsi`" @error="onImgError" />
+            <div class="menu-price-badge">
+              <strong>{{ m.pricePerPerson }} ₼</strong>
+              <span>1 nəfər</span>
+            </div>
           </div>
-          <ul>
-            <li v-for="i in m.items" :key="i.id">{{ i.name }}</li>
-          </ul>
+
+          <div class="menu-body">
+            <h3>{{ m.name }} menyusu</h3>
+            <p class="menu-desc">{{ m.description }}</p>
+
+            <span class="composition-label">Süfrənin tərkibi</span>
+            <ul class="composition">
+              <li v-for="i in m.items" :key="i.id">
+                <span class="dot">•</span> {{ i.name }}
+                <span class="cat-mini">{{ i.category }}</span>
+              </li>
+            </ul>
+
+            <div class="menu-foot">
+              <div class="calc">
+                <span class="calc-label">100 nəfər üçün</span>
+                <strong>{{ (m.pricePerPerson * 100).toLocaleString() }} ₼</strong>
+              </div>
+              <button class="photo-btn" @click="openMenu(m)">📷 Yeməklərin şəkilləri</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -85,6 +113,34 @@
       </div>
       <el-empty v-else description="Hələ rəy yoxdur" />
     </div>
+
+    <!-- Menyu detalı dialoqu — yeməklərin şəkilləri ilə -->
+    <el-dialog v-model="menuVisible" :title="selectedMenu?.name" width="620px">
+      <div v-if="selectedMenu">
+        <div class="dialog-cover">
+          <img :src="selectedMenu.coverImageUrl" :alt="selectedMenu.name" @error="onImgError" />
+          <div class="menu-price-badge">
+            <strong>{{ selectedMenu.pricePerPerson }} ₼</strong>
+            <span>1 nəfər</span>
+          </div>
+        </div>
+        <p class="dialog-desc">{{ selectedMenu.description }}</p>
+
+        <div v-for="(items, cat) in groupedItems" :key="cat" class="cat-block">
+          <h4 class="cat-title">{{ cat }}</h4>
+          <div class="dish-grid">
+            <div v-for="i in items" :key="i.id" class="dish">
+              <img :src="i.imageUrl" :alt="i.name" @error="onImgError" />
+              <span>{{ i.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <el-button @click="menuVisible = false">Bağla</el-button>
+      </template>
+    </el-dialog>
 
     <!-- Rezerv dialoqu -->
     <el-dialog
@@ -157,6 +213,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
+import AddressLink from '@/components/AddressLink.vue'
 import { getVenueById, getHallBusyDates } from '@/services/venueService'
 import { createReservation } from '@/services/reservationService'
 import { useAuthStore } from '@/store/auth'
@@ -168,6 +225,9 @@ const auth = useAuthStore()
 const venue = ref(null)
 const isLoading = ref(false)
 const activeImage = ref('')
+
+const menuVisible = ref(false)
+const selectedMenu = ref(null)
 
 const reserveVisible = ref(false)
 const selectedHall = ref(null)
@@ -194,6 +254,23 @@ const loadVenue = async () => {
     isLoading.value = false
   }
 }
+
+// Menyu dialoqunu açır
+const openMenu = (menu) => {
+  selectedMenu.value = menu
+  menuVisible.value = true
+}
+
+// Menyu yeməklərini kateqoriyalara (Soyuq/İsti/Desert/İçki) görə qruplaşdırır
+const groupedItems = computed(() => {
+  const groups = {}
+  for (const item of selectedMenu.value?.items ?? []) {
+    const cat = item.category ?? 'Digər'
+    if (!groups[cat]) groups[cat] = []
+    groups[cat].push(item)
+  }
+  return groups
+})
 
 // Seçilən zalın dolu/tutulmuş günlərini yükləyir ki, təqvimdə bağlansın
 const loadAvailability = async (hallId) => {
@@ -395,11 +472,20 @@ onMounted(loadVenue)
   font-size: 1.8rem;
 }
 
-.venue-loc,
 .venue-phone {
-  margin: 0 0 4px;
+  margin: 4px 0 0;
   color: #6c757d;
   font-size: 0.92rem;
+}
+
+.venue-phone a {
+  color: #6c757d;
+  text-decoration: none;
+}
+
+.venue-phone a:hover {
+  color: #721438;
+  text-decoration: underline;
 }
 
 .rating-box {
@@ -510,41 +596,237 @@ onMounted(loadVenue)
   padding-top: 10px;
 }
 
+/* Menyular — süfrə şəkli + tərkib */
 .menu-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
 }
 
 .menu-card {
   background: #fff;
-  border-radius: 12px;
-  padding: 16px 18px;
+  border-radius: 14px;
+  overflow: hidden;
   border: 1px solid #eaeaea;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.menu-head {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px dashed #e9ecef;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.menu-head h3 {
-  margin: 0;
-  font-size: 1.05rem;
+.menu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.menu-cover {
+  position: relative;
+  height: 210px;
+  cursor: pointer;
+}
+
+.menu-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-price-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(114, 20, 56, 0.95);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.menu-price-badge strong {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.menu-price-badge span {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+.menu-body {
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.menu-body h3 {
+  margin: 0 0 5px;
+  font-size: 1.15rem;
   color: #1a1118;
 }
 
-.menu-card ul {
-  margin: 0;
-  padding-left: 18px;
+.menu-desc {
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  color: #868e96;
+  line-height: 1.45;
+}
+
+.composition-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a6220;
+  padding-bottom: 7px;
+  border-bottom: 1px dashed #e9ecef;
+  margin-bottom: 10px;
+}
+
+.composition {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.composition li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.87rem;
   color: #495057;
-  line-height: 1.7;
+  padding: 5px 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.composition .dot {
+  color: #dfb15b;
+  font-weight: 700;
+}
+
+.cat-mini {
+  margin-left: auto;
+  background: #f8f9fa;
+  color: #adb5bd;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.menu-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f1f3f5;
+}
+
+.calc {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.calc-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #adb5bd;
+  font-weight: 600;
+}
+
+.calc strong {
+  font-size: 1.05rem;
+  color: #721438;
+}
+
+.photo-btn {
+  background: #fff;
+  color: #721438;
+  border: 1px solid #e5cdd6;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.photo-btn:hover {
+  background: #fdf3f6;
+  border-color: #721438;
+}
+
+/* Menyu dialoqu */
+.dialog-cover {
+  position: relative;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.dialog-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dialog-desc {
+  margin: 0 0 16px;
+  color: #6c757d;
+  font-size: 0.88rem;
+}
+
+.cat-block {
+  margin-bottom: 18px;
+}
+
+.cat-title {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a6220;
+  border-bottom: 1px dashed #e9ecef;
+  padding-bottom: 6px;
+}
+
+.dish-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.dish {
+  text-align: center;
+}
+
+.dish img {
+  width: 100%;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+
+.dish span {
+  font-size: 0.8rem;
+  color: #495057;
+  line-height: 1.3;
+  display: block;
 }
 
 .price {

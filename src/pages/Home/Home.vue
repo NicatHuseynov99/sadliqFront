@@ -88,7 +88,16 @@
               <h3>{{ venue.name }}</h3>
               <span class="rating-pill">★ {{ venue.rating }}</span>
             </div>
-            <p class="address">📍 {{ venue.address }} <span class="rev-count">· {{ venue.reviewCount }} rəy</span></p>
+            <div class="address-row">
+              <AddressLink
+                compact
+                :address="venue.address"
+                :city="venue.city"
+                :latitude="venue.latitude"
+                :longitude="venue.longitude"
+              />
+              <span class="rev-count">· {{ venue.reviewCount }} rəy</span>
+            </div>
             <p class="description">{{ venue.description }}</p>
 
             <div class="halls-preview">
@@ -97,9 +106,28 @@
               </span>
             </div>
 
+            <!-- Menyuların şəkilli önizləməsi -->
+            <div class="menu-preview">
+              <span class="menu-preview-label">Menyular</span>
+              <div class="menu-chips">
+                <div
+                  v-for="m in venue.menus"
+                  :key="m.id"
+                  class="menu-chip"
+                  @click="selectVenue(venue)"
+                >
+                  <img :src="m.coverImageUrl" :alt="m.name" @error="onImgError" />
+                  <div class="menu-chip-text">
+                    <strong>{{ m.name }}</strong>
+                    <span>₼{{ m.pricePerPerson }}/nəfər</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="venue-footer">
               <div class="menus-summary">
-                <small>Menyular: {{ venue.menus.map(m => m.name).join(', ') }}</small>
+                <small>{{ venue.halls.length }} zal · {{ venue.menus.length }} menyu</small>
               </div>
               <button @click="selectVenue(venue)" class="detail-btn">Seç / Bax</button>
             </div>
@@ -113,6 +141,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import AddressLink from '@/components/AddressLink.vue'
 import { getAllVenues } from '@/services/venueService'
 
 const router = useRouter()
@@ -582,10 +611,75 @@ const onImgError = (e) => {
   font-size: 0.8rem;
 }
 
-.address {
-  color: #6c757d;
-  font-size: 0.85rem;
+.address-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.menu-preview {
+  margin-bottom: 14px;
+}
+
+.menu-preview-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #adb5bd;
+  margin-bottom: 7px;
+}
+
+.menu-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.menu-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8f9fa;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 5px 10px 5px 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.menu-chip:hover {
+  border-color: #dfb15b;
+  background: #fffaf0;
+}
+
+.menu-chip img {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.menu-chip-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.menu-chip-text strong {
+  font-size: 0.8rem;
+  color: #1a1118;
+}
+
+.menu-chip-text span {
+  font-size: 0.72rem;
+  color: #721438;
+  font-weight: 600;
 }
 
 .description {
