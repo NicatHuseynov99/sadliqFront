@@ -33,7 +33,7 @@ const auth = useAuthStore()
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 32px;
+  padding: 14px 40px;
   background: #1a1118;
   position: sticky;
   top: 0;

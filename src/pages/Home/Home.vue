@@ -24,6 +24,11 @@
             </div>
 
             <div class="field">
+              <label>Tədbir tarixi</label>
+              <input v-model="filters.date" type="date" :min="todayKey" />
+            </div>
+
+            <div class="field">
               <label>Qonaq sayı</label>
               <input v-model.number="filters.capacity" type="number" min="0" placeholder="Min. qonaq sayı" />
             </div>
@@ -45,6 +50,7 @@
             <button class="chip" @click="toggleQuick('big')" :aria-pressed="quickFilters.big">500+ qonaq</button>
             <button class="chip" @click="toggleQuick('cheap')" :aria-pressed="quickFilters.cheap">45 ₼-a qədər</button>
             <button class="chip" @click="toggleQuick('baku')" :aria-pressed="quickFilters.baku">Yalnız Bakı</button>
+            <button class="chip" @click="setWeekend" >Bu həftə sonu boş olanlar</button>
           </div>
         </div>
       </div>
@@ -87,6 +93,18 @@
             <div class="title-row">
               <h3>{{ venue.name }}</h3>
               <span class="rating-pill">★ {{ venue.rating }}</span>
+            </div>
+
+            <div class="avail-row">
+              <span v-if="filters.date" class="avail-badge free">
+                ✅ {{ formatDate(filters.date) }} — boşdur ({{ freeHallCount(venue, filters.date) }} zal)
+              </span>
+              <template v-else-if="nearestDates[venue.id] !== undefined">
+                <span v-if="nearestDates[venue.id]" class="avail-badge free">
+                  ✅ Ən yaxın boş tarix: <b>{{ formatDate(nearestDates[venue.id]) }}</b>
+                </span>
+                <span v-else class="avail-badge busy">⛔ Yaxın 4 ayda boş tarix yoxdur</span>
+              </template>
             </div>
             <div class="address-row">
               <AddressLink
@@ -142,22 +160,38 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import AddressLink from '@/components/AddressLink.vue'
-import { getAllVenues } from '@/services/venueService'
+import { getAllVenues, getNearestFreeDate, getAllBusyDates, toDateKey } from '@/services/venueService'
+import { formatDate } from '@/utils/date'
 
 const router = useRouter()
 
 const venues = ref([])
 const isLoading = ref(false)
+const nearestDates = ref({})
+const busyMap = ref({})
+
+const todayKey = toDateKey(new Date())
 
 // Sarayları mock servisdən yükləyir (real API qoşulanda servis özü dəyişəcək)
 const loadVenues = async () => {
   isLoading.value = true
   try {
     venues.value = await getAllVenues()
+    busyMap.value = await getAllBusyDates()
+    loadNearestDates()
   } finally {
     isLoading.value = false
   }
 }
+
+// Hər saray üçün bu gündən sonrakı ən yaxın boş tarixi arxa planda hesablayır
+const loadNearestDates = async () => {
+  const results = await Promise.all(
+    venues.value.map(async (v) => [v.id, await getNearestFreeDate(v)]),
+  )
+  nearestDates.value = Object.fromEntries(results)
+}
+
 
 onMounted(loadVenues)
 
@@ -167,10 +201,27 @@ const cities = computed(() => [...new Set(venues.value.map(v => v.city))])
 const filters = reactive({
   searchQuery: '',
   city: '',
+  date: '',
   capacity: null,
   maxPrice: null,
   sort: 'rating-desc'
 })
+
+// Seçilən tarixdə sarayın ən azı bir zalı boşdursa true qaytarır
+const isFreeOn = (venue, dateKey) =>
+  venue.halls.some((h) => !(busyMap.value[h.id]?.has(dateKey)))
+
+// Seçilən tarixdə boş olan zalların sayı
+const freeHallCount = (venue, dateKey) =>
+  venue.halls.filter((h) => !(busyMap.value[h.id]?.has(dateKey))).length
+
+// Növbəti şənbə tarixini filtrə yazır
+const setWeekend = () => {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7 || 7))
+  filters.date = toDateKey(d)
+}
 
 const state = reactive({
   favs: new Set()
@@ -198,8 +249,9 @@ const filteredVenues = computed(() => {
     const matchesCity = filters.city === '' || venue.city === filters.city
     const matchesCapacity = !filters.capacity || venue.halls.some(h => h.capacity >= filters.capacity)
     const matchesPrice = !filters.maxPrice || venue.menus.some(m => m.pricePerPerson <= filters.maxPrice)
+    const matchesDate = !filters.date || isFreeOn(venue, filters.date)
 
-    return matchesSearch && matchesCity && matchesCapacity && matchesPrice
+    return matchesSearch && matchesCity && matchesCapacity && matchesPrice && matchesDate
   })
 
   list.sort((a, b) => {
@@ -222,6 +274,7 @@ const getMinMenuPrice = (venue) => {
 const resetFilters = () => {
   filters.searchQuery = ''
   filters.city = ''
+  filters.date = ''
   filters.capacity = null
   filters.maxPrice = null
   filters.sort = 'rating-desc'
@@ -292,14 +345,14 @@ const onImgError = (e) => {
   border-radius: 12px;
   display: inline-block;
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-  max-width: 950px;
+  max-width: 1200px;
   width: 100%;
   text-align: left;
 }
 
 .search-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
+  grid-template-columns: 1.4fr 1fr 1fr 0.9fr 1.1fr auto;
   gap: 12px;
   align-items: end;
 }
@@ -409,9 +462,9 @@ const onImgError = (e) => {
 }
 
 .venues-container {
-  max-width: 1200px;
+  max-width: 1360px;
   margin: 40px auto;
-  padding: 0 20px;
+  padding: 0 40px;
   min-height: 200px;
 }
 
@@ -611,6 +664,28 @@ const onImgError = (e) => {
   font-size: 0.8rem;
 }
 
+.avail-row {
+  margin-bottom: 8px;
+}
+
+.avail-badge {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.avail-badge.free {
+  background: #e8f6ec;
+  color: #1e7e34;
+}
+
+.avail-badge.busy {
+  background: #fdeaea;
+  color: #c0392b;
+}
+
 .address-row {
   display: flex;
   align-items: center;
@@ -761,6 +836,9 @@ const onImgError = (e) => {
   }
   .venues-grid {
     grid-template-columns: 1fr;
+  }
+  .venues-container {
+    padding: 0 16px;
   }
 }
 </style>

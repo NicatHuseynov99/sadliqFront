@@ -18,7 +18,7 @@
               <span class="status-tag" :class="statusClass(r.status)">{{ statusText(r.status) }}</span>
             </div>
             <p class="res-line">🏛 {{ r.hallName }} · 🍽 {{ r.menuName }} (₼{{ r.pricePerPerson }}/nəfər)</p>
-            <p class="res-line">📅 {{ r.eventDate }} · 👥 {{ r.guestCount }} qonaq</p>
+            <p class="res-line">📅 {{ formatDateFull(r.eventDate) }} · 👥 {{ r.guestCount }} qonaq</p>
             <p class="res-line total">Təxmini məbləğ: <b>₼{{ (r.pricePerPerson * r.guestCount).toLocaleString() }}</b></p>
             <p class="res-note" v-if="r.note">Qeyd: {{ r.note }}</p>
           </div>
@@ -45,6 +45,7 @@
 import { onMounted, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import { getMyReservations, cancelReservation } from '@/services/reservationService'
+import { formatDateFull } from '@/utils/date'
 
 const reservations = ref([])
 const isLoading = ref(false)
@@ -89,12 +90,12 @@ onMounted(load)
 .res-page {
   min-height: calc(100vh - 61px);
   background: #f4f6f8;
-  padding: 30px 20px 60px;
+  padding: 30px 40px 60px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .res-inner {
-  max-width: 800px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 

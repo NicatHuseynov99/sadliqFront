@@ -42,12 +42,12 @@
 .app-footer {
   background: #1a1118;
   color: #cbc3c8;
-  padding: 44px 32px 0;
+  padding: 44px 40px 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .footer-grid {
-  max-width: 1200px;
+  max-width: 1360px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.3fr;

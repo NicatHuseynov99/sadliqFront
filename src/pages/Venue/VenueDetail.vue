@@ -47,18 +47,54 @@
 
       <p class="venue-desc">{{ venue.description }}</p>
 
-      <!-- Zallar -->
-      <h2 class="section-title">Zallar</h2>
+      <!-- Zallar — hər zalın öz boş/dolu günləri ilə (rezervlər zal əsaslıdır) -->
+      <h2 class="section-title">Zallar və boş günləri</h2>
       <div class="hall-list">
         <div v-for="h in venue.halls" :key="h.id" class="hall-card">
           <img :src="h.imageUrl" :alt="h.name" class="hall-img" @error="onImgError" />
+
           <div class="hall-body">
-            <h3>{{ h.name }}</h3>
-            <p class="hall-meta">👥 {{ h.capacity }} qonaq tutumu</p>
-            <p class="hall-desc">{{ h.description }}</p>
-            <div class="hall-footer">
+            <div class="hall-top">
+              <div>
+                <h3>{{ h.name }}</h3>
+                <p class="hall-meta">👥 {{ h.capacity }} qonaq tutumu</p>
+              </div>
               <span class="price">₼{{ h.minPrice }}-dən / nəfər</span>
+            </div>
+
+            <p class="hall-desc">{{ h.description }}</p>
+
+            <!-- Yaxın 14 günün vəziyyəti -->
+            <div class="strip-head">
+              <span class="strip-label">Yaxın 2 həftə</span>
+              <span class="strip-free" v-if="nextFreeOf(h.id)">
+                Ən yaxın boş gün: <b>{{ formatDate(nextFreeOf(h.id)) }}</b>
+              </span>
+            </div>
+            <div class="day-strip">
+              <button
+                v-for="d in nextDays(h.id)"
+                :key="d.key"
+                class="strip-day"
+                :class="d.status"
+                :disabled="d.status === 'busy'"
+                :title="d.status === 'busy' ? 'Doludur' : 'Boşdur — rezerv et'"
+                @click="onDateSelect(h, d.key)"
+              >
+                <span class="wd">{{ d.weekday }}</span>
+                <span class="dn">{{ d.number }}</span>
+              </button>
+            </div>
+
+            <div class="hall-footer">
+              <button class="calendar-toggle" @click="toggleCalendar(h.id)">
+                {{ openCalendars.has(h.id) ? '▲ Təqvimi gizlət' : '📅 Bütün ayı gör' }}
+              </button>
               <button class="reserve-btn" @click="openReserve(h)">Rezerv et</button>
+            </div>
+
+            <div v-if="openCalendars.has(h.id)" class="hall-calendar">
+              <AvailabilityCalendar :hall-id="h.id" @select="(key) => onDateSelect(h, key)" />
             </div>
           </div>
         </div>
@@ -108,7 +144,7 @@
             <span class="review-stars">{{ '★'.repeat(r.rating) }}{{ '☆'.repeat(5 - r.rating) }}</span>
           </div>
           <p class="review-text">{{ r.text }}</p>
-          <span class="review-date">{{ r.date }}</span>
+          <span class="review-date">{{ formatDateFull(r.date) }}</span>
         </div>
       </div>
       <el-empty v-else description="Hələ rəy yoxdur" />
@@ -214,7 +250,9 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
 import AddressLink from '@/components/AddressLink.vue'
-import { getVenueById, getHallBusyDates } from '@/services/venueService'
+import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
+import { getVenueById, getHallBusyDates, toDateKey } from '@/services/venueService'
+import { formatDate, formatDateFull, weekdayShort } from '@/utils/date'
 import { createReservation } from '@/services/reservationService'
 import { useAuthStore } from '@/store/auth'
 
@@ -228,6 +266,9 @@ const activeImage = ref('')
 
 const menuVisible = ref(false)
 const selectedMenu = ref(null)
+
+const hallBusy = ref({})
+const openCalendars = ref(new Set())
 
 const reserveVisible = ref(false)
 const selectedHall = ref(null)
@@ -250,10 +291,51 @@ const loadVenue = async () => {
   try {
     venue.value = await getVenueById(route.params.id)
     activeImage.value = venue.value.coverImageUrl
+    await loadHallBusy()
   } finally {
     isLoading.value = false
   }
 }
+
+// Hər zalın dolu günlərini yükləyir — rezervlər zal əsaslı olduğu üçün ayrı-ayrı saxlanılır
+const loadHallBusy = async () => {
+  const entries = await Promise.all(
+    venue.value.halls.map(async (h) => [h.id, await getHallBusyDates(h.id)]),
+  )
+  hallBusy.value = Object.fromEntries(entries)
+}
+
+// Zalın yaxın 14 gününü vəziyyəti ilə birlikdə qaytarır
+const nextDays = (hallId) => {
+  const busy = hallBusy.value[hallId]
+  const result = []
+  const cursor = new Date()
+  cursor.setHours(0, 0, 0, 0)
+  cursor.setDate(cursor.getDate() + 1)
+
+  for (let i = 0; i < 14; i++) {
+    const key = toDateKey(cursor)
+    result.push({
+      key,
+      number: cursor.getDate(),
+      weekday: weekdayShort(cursor),
+      status: busy?.has(key) ? 'busy' : 'free',
+    })
+    cursor.setDate(cursor.getDate() + 1)
+  }
+
+  return result
+}
+
+// Zalın yaxın 14 gün ərzindəki ilk boş tarixi
+const nextFreeOf = (hallId) => nextDays(hallId).find((d) => d.status === 'free')?.key ?? null
+
+const toggleCalendar = (hallId) => {
+  const set = new Set(openCalendars.value)
+  set.has(hallId) ? set.delete(hallId) : set.add(hallId)
+  openCalendars.value = set
+}
+
 
 // Menyu dialoqunu açır
 const openMenu = (menu) => {
@@ -272,8 +354,13 @@ const groupedItems = computed(() => {
   return groups
 })
 
-// Seçilən zalın dolu/tutulmuş günlərini yükləyir ki, təqvimdə bağlansın
+// Rezerv təqvimi üçün seçilən zalın dolu günlərini yükləyir (artıq yüklənibsə təkrar sorğu getmir)
 const loadAvailability = async (hallId) => {
+  if (hallBusy.value[hallId]) {
+    busyDates.value = hallBusy.value[hallId]
+    return
+  }
+
   availLoading.value = true
   try {
     busyDates.value = await getHallBusyDates(hallId)
@@ -328,6 +415,12 @@ const openReserve = (hall) => {
   loadAvailability(hall.id)
 }
 
+// Boş günə kliklədikdə həmin zal və tarixlə rezerv dialoqunu açır
+const onDateSelect = (hall, dateKey) => {
+  openReserve(hall)
+  if (reserveVisible.value) reserveForm.eventDate = dateKey
+}
+
 const estimatedTotal = computed(() => {
   const menu = venue.value?.menus?.find((m) => m.id === reserveForm.menuId)
   if (!menu || !reserveForm.guestCount) return null
@@ -365,6 +458,8 @@ const submitReserve = async () => {
       type: 'success',
       zIndex: 99999,
     })
+    // Yeni rezerv edilən gün dərhal dolu kimi görünsün
+    await loadHallBusy()
   } catch (e) {
     reserveError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
@@ -384,12 +479,12 @@ onMounted(loadVenue)
 .detail-page {
   min-height: calc(100vh - 61px);
   background: #f4f6f8;
-  padding: 24px 20px 60px;
+  padding: 24px 40px 60px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .detail-inner {
-  max-width: 1000px;
+  max-width: 1360px;
   margin: 0 auto;
 }
 
@@ -410,7 +505,7 @@ onMounted(loadVenue)
 
 .main-image {
   position: relative;
-  height: 380px;
+  height: 440px;
   border-radius: 14px;
   overflow: hidden;
 }
@@ -541,59 +636,159 @@ onMounted(loadVenue)
 }
 
 .hall-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 18px;
 }
 
 .hall-card {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   border: 1px solid #eaeaea;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s;
-}
-
-.hall-card:hover {
-  transform: translateY(-3px);
+  display: flex;
 }
 
 .hall-img {
-  width: 100%;
-  height: 160px;
+  width: 260px;
+  height: 240px;
+  flex-shrink: 0;
   object-fit: cover;
+  align-self: flex-start;
 }
 
 .hall-body {
-  padding: 14px 16px 16px;
+  padding: 16px 18px 18px;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.hall-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .hall-body h3 {
-  margin: 0 0 6px;
-  font-size: 1.05rem;
+  margin: 0 0 4px;
+  font-size: 1.15rem;
   color: #1a1118;
 }
 
 .hall-meta {
-  margin: 0 0 6px;
+  margin: 0;
   font-size: 0.85rem;
   color: #6c757d;
 }
 
 .hall-desc {
-  margin: 0 0 12px;
-  font-size: 0.83rem;
+  margin: 8px 0 14px;
+  font-size: 0.85rem;
   color: #868e96;
-  line-height: 1.4;
+  line-height: 1.45;
+}
+
+/* Yaxın günlərin zolağı */
+.strip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 7px;
+  flex-wrap: wrap;
+}
+
+.strip-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #adb5bd;
+}
+
+.strip-free {
+  font-size: 0.78rem;
+  color: #1e7e34;
+}
+
+.day-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.strip-day {
+  flex: 0 0 auto;
+  width: 44px;
+  border: none;
+  border-radius: 9px;
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.strip-day .wd {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.strip-day .dn {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.strip-day.free {
+  background: #e8f6ec;
+  color: #1e7e34;
+}
+
+.strip-day.free:hover {
+  background: #1e7e34;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.strip-day.busy {
+  background: #fdeaea;
+  color: #c0392b;
+  cursor: not-allowed;
+  text-decoration: line-through;
 }
 
 .hall-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
   border-top: 1px solid #f1f3f5;
-  padding-top: 10px;
+  padding-top: 12px;
+}
+
+.calendar-toggle {
+  background: none;
+  border: none;
+  color: #721438;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.calendar-toggle:hover {
+  text-decoration: underline;
+}
+
+.hall-calendar {
+  margin-top: 14px;
+  max-width: 420px;
 }
 
 /* Menyular — süfrə şəkli + tərkib */
@@ -923,6 +1118,16 @@ onMounted(loadVenue)
   color: #d93025;
   font-size: 13px;
   white-space: pre-line;
+}
+
+@media (max-width: 700px) {
+  .hall-card {
+    flex-direction: column;
+  }
+  .hall-img {
+    width: 100%;
+    height: 180px;
+  }
 }
 
 @media (max-width: 600px) {
