@@ -1,386 +1,672 @@
 <template>
-  <div class="home-page">
-    <!-- Yuxarı axtarış zolağı -->
-    <div class="search-bar">
-      <div class="search-bar-inner">
-        <el-input
-          v-model="filters.city"
-          placeholder="Şəhər (məs: Bakı)"
-          clearable
-          class="search-city"
-          @keyup.enter="search"
-        />
-        <el-date-picker
-          v-model="filters.date"
-          type="date"
-          placeholder="Tarix seçin"
-          format="DD.MM.YYYY"
-          value-format="YYYY-MM-DD"
-          class="search-date"
-        />
-        <el-input-number
-          v-model="filters.capacity"
-          :min="1"
-          :step="50"
-          placeholder="Qonaq sayı"
-          class="search-capacity"
-          controls-position="right"
-        />
-        <el-button type="primary" class="gold-btn search-btn" @click="search">Axtar</el-button>
+  <div class="site-wrapper">
+    <!-- HERO & SEARCH SECTION -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <span class="badge-top">Bakı · Sumqayıt · Gəncə · Quba — 350+ Məkan</span>
+        <h1>Xəyallarınızdakı Toy Məkanını Kəşf Edin</h1>
+        <p>Bakı və bölgələrdə ən məşhur şadlıq sarayları, zallar və özəl tədbir məkanları.</p>
+
+        <!-- Axtarış və Zəngin Filtr Paneli -->
+        <div class="search-box">
+          <div class="search-grid">
+            <div class="field">
+              <label>Axtarış</label>
+              <input v-model="filters.searchQuery" type="text" placeholder="Restoran adı və ya ünvan..." />
+            </div>
+
+            <div class="field">
+              <label>Şəhər / Bölgə</label>
+              <select v-model="filters.city">
+                <option value="">Bütün şəhərlər</option>
+                <option v-for="c in cities" :key="c" :value="c">{{ c }}</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Qonaq sayı</label>
+              <input v-model.number="filters.capacity" type="number" min="0" placeholder="Min. qonaq sayı" />
+            </div>
+
+            <div class="field">
+              <label>Maks. Menyu Qiyməti</label>
+              <div class="budget-row">
+                <input v-model.number="filters.maxPrice" type="range" min="20" max="100" step="5" />
+                <span class="budget-val">{{ filters.maxPrice ? filters.maxPrice + ' ₼' : 'Hamısı' }}</span>
+              </div>
+            </div>
+
+            <button @click="resetFilters" class="reset-btn">Təmizlə</button>
+          </div>
+
+          <!-- Sürətli Filtrlər (Chips) -->
+          <div class="quick-chips">
+            <span class="chips-label">Sürətli:</span>
+            <button class="chip" @click="toggleQuick('big')" :aria-pressed="quickFilters.big">500+ qonaq</button>
+            <button class="chip" @click="toggleQuick('cheap')" :aria-pressed="quickFilters.cheap">45 ₼-a qədər</button>
+            <button class="chip" @click="toggleQuick('baku')" :aria-pressed="quickFilters.baku">Yalnız Bakı</button>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="content">
-      <!-- Sol filter paneli -->
-      <aside class="filters">
-        <h3 class="filters-title">Filterlər</h3>
-
-        <div class="filter-group">
-          <div class="filter-label">Şəhər</div>
-          <el-radio-group v-model="filters.city" class="city-list">
-            <el-radio v-for="c in cities" :key="c" :value="c">{{ c }}</el-radio>
-          </el-radio-group>
+    <!-- Restoranlar Siyahısı -->
+    <section class="venues-container" v-loading="isLoading">
+      <div class="results-header">
+        <h2>Mövcud Saraylar <span>({{ filteredVenues.length }})</span></h2>
+        <div class="sort-box">
+          <label>Sıralama:</label>
+          <select v-model="filters.sort">
+            <option value="rating-desc">Reytinq — ən yüksək</option>
+            <option value="price-asc">Qiymət — ucuzdan bahaya</option>
+            <option value="price-desc">Qiymət — bahadan ucuza</option>
+          </select>
         </div>
+      </div>
 
-        <div class="filter-group">
-          <div class="filter-label">Qiymət (₼/nəfər)</div>
-          <el-slider v-model="priceRange" range :max="200" />
-          <div class="price-labels">₼{{ priceRange[0] }} — ₼{{ priceRange[1] }}</div>
-        </div>
+      <div v-if="!isLoading && filteredVenues.length === 0" class="no-result">
+        <h3>Axtarışınıza uyğun heç bir saray tapılmadı.</h3>
+        <p>Filtrləri dəyişərək yenidən yoxlaya bilərsiniz.</p>
+        <button @click="resetFilters" class="btn-reset-empty">Filtrləri sıfırla</button>
+      </div>
 
-        <div class="filter-group">
-          <div class="filter-label">Minimum tutum</div>
-          <el-select v-model="filters.capacity" placeholder="Seçin" clearable>
-            <el-option :value="100" label="100+ qonaq" />
-            <el-option :value="200" label="200+ qonaq" />
-            <el-option :value="300" label="300+ qonaq" />
-            <el-option :value="500" label="500+ qonaq" />
-          </el-select>
-        </div>
+      <div v-else class="venues-grid">
+        <div v-for="venue in filteredVenues" :key="venue.id" class="venue-card">
+          <div class="image-wrapper">
+            <img :src="venue.coverImageUrl" :alt="venue.name" class="venue-img" @error="onImgError" />
+            <span class="badge">{{ venue.city }}</span>
+            <button class="fav-btn" :aria-pressed="state.favs.has(venue.id)" @click="toggleFav(venue.id)" aria-label="Seçilmişlərə əlavə et">♥</button>
 
-        <div class="filter-group">
-          <div class="filter-label">Tarix</div>
-          <el-date-picker
-            v-model="filters.date"
-            type="date"
-            placeholder="Tarix seçin"
-            format="DD.MM.YYYY"
-            value-format="YYYY-MM-DD"
-            style="width: 100%"
-          />
-        </div>
-
-        <el-button type="primary" class="gold-btn filter-btn" @click="search">Filtrlə</el-button>
-        <el-button text class="reset-btn" @click="reset">Təmizlə</el-button>
-      </aside>
-
-      <!-- Nəticələr -->
-      <section class="results" v-loading="isLoading">
-        <p class="result-count">{{ venues.length }} saray tapıldı</p>
-
-        <div v-for="v in venues" :key="v.id" class="venue-card">
-          <div class="venue-img">
-            <img v-if="v.coverImageUrl" :src="v.coverImageUrl" :alt="v.name" />
-            <div v-else class="img-placeholder">🏰</div>
+            <div class="card-price-tag">
+              <strong>Min. {{ getMinMenuPrice(venue) }} ₼</strong>
+              <span>1 nəfər üçün</span>
+            </div>
           </div>
 
           <div class="venue-info">
-            <h3 class="venue-name">{{ v.name }}</h3>
-            <p class="venue-loc">📍 {{ v.city }}<span v-if="v.address">, {{ v.address }}</span></p>
-            <p class="venue-cap" v-if="capacityText(v)">👥 {{ capacityText(v) }}</p>
-            <p class="venue-desc" v-if="v.description">{{ v.description }}</p>
-          </div>
+            <div class="title-row">
+              <h3>{{ venue.name }}</h3>
+              <span class="rating-pill">★ {{ venue.rating }}</span>
+            </div>
+            <p class="address">📍 {{ venue.address }} <span class="rev-count">· {{ venue.reviewCount }} rəy</span></p>
+            <p class="description">{{ venue.description }}</p>
 
-          <div class="venue-side">
-            <div class="venue-price" v-if="priceText(v)">{{ priceText(v) }}</div>
-            <el-button type="primary" class="gold-btn" @click="goDetail(v)">Bax →</el-button>
+            <div class="halls-preview">
+              <span v-for="hall in venue.halls" :key="hall.id" class="hall-tag">
+                {{ hall.name }} (Max: {{ hall.capacity }} nəfər)
+              </span>
+            </div>
+
+            <div class="venue-footer">
+              <div class="menus-summary">
+                <small>Menyular: {{ venue.menus.map(m => m.name).join(', ') }}</small>
+              </div>
+              <button @click="selectVenue(venue)" class="detail-btn">Seç / Bax</button>
+            </div>
           </div>
         </div>
-
-        <el-empty v-if="!isLoading && !venues.length" description="Heç bir saray tapılmadı" />
-      </section>
-    </div>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/services/api'
+import { getAllVenues } from '@/services/venueService'
 
 const router = useRouter()
 
 const venues = ref([])
-const allVenues = ref([])
 const isLoading = ref(false)
 
-const filters = reactive({ city: '', date: null, capacity: null })
-const priceRange = ref([0, 200])
-
-// Filter panelindəki şəhər siyahısı mövcud sarayların şəhərlərindən yığılır
-const cities = computed(() => [...new Set(allVenues.value.map((v) => v.city).filter(Boolean))])
-
-// Bütün təsdiqlənmiş sarayları yükləyir
-const loadAll = async () => {
+// Sarayları mock servisdən yükləyir (real API qoşulanda servis özü dəyişəcək)
+const loadVenues = async () => {
   isLoading.value = true
   try {
-    const { data } = await api.get('/Venues/GetAll')
-    venues.value = data.data ?? []
-    allVenues.value = venues.value
+    venues.value = await getAllVenues()
   } finally {
     isLoading.value = false
   }
 }
 
-// Seçilmiş filterlərlə backend-də axtarış edir
-const search = async () => {
-  isLoading.value = true
-  try {
-    const params = {}
-    if (filters.city) params.city = filters.city
-    if (filters.date) params.date = filters.date
-    if (filters.capacity) params.capacity = filters.capacity
-    if (priceRange.value[0] > 0) params.minPrice = priceRange.value[0]
-    if (priceRange.value[1] < 200) params.maxPrice = priceRange.value[1]
+onMounted(loadVenues)
 
-    const { data } = await api.get('/Venues/Search', { params })
-    venues.value = data.data ?? []
-  } finally {
-    isLoading.value = false
-  }
+// Filtr seçimində göstərmək üçün mövcud şəhərlərin unikal siyahısı
+const cities = computed(() => [...new Set(venues.value.map(v => v.city))])
+
+const filters = reactive({
+  searchQuery: '',
+  city: '',
+  capacity: null,
+  maxPrice: null,
+  sort: 'rating-desc'
+})
+
+const state = reactive({
+  favs: new Set()
+})
+
+const quickFilters = reactive({
+  big: false,
+  cheap: false,
+  baku: false
+})
+
+const toggleQuick = (key) => {
+  quickFilters[key] = !quickFilters[key]
+  if (key === 'big') filters.capacity = quickFilters.big ? 500 : null
+  if (key === 'cheap') filters.maxPrice = quickFilters.cheap ? 45 : null
+  if (key === 'baku') filters.city = quickFilters.baku ? 'Bakı' : ''
 }
 
-// Filterləri sıfırlayıb tam siyahını qaytarır
-const reset = async () => {
+const filteredVenues = computed(() => {
+  let list = venues.value.filter(venue => {
+    const matchesSearch = filters.searchQuery === '' ||
+        venue.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+        venue.address.toLowerCase().includes(filters.searchQuery.toLowerCase())
+
+    const matchesCity = filters.city === '' || venue.city === filters.city
+    const matchesCapacity = !filters.capacity || venue.halls.some(h => h.capacity >= filters.capacity)
+    const matchesPrice = !filters.maxPrice || venue.menus.some(m => m.pricePerPerson <= filters.maxPrice)
+
+    return matchesSearch && matchesCity && matchesCapacity && matchesPrice
+  })
+
+  list.sort((a, b) => {
+    if (filters.sort === 'rating-desc') return b.rating - a.rating
+    const priceA = getMinMenuPrice(a)
+    const priceB = getMinMenuPrice(b)
+    if (filters.sort === 'price-asc') return priceA - priceB
+    if (filters.sort === 'price-desc') return priceB - priceA
+    return 0
+  })
+
+  return list
+})
+
+const getMinMenuPrice = (venue) => {
+  if (!venue.menus || venue.menus.length === 0) return 0
+  return Math.min(...venue.menus.map(m => m.pricePerPerson))
+}
+
+const resetFilters = () => {
+  filters.searchQuery = ''
   filters.city = ''
-  filters.date = null
   filters.capacity = null
-  priceRange.value = [0, 200]
-  await loadAll()
+  filters.maxPrice = null
+  filters.sort = 'rating-desc'
+  Object.keys(quickFilters).forEach(k => quickFilters[k] = false)
 }
 
-// Zalların tutumuna görə "min-max qonaq" mətni
-const capacityText = (v) => {
-  const caps = (v.halls ?? []).map((h) => h.capacity).filter(Boolean)
-  if (!caps.length) return ''
-  const min = Math.min(...caps)
-  const max = Math.max(...caps)
-  return min === max ? `${min} qonaq` : `${min}-${max} qonaq`
+const toggleFav = (id) => {
+  state.favs.has(id) ? state.favs.delete(id) : state.favs.add(id)
 }
 
-// Menyulardan ən aşağı qiyməti "₼X/nəfər" formatında göstərir
-const priceText = (v) => {
-  const prices = (v.menus ?? []).map((m) => m.pricePerPerson).filter(Boolean)
-  if (!prices.length) return ''
-  return `₼${Math.min(...prices)}/nəfər`
+// Kart seçiləndə sarayın detal səhifəsinə keçid edir
+const selectVenue = (venue) => {
+  router.push({ name: 'venue-detail', params: { id: venue.id } })
 }
 
-const goDetail = (v) => {
-  router.push({ name: 'venue-detail', params: { id: v.id } })
+// Şəkil yüklənməsə ehtiyat şəkil qoyur ki, kart boş görünməsin
+const onImgError = (e) => {
+  e.target.src = 'https://picsum.photos/seed/sadliq/900/600'
 }
-
-onMounted(loadAll)
 </script>
 
 <style scoped>
-.home-page {
-  min-height: calc(100vh - 61px);
-  background: #f7f5f0;
+.site-wrapper {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
+  background-color: #f4f6f8;
+  min-height: 100vh;
+  padding-bottom: 60px;
 }
 
-/* Yuxarı axtarış zolağı */
-.search-bar {
-  background: #b8860b;
-  padding: 20px 32px;
+.hero-section {
+  background: linear-gradient(rgba(26, 17, 24, 0.75), rgba(26, 17, 24, 0.75)), url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80') center/cover;
+  padding: 60px 20px;
+  text-align: center;
+  color: white;
 }
 
-.search-bar-inner {
-  display: flex;
-  gap: 10px;
-  max-width: 1100px;
+.badge-top {
+  display: inline-block;
+  background: rgba(197, 155, 71, 0.2);
+  color: #dfb15b;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hero-content h1 {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.hero-content p {
+  font-size: 1.05rem;
+  opacity: 0.85;
+  max-width: 600px;
   margin: 0 auto;
 }
 
-.search-city {
-  flex: 2;
-}
-
-.search-date,
-.search-capacity {
-  flex: 1;
-}
-
-.search-btn {
-  background: #08060d;
-  border-color: #08060d;
-  padding: 0 28px;
-}
-
-.search-btn:hover {
-  background: #2a2438;
-  border-color: #2a2438;
-}
-
-/* Kontent: solda filter, sağda nəticələr */
-.content {
-  display: flex;
-  gap: 24px;
-  max-width: 1100px;
-  margin: 24px auto;
-  padding: 0 32px;
-  align-items: flex-start;
-}
-
-.filters {
-  width: 250px;
-  flex-shrink: 0;
-  background: #fff;
-  border-radius: 12px;
+.search-box {
+  margin-top: 30px;
+  background: white;
   padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  position: sticky;
-  top: 80px;
-}
-
-.filters-title {
-  margin: 0 0 16px;
-  font-size: 17px;
-  color: #08060d;
-}
-
-.filter-group {
-  margin-bottom: 20px;
-}
-
-.filter-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #666;
-  margin-bottom: 8px;
-}
-
-.city-list {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.price-labels {
-  font-size: 13px;
-  color: #666;
-  text-align: center;
-}
-
-.filter-btn {
+  border-radius: 12px;
+  display: inline-block;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  max-width: 950px;
   width: 100%;
+  text-align: left;
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6c757d;
+  margin-bottom: 5px;
+}
+
+.field input, .field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  color: #212529;
+}
+
+.field input:focus, .field select:focus {
+  border-color: #dfb15b;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(223, 177, 91, 0.15);
+}
+
+.budget-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.budget-row input[type=range] {
+  flex: 1;
+  padding: 0;
+  accent-color: #721438;
+}
+
+.budget-val {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #721438;
+  white-space: nowrap;
 }
 
 .reset-btn {
-  width: 100%;
-  margin: 8px 0 0 !important;
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 11px 16px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 41px;
 }
 
-/* Saray kartları */
-.results {
-  flex: 1;
+.reset-btn:hover {
+  background: #c82333;
+}
+
+.quick-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid #e9ecef;
+  align-items: center;
+}
+
+.chips-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6c757d;
+  margin-right: 5px;
+}
+
+.chip {
+  border: 1px solid #ced4da;
+  background: #f8f9fa;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.chip:hover {
+  border-color: #dfb15b;
+  color: #212529;
+}
+
+.chip[aria-pressed="true"] {
+  background: #1a1118;
+  border-color: #1a1118;
+  color: #fff;
+}
+
+.venues-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
   min-height: 200px;
 }
 
-.result-count {
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.results-header h2 {
+  font-size: 1.6rem;
+  color: #1a1118;
+}
+
+.results-header h2 span {
+  color: #721438;
+}
+
+.sort-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.sort-box select {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+.no-result {
+  text-align: center;
+  padding: 50px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.no-result h3 {
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.no-result p {
   color: #666;
-  font-size: 14px;
-  margin: 0 0 12px;
+  margin-bottom: 20px;
+}
+
+.btn-reset-empty {
+  background: #1a1118;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.venues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
 }
 
 .venue-card {
-  display: flex;
-  background: #fff;
+  background: white;
   border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eaeaea;
 }
 
 .venue-card:hover {
-  box-shadow: 0 6px 24px rgba(184, 134, 11, 0.18);
-  transform: translateY(-2px);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.image-wrapper {
+  position: relative;
+  height: 220px;
 }
 
 .venue-img {
-  width: 220px;
-  height: 170px;
-  flex-shrink: 0;
-}
-
-.venue-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.img-placeholder {
-  width: 100%;
-  height: 100%;
+.badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.fav-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  color: #721438;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+
+.fav-btn:hover {
+  transform: scale(1.1);
+}
+
+.fav-btn[aria-pressed="true"] {
+  background: #721438;
+  color: #fff;
+}
+
+.card-price-tag {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 52px;
-  background: linear-gradient(135deg, #fdf6e3, #f3e2c7);
+  flex-direction: column;
+}
+
+.card-price-tag strong {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.card-price-tag span {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  opacity: 0.8;
 }
 
 .venue-info {
-  flex: 1;
-  padding: 16px 20px;
-  min-width: 0;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
-.venue-name {
-  margin: 0 0 6px;
-  font-size: 19px;
-  color: #08060d;
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
-.venue-loc,
-.venue-cap {
-  margin: 0 0 4px;
-  font-size: 14px;
-  color: #666;
+.title-row h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1a1118;
 }
 
-.venue-desc {
-  margin: 8px 0 0;
-  font-size: 13px;
-  color: #888;
+.rating-pill {
+  background: #fdf3e0;
+  color: #b07d2b;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.rev-count {
+  color: #adb5bd;
+  font-size: 0.8rem;
+}
+
+.address {
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 0.88rem;
+  color: #495057;
+  margin-bottom: 14px;
+  line-height: 1.45;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.venue-side {
+.halls-preview {
+  margin-bottom: 15px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hall-tag {
+  background: #f1f3f5;
+  color: #495057;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.venue-footer {
+  display: flex;
   justify-content: space-between;
-  padding: 16px 20px;
-  flex-shrink: 0;
+  align-items: center;
+  border-top: 1px solid #f1f3f5;
+  padding-top: 12px;
+  margin-top: auto;
+  gap: 10px;
 }
 
-.venue-price {
-  font-weight: 700;
-  font-size: 17px;
-  color: #b8860b;
+.menus-summary small {
+  color: #6c757d;
+  font-size: 0.75rem;
+  display: block;
+  max-width: 170px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.gold-btn {
-  background: #b8860b;
-  border-color: #b8860b;
+.detail-btn {
+  background: #721438;
+  color: white;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: background 0.2s;
+  white-space: nowrap;
 }
 
-.gold-btn:hover {
-  background: #a3760a;
-  border-color: #a3760a;
+.detail-btn:hover {
+  background: #590f2b;
+}
+
+@media (max-width: 900px) {
+  .search-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .reset-btn {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .search-grid {
+    grid-template-columns: 1fr;
+  }
+  .venues-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

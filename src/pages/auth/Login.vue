@@ -28,6 +28,10 @@
       <p class="switch-link">
         Hesabınız yoxdur? <router-link to="/register">Qeydiyyatdan keçin</router-link>
       </p>
+
+      <div class="demo-hint">
+        Demo hesab: <b>demo@sadliq.az</b> / <b>demo123</b>
+      </div>
     </div>
   </div>
 </template>
@@ -125,4 +129,16 @@ const login = async () => {
   font-weight: 600;
   text-decoration: none;
 }
+
+.demo-hint {
+  margin-top: 18px;
+  background: #fdf6e3;
+  border: 1px dashed #dfb15b;
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 12.5px;
+  color: #8a6220;
+}
+
 </style>

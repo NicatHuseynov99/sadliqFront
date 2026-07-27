@@ -22,6 +22,12 @@ const routes = [
     name: 'venue-detail',
     component: () => import('@/pages/Venue/VenueDetail.vue'),
   },
+  {
+    path: '/my-reservations',
+    name: 'my-reservations',
+    component: () => import('@/pages/Reservations/MyReservations.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
