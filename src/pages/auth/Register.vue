@@ -2,7 +2,7 @@
   <div class="auth-page">
     <div class="auth-card">
       <h1 class="title">Qeydiyyat</h1>
-      <p class="subtitle">Sadlıq Sarayları-na qoşulun</p>
+      <p class="subtitle">Şadlıq Sarayları-na qoşulun</p>
 
       <el-form @submit.prevent="register">
         <el-form-item>

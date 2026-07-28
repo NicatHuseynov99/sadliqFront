@@ -2,7 +2,7 @@
   <footer class="app-footer">
     <div class="footer-grid">
       <div class="footer-col">
-        <h4 class="footer-logo">Sadlıq Sarayları</h4>
+        <h4 class="footer-logo">Şadlıq Sarayları</h4>
         <p class="footer-about">
           Azərbaycanda toy, nişan və özəl tədbir məkanlarını bir ünvanda toplayan onlayn rezervasiya platforması.
         </p>
@@ -33,7 +33,7 @@
     </div>
 
     <div class="footer-bottom">
-      © {{ new Date().getFullYear() }} Sadlıq Sarayları — Bütün hüquqlar qorunur.
+      © {{ new Date().getFullYear() }} Şadlıq Sarayları — Bütün hüquqlar qorunur.
     </div>
   </footer>
 </template>

@@ -1,56 +1,117 @@
 <template>
   <div class="res-page" v-loading="isLoading">
     <div class="res-inner">
-      <h1 class="page-title">Rezervlərim</h1>
-      <p class="page-sub">Göndərdiyiniz rezerv sorğuları və onların vəziyyəti</p>
+      <header class="page-head">
+        <div>
+          <h1 class="page-title">Rezervlərim</h1>
+          <p class="page-sub">Göndərdiyiniz rezerv sorğuları və onların vəziyyəti</p>
+        </div>
+        <router-link to="/" class="new-link">+ Yeni rezerv</router-link>
+      </header>
 
-      <div v-if="!isLoading && reservations.length === 0" class="no-result">
-        <h3>Hələ heç bir rezerviniz yoxdur.</h3>
+      <!-- Statuslara görə xülasə -->
+      <div class="summary" v-if="reservations.length">
+        <button
+          v-for="tab in tabs"
+          :key="tab.value"
+          class="summary-card"
+          :class="[tab.key, { active: activeTab === tab.value }]"
+          @click="activeTab = tab.value"
+        >
+          <span class="summary-count">{{ counts[tab.value] ?? 0 }}</span>
+          <span class="summary-label">{{ tab.label }}</span>
+        </button>
+      </div>
+
+      <div v-if="!isLoading && visible.length === 0" class="no-result">
+        <div class="empty-icon">🗓️</div>
+        <h3>{{ reservations.length ? 'Bu bölmədə rezerv yoxdur.' : 'Hələ heç bir rezerviniz yoxdur.' }}</h3>
         <p>Ana səhifədən saray seçib rezerv sorğusu göndərə bilərsiniz.</p>
         <router-link to="/"><button class="primary-btn">Saraylara bax</button></router-link>
       </div>
 
       <div v-else class="res-list">
-        <div v-for="r in reservations" :key="r.id" class="res-card">
-          <div class="res-main">
-            <div class="res-title-row">
-              <h3>{{ r.venueName }}</h3>
-              <span class="status-tag" :class="statusClass(r.status)">{{ statusText(r.status) }}</span>
-            </div>
-            <p class="res-line">🏛 {{ r.hallName }} · 🍽 {{ r.menuName }} (₼{{ r.pricePerPerson }}/nəfər)</p>
-            <p class="res-line">📅 {{ formatDateFull(r.eventDate) }} · 👥 {{ r.guestCount }} qonaq</p>
-            <p class="res-line total">Təxmini məbləğ: <b>₼{{ (r.pricePerPerson * r.guestCount).toLocaleString() }}</b></p>
-            <p class="res-note" v-if="r.note">Qeyd: {{ r.note }}</p>
+        <article v-for="r in visible" :key="r.id" class="res-card" :class="statusClass(r.status)">
+          <div class="res-thumb">
+            <img :src="r.venueImage" :alt="r.venueName" @error="onImgError" />
           </div>
 
-          <div class="res-actions" v-if="r.status === 0 || r.status === 1">
-            <el-popconfirm
-              title="Rezervi ləğv etmək istədiyinizə əminsiniz?"
-              confirm-button-text="Bəli, ləğv et"
-              cancel-button-text="Xeyr"
-              @confirm="cancel(r)"
-            >
-              <template #reference>
-                <button class="cancel-btn">Ləğv et</button>
-              </template>
-            </el-popconfirm>
+          <div class="res-main">
+            <div class="res-title-row">
+              <div>
+                <h3>{{ r.venueName }}</h3>
+                <span class="res-city" v-if="r.venueCity">📍 {{ r.venueCity }}</span>
+              </div>
+              <span class="status-tag" :class="statusClass(r.status)">
+                {{ statusIcon(r.status) }} {{ statusText(r.status) }}
+              </span>
+            </div>
+
+            <div class="res-facts">
+              <div class="fact">
+                <span class="fact-label">Tarix</span>
+                <b>{{ formatDateFull(r.eventDate) }}</b>
+                <em v-if="daysLeft(r) !== null" class="fact-extra">{{ daysLeftText(r) }}</em>
+              </div>
+              <div class="fact">
+                <span class="fact-label">Zal</span>
+                <b>{{ r.hallName }}</b>
+                <em class="fact-extra">{{ r.guestCount }} qonaq</em>
+              </div>
+              <div class="fact">
+                <span class="fact-label">Menyu</span>
+                <b>{{ r.menuName }}</b>
+                <em class="fact-extra">{{ r.pricePerPerson }} ₼ / nəfər</em>
+              </div>
+              <div class="fact fact-total">
+                <span class="fact-label">Ümumi məbləğ</span>
+                <b>{{ (r.pricePerPerson * r.guestCount).toLocaleString() }} ₼</b>
+              </div>
+            </div>
+
+            <p class="res-note" v-if="r.note">💬 {{ r.note }}</p>
+
+            <footer class="res-foot">
+              <span class="res-contact">📞 {{ r.contactPhone }}</span>
+
+              <el-popconfirm
+                v-if="r.status === 0 || r.status === 1"
+                title="Rezervi ləğv etmək istədiyinizə əminsiniz?"
+                confirm-button-text="Bəli, ləğv et"
+                cancel-button-text="Xeyr"
+                @confirm="cancel(r)"
+              >
+                <template #reference>
+                  <button class="cancel-btn">Ləğv et</button>
+                </template>
+              </el-popconfirm>
+            </footer>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import { getMyReservations, cancelReservation } from '@/services/reservationService'
 import { formatDateFull } from '@/utils/date'
 
 const reservations = ref([])
 const isLoading = ref(false)
+const activeTab = ref('all')
 
-// Müştərinin öz rezervlərini yükləyir (mock servis)
+const tabs = [
+  { value: 'all', label: 'Hamısı', key: 'all' },
+  { value: 0, label: 'Gözləyir', key: 'pending' },
+  { value: 1, label: 'Təsdiqlənib', key: 'confirmed' },
+  { value: 2, label: 'Rədd edilib', key: 'rejected' },
+  { value: 3, label: 'Ləğv edilib', key: 'cancelled' },
+]
+
+// Müştərinin öz rezervlərini yükləyir
 const load = async () => {
   isLoading.value = true
   try {
@@ -60,12 +121,42 @@ const load = async () => {
   }
 }
 
+// Hər status üçün rezerv sayı (xülasə kartlarında göstərilir)
+const counts = computed(() => {
+  const result = { all: reservations.value.length }
+  for (const r of reservations.value) result[r.status] = (result[r.status] ?? 0) + 1
+  return result
+})
+
+const visible = computed(() =>
+  activeTab.value === 'all'
+    ? reservations.value
+    : reservations.value.filter((r) => r.status === activeTab.value),
+)
+
 // Backend ReservationStatus enum-una uyğun status mətnləri
 const statusText = (s) =>
   ({ 0: 'Gözləyir', 1: 'Təsdiqlənib', 2: 'Rədd edilib', 3: 'Ləğv edilib' })[s] ?? '—'
 
 const statusClass = (s) =>
   ({ 0: 'pending', 1: 'confirmed', 2: 'rejected', 3: 'cancelled' })[s] ?? ''
+
+const statusIcon = (s) => ({ 0: '⏳', 1: '✅', 2: '✕', 3: '🚫' })[s] ?? ''
+
+// Tədbirə neçə gün qaldığını hesablayır (keçmiş tarixlərdə null qaytarır)
+const daysLeft = (r) => {
+  if (r.status === 2 || r.status === 3) return null
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const diff = Math.round((new Date(r.eventDate) - today) / 86400000)
+  return diff < 0 ? null : diff
+}
+
+const daysLeftText = (r) => {
+  const days = daysLeft(r)
+  if (days === 0) return 'bu gün!'
+  return `${days} gün qaldı`
+}
 
 // Rezervi ləğv edir və siyahını yeniləyir
 const cancel = async (r) => {
@@ -81,6 +172,10 @@ const cancel = async (r) => {
       zIndex: 99999,
     })
   }
+}
+
+const onImgError = (e) => {
+  e.target.src = 'https://picsum.photos/seed/sadliq/600/400'
 }
 
 onMounted(load)
@@ -99,6 +194,14 @@ onMounted(load)
   margin: 0 auto;
 }
 
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
 .page-title {
   margin: 0 0 4px;
   color: #1a1118;
@@ -106,17 +209,252 @@ onMounted(load)
 }
 
 .page-sub {
-  margin: 0 0 24px;
+  margin: 0;
   color: #6c757d;
   font-size: 0.92rem;
 }
 
+.new-link {
+  background: #721438;
+  color: #fff;
+  text-decoration: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 0.87rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.new-link:hover {
+  background: #590f2b;
+}
+
+/* Status xülasəsi */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 14px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.2s;
+  border-bottom: 3px solid #eaeaea;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+}
+
+.summary-count {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a1118;
+  line-height: 1;
+}
+
+.summary-label {
+  font-size: 0.76rem;
+  color: #868e96;
+  font-weight: 600;
+}
+
+.summary-card.active {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.summary-card.all.active { border-bottom-color: #721438; }
+.summary-card.pending.active { border-bottom-color: #b07d2b; }
+.summary-card.confirmed.active { border-bottom-color: #1e7e34; }
+.summary-card.rejected.active { border-bottom-color: #c0392b; }
+.summary-card.cancelled.active { border-bottom-color: #868e96; }
+
+/* Rezerv kartları */
+.res-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.res-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  display: flex;
+  overflow: hidden;
+  border-left: 4px solid #eaeaea;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.res-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.res-card.pending { border-left-color: #dfb15b; }
+.res-card.confirmed { border-left-color: #1e7e34; }
+.res-card.rejected { border-left-color: #c0392b; }
+.res-card.cancelled { border-left-color: #ced4da; }
+
+.res-card.cancelled .res-thumb img,
+.res-card.rejected .res-thumb img {
+  filter: grayscale(0.85);
+}
+
+.res-thumb {
+  width: 170px;
+  flex-shrink: 0;
+}
+
+.res-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.res-main {
+  flex-grow: 1;
+  padding: 16px 20px 14px;
+  min-width: 0;
+}
+
+.res-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.res-title-row h3 {
+  margin: 0 0 2px;
+  color: #1a1118;
+  font-size: 1.15rem;
+}
+
+.res-city {
+  font-size: 0.8rem;
+  color: #adb5bd;
+}
+
+.status-tag {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.status-tag.pending { background: #fff6e0; color: #b07d2b; }
+.status-tag.confirmed { background: #e3f6e8; color: #1e7e34; }
+.status-tag.rejected { background: #fdeaea; color: #c0392b; }
+.status-tag.cancelled { background: #f1f3f5; color: #868e96; }
+
+/* Detal sətirləri */
+.res-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid #f1f3f5;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fact-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #adb5bd;
+  font-weight: 700;
+}
+
+.fact b {
+  font-size: 0.92rem;
+  color: #1a1118;
+  font-weight: 600;
+}
+
+.fact-extra {
+  font-style: normal;
+  font-size: 0.75rem;
+  color: #868e96;
+}
+
+.fact-total b {
+  color: #721438;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.res-note {
+  margin: 12px 0 0;
+  font-size: 0.83rem;
+  color: #868e96;
+  font-style: italic;
+}
+
+.res-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.res-contact {
+  font-size: 0.83rem;
+  color: #6c757d;
+}
+
+.cancel-btn {
+  background: #fff;
+  color: #c0392b;
+  border: 1px solid #e5b4ae;
+  padding: 7px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #c0392b;
+  border-color: #c0392b;
+  color: #fff;
+}
+
+/* Boş vəziyyət */
 .no-result {
   text-align: center;
-  padding: 50px 20px;
+  padding: 54px 20px;
   background: white;
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.empty-icon {
+  font-size: 2.6rem;
+  margin-bottom: 10px;
 }
 
 .no-result h3 {
@@ -134,7 +472,7 @@ onMounted(load)
   color: white;
   border: none;
   padding: 9px 22px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -143,101 +481,16 @@ onMounted(load)
   background: #590f2b;
 }
 
-.res-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.res-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 18px 20px;
-  border: 1px solid #eaeaea;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 14px;
-}
-
-.res-title-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.res-title-row h3 {
-  margin: 0;
-  color: #1a1118;
-  font-size: 1.1rem;
-}
-
-.status-tag {
-  font-size: 12px;
-  font-weight: 700;
-  padding: 3px 11px;
-  border-radius: 20px;
-}
-
-.status-tag.pending {
-  background: #fff6e0;
-  color: #b07d2b;
-}
-
-.status-tag.confirmed {
-  background: #e3f6e8;
-  color: #1e7e34;
-}
-
-.status-tag.rejected {
-  background: #fdeaea;
-  color: #c0392b;
-}
-
-.status-tag.cancelled {
-  background: #f1f3f5;
-  color: #868e96;
-}
-
-.res-line {
-  margin: 0 0 4px;
-  font-size: 0.88rem;
-  color: #495057;
-}
-
-.res-line.total b {
-  color: #721438;
-}
-
-.res-note {
-  margin: 6px 0 0;
-  font-size: 0.82rem;
-  color: #868e96;
-  font-style: italic;
-}
-
-.cancel-btn {
-  background: #fff;
-  color: #c0392b;
-  border: 1px solid #e5b4ae;
-  padding: 7px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-
-.cancel-btn:hover {
-  background: #fdeaea;
-}
-
-@media (max-width: 600px) {
+@media (max-width: 760px) {
+  .summary {
+    grid-template-columns: repeat(3, 1fr);
+  }
   .res-card {
     flex-direction: column;
+  }
+  .res-thumb {
+    width: 100%;
+    height: 150px;
   }
 }
 </style>

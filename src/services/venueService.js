@@ -63,7 +63,11 @@ export const getAllVenues = async () => {
 // GET /Venues/Search — filtr + sıralama + səhifələmə (sonsuz scroll üçün)
 // params: { q, city, date, minPrice, maxPrice, capacity, sort, page, pageSize }
 export const searchVenues = async (params) => {
-  const { data } = await api.get('/Venues/Search', { params })
+  // indexes: null → massivlər features=a&features=b kimi göndərilir (ASP.NET bu formatı gözləyir)
+  const { data } = await api.get('/Venues/Search', {
+    params,
+    paramsSerializer: { indexes: null },
+  })
   const paged = data.data ?? {}
   return {
     items: (paged.items ?? []).map(mapVenue),
@@ -71,6 +75,12 @@ export const searchVenues = async (params) => {
     page: paged.page ?? 1,
     hasMore: paged.hasMore ?? false,
   }
+}
+
+// GET /Venues/GetFilterOptions — filtr panelinin seçimləri (şəhərlər, özəlliklər, aralıqlar)
+export const getFilterOptions = async () => {
+  const { data } = await api.get('/Venues/GetFilterOptions')
+  return data.data ?? { cities: [], features: [], minPrice: 0, maxPrice: 0 }
 }
 
 // GET /Venues/GetById/{id}

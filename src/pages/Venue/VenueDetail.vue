@@ -59,7 +59,7 @@
                 <h3>{{ h.name }}</h3>
                 <p class="hall-meta">👥 {{ h.capacity }} qonaq tutumu</p>
               </div>
-              <span class="price">₼{{ h.minPrice }}-dən / nəfər</span>
+              <span class="price">{{ h.minPrice }} ₼-dən</span>
             </div>
 
             <p class="hall-desc">{{ h.description }}</p>
@@ -108,7 +108,7 @@
             <img :src="m.coverImageUrl" :alt="`${m.name} süfrəsi`" @error="onImgError" />
             <div class="menu-price-badge">
               <strong>{{ m.pricePerPerson }} ₼</strong>
-              <span>1 nəfər</span>
+              <span>1 nəfər üçün</span>
             </div>
           </div>
 
@@ -153,7 +153,7 @@
           <img :src="selectedMenu.coverImageUrl" :alt="selectedMenu.name" @error="onImgError" />
           <div class="menu-price-badge">
             <strong>{{ selectedMenu.pricePerPerson }} ₼</strong>
-            <span>1 nəfər</span>
+            <span>1 nəfər üçün</span>
           </div>
         </div>
         <p class="dialog-desc">{{ selectedMenu.description }}</p>
@@ -200,7 +200,7 @@
               v-for="m in venue?.menus ?? []"
               :key="m.id"
               :value="m.id"
-              :label="`${m.name} — ₼${m.pricePerPerson}/nəfər`"
+              :label="`${m.name} — ${m.pricePerPerson} ₼`"
             />
           </el-select>
         </el-form-item>
@@ -224,7 +224,7 @@
         </el-form-item>
 
         <p class="total-line" v-if="estimatedTotal">
-          Təxmini məbləğ: <b>₼{{ estimatedTotal.toLocaleString() }}</b>
+          Təxmini məbləğ: <b>{{ estimatedTotal.toLocaleString() }} ₼</b>
         </p>
 
         <p v-if="reserveError" class="form-error">{{ reserveError }}</p>

@@ -1,7 +1,7 @@
 <template>
   <div class="auth-page">
     <div class="auth-card">
-      <h1 class="title">Sadlıq Sarayları</h1>
+      <h1 class="title">Şadlıq Sarayları</h1>
       <p class="subtitle">Hesabınıza daxil olun</p>
 
       <el-form @submit.prevent="login">

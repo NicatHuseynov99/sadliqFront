@@ -1,6 +1,6 @@
 <template>
   <header class="app-header">
-    <router-link to="/" class="logo">Sadlıq <span>Sarayları</span></router-link>
+    <router-link to="/" class="logo">Şadlıq <span>Sarayları</span></router-link>
 
     <nav class="nav-links">
       <router-link to="/">Ana səhifə</router-link>

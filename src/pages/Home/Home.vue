@@ -3,54 +3,108 @@
     <!-- HERO & SEARCH SECTION -->
     <section class="hero-section">
       <div class="hero-content">
-        <span class="badge-top">Bakı · Sumqayıt · Gəncə · Quba — 350+ Məkan</span>
+        <span class="badge-top">{{ options.cities.length }} şəhər · {{ totalCount }} məkan</span>
         <h1>Xəyallarınızdakı Toy Məkanını Kəşf Edin</h1>
         <p>Bakı və bölgələrdə ən məşhur şadlıq sarayları, zallar və özəl tədbir məkanları.</p>
 
-        <!-- Axtarış və Zəngin Filtr Paneli -->
+        <!-- Axtarış və filtr paneli -->
         <div class="search-box">
+          <div class="search-main">
+            <span class="search-icon">🔍</span>
+            <input
+              v-model="filters.searchQuery"
+              type="text"
+              class="search-input"
+              placeholder="Saray adı və ya ünvan yazın..."
+            />
+            <button class="search-clear" v-if="filters.searchQuery" @click="filters.searchQuery = ''">✕</button>
+          </div>
+
           <div class="search-grid">
             <div class="field">
-              <label>Axtarış</label>
-              <input v-model="filters.searchQuery" type="text" placeholder="Restoran adı və ya ünvan..." />
-            </div>
-
-            <div class="field">
-              <label>Şəhər / Bölgə</label>
+              <label>Şəhər</label>
               <select v-model="filters.city">
                 <option value="">Bütün şəhərlər</option>
-                <option v-for="c in cities" :key="c" :value="c">{{ c }}</option>
+                <option v-for="c in options.cities" :key="c.name" :value="c.name">
+                  {{ c.name }} ({{ c.count }})
+                </option>
               </select>
             </div>
 
             <div class="field">
-              <label>Tədbir tarixi</label>
-              <input v-model="filters.date" type="date" :min="todayKey" />
-            </div>
-
-            <div class="field">
-              <label>Qonaq sayı</label>
-              <input v-model.number="filters.capacity" type="number" min="0" placeholder="Min. qonaq sayı" />
-            </div>
-
-            <div class="field">
-              <label>Maks. Menyu Qiyməti</label>
-              <div class="budget-row">
-                <input v-model.number="filters.maxPrice" type="range" min="20" max="100" step="5" />
-                <span class="budget-val">{{ filters.maxPrice ? filters.maxPrice + ' ₼' : 'Hamısı' }}</span>
+              <label>Neçə qonaq gözləyirsiniz?</label>
+              <input
+                v-model.number="filters.capacity"
+                type="number"
+                min="0"
+                step="50"
+                placeholder="məs. 250"
+              />
+              <div class="mini-chips">
+                <button
+                  v-for="c in capacityOptions"
+                  :key="c"
+                  class="mini-chip"
+                  :aria-pressed="filters.capacity === c"
+                  @click="filters.capacity = filters.capacity === c ? null : c"
+                >
+                  {{ c }}
+                </button>
               </div>
             </div>
 
-            <button @click="resetFilters" class="reset-btn">Təmizlə</button>
+            <div class="field">
+              <label>Ümumi büdcəniz</label>
+              <div class="input-suffix">
+                <input v-model.number="filters.budget" type="number" min="0" step="500" placeholder="məs. 12000" />
+                <span>₼</span>
+              </div>
+              <span class="field-hint">{{ budgetHint }}</span>
+            </div>
+
+            <div class="field field-wide">
+              <label>
+                Bir nəfər üçün qiymət
+                <b class="range-val">{{ filters.priceRange[0] }} – {{ filters.priceRange[1] }} ₼</b>
+              </label>
+              <el-slider
+                v-model="filters.priceRange"
+                range
+                :min="options.minPrice"
+                :max="options.maxPrice"
+                :step="5"
+                class="price-slider"
+              />
+            </div>
           </div>
 
-          <!-- Sürətli Filtrlər (Chips) -->
-          <div class="quick-chips">
-            <span class="chips-label">Sürətli:</span>
-            <button class="chip" @click="toggleQuick('big')" :aria-pressed="quickFilters.big">500+ qonaq</button>
-            <button class="chip" @click="toggleQuick('cheap')" :aria-pressed="quickFilters.cheap">45 ₼-a qədər</button>
-            <button class="chip" @click="toggleQuick('baku')" :aria-pressed="quickFilters.baku">Yalnız Bakı</button>
-            <button class="chip" @click="setWeekend" >Bu həftə sonu boş olanlar</button>
+          <!-- Reytinq -->
+          <div class="chip-row">
+            <span class="chips-label">Reytinq</span>
+            <button
+              v-for="r in ratingOptions"
+              :key="r"
+              class="chip chip-star"
+              :aria-pressed="filters.minRating === r"
+              @click="filters.minRating = filters.minRating === r ? null : r"
+            >
+              ★ {{ r }}+
+            </button>
+
+            <span class="chips-label divider-label">Özəlliklər</span>
+            <button
+              v-for="f in options.features"
+              :key="f.name"
+              class="chip"
+              :aria-pressed="filters.features.includes(f.name)"
+              @click="toggleFeature(f.name)"
+            >
+              {{ f.name }} <em>{{ f.count }}</em>
+            </button>
+
+            <button v-if="hasActiveFilters" class="clear-link" @click="resetFilters">
+              Təmizlə ({{ activeFilterCount }}) ✕
+            </button>
           </div>
         </div>
       </div>
@@ -95,16 +149,11 @@
               <span class="rating-pill">★ {{ venue.rating }}</span>
             </div>
 
-            <div class="avail-row">
-              <span v-if="filters.date" class="avail-badge free">
-                ✅ {{ formatDate(filters.date) }} — boşdur ({{ freeHallCount(venue, filters.date) }} zal)
+            <div class="avail-row" v-if="nearestDates[venue.id] !== undefined">
+              <span v-if="nearestDates[venue.id]" class="avail-badge free">
+                ✅ Ən yaxın boş tarix: <b>{{ formatDate(nearestDates[venue.id]) }}</b>
               </span>
-              <template v-else-if="nearestDates[venue.id] !== undefined">
-                <span v-if="nearestDates[venue.id]" class="avail-badge free">
-                  ✅ Ən yaxın boş tarix: <b>{{ formatDate(nearestDates[venue.id]) }}</b>
-                </span>
-                <span v-else class="avail-badge busy">⛔ Yaxın 4 ayda boş tarix yoxdur</span>
-              </template>
+              <span v-else class="avail-badge busy">⛔ Yaxın 4 ayda boş tarix yoxdur</span>
             </div>
             <div class="address-row">
               <AddressLink
@@ -137,7 +186,7 @@
                   <img :src="m.coverImageUrl" :alt="m.name" @error="onImgError" />
                   <div class="menu-chip-text">
                     <strong>{{ m.name }}</strong>
-                    <span>₼{{ m.pricePerPerson }}/nəfər</span>
+                    <span>{{ m.pricePerPerson }} ₼</span>
                   </div>
                 </div>
               </div>
@@ -167,13 +216,24 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import AddressLink from '@/components/AddressLink.vue'
-import { searchVenues, getNearestFreeDate, buildBusyMap, toDateKey } from '@/services/venueService'
+import {
+  searchVenues,
+  getFilterOptions,
+  getNearestFreeDate,
+  buildBusyMap,
+} from '@/services/venueService'
 import { formatDate } from '@/utils/date'
 
 const PAGE_SIZE = 12
+
+// Tez seçim üçün tipik qonaq sayları (bazadakı tutumlar 150-800 arasındadır)
+const capacityOptions = [150, 250, 400, 600]
+
+// Reytinq həddi seçimləri
+const ratingOptions = [4.5, 4]
 
 const router = useRouter()
 
@@ -187,32 +247,64 @@ const nearestDates = ref({})
 const busyMap = ref({})
 const sentinel = ref(null)
 
-const todayKey = toDateKey(new Date())
-
-// Şəhər siyahısı bütün saraylardan asılı olduğu üçün sabit saxlanılır
-// (səhifələnmiş siyahıdan çıxarılsa, hər scroll-da dəyişərdi)
-const cities = ['Bakı', 'Sumqayıt', 'Gəncə', 'Xırdalan', 'Quba', 'Şəki', 'Lənkəran', 'Mingəçevir']
+// Filtr seçimləri (şəhərlər, özəlliklər, qiymət aralığı) bazadan gəlir
+const options = ref({ cities: [], features: [], minPrice: 30, maxPrice: 100 })
 
 const filters = reactive({
   searchQuery: '',
   city: '',
-  date: '',
   capacity: null,
-  maxPrice: null,
+  budget: null,
+  minRating: null,
+  priceRange: [30, 100],
+  features: [],
   sort: 'rating-desc'
 })
+
+// Qiymət aralığı toxunulmayıbsa serverə göndərilmir
+const isFullPriceRange = () =>
+  filters.priceRange[0] <= options.value.minPrice && filters.priceRange[1] >= options.value.maxPrice
+
+// Büdcə qonaq sayı ilə birlikdə işləyir — istifadəçiyə nə demək olduğunu izah edirik
+const budgetHint = computed(() => {
+  if (!filters.budget) return 'Qonaq sayı ilə birlikdə işləyir'
+  if (!filters.capacity) return 'Qonaq sayını yazsanız daha dəqiq olar'
+  return `≈ ${Math.floor(filters.budget / filters.capacity)} ₼ / nəfər`
+})
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (filters.searchQuery) count++
+  if (filters.city) count++
+  if (filters.capacity) count++
+  if (filters.budget) count++
+  if (filters.minRating) count++
+  if (!isFullPriceRange()) count++
+  count += filters.features.length
+  return count
+})
+
+const hasActiveFilters = computed(() => activeFilterCount.value > 0)
 
 // Filtrləri backend-in gözlədiyi query parametrlərinə çevirir
 const buildParams = (pageNumber) => ({
   q: filters.searchQuery || undefined,
   city: filters.city || undefined,
-  date: filters.date || undefined,
   capacity: filters.capacity || undefined,
-  maxPrice: filters.maxPrice || undefined,
+  budget: filters.budget || undefined,
+  minRating: filters.minRating || undefined,
+  minPrice: isFullPriceRange() ? undefined : filters.priceRange[0],
+  maxPrice: isFullPriceRange() ? undefined : filters.priceRange[1],
+  features: filters.features.length ? filters.features : undefined,
   sort: filters.sort,
   page: pageNumber,
   pageSize: PAGE_SIZE,
 })
+
+const toggleFeature = (name) => {
+  const index = filters.features.indexOf(name)
+  index === -1 ? filters.features.push(name) : filters.features.splice(index, 1)
+}
 
 // Yeni gələn sarayların dolu günlərini və ən yaxın boş tarixini hesablayıb yaddaşa yazır
 const indexVenues = (list) => {
@@ -264,6 +356,10 @@ watch(filters, () => {
 // Siyahının sonundakı element ekrana girəndə növbəti səhifə yüklənir
 let observer = null
 onMounted(async () => {
+  // Filtr seçimlərini bazadan alıb qiymət sürgüsünü real aralığa uyğunlaşdırırıq
+  options.value = await getFilterOptions()
+  filters.priceRange = [options.value.minPrice, options.value.maxPrice]
+
   await loadFirstPage()
 
   observer = new IntersectionObserver(
@@ -281,34 +377,9 @@ onBeforeUnmount(() => {
   clearTimeout(filterTimer)
 })
 
-// Seçilən tarixdə boş olan zalların sayı
-const freeHallCount = (venue, dateKey) =>
-  venue.halls.filter((h) => !(busyMap.value[h.id]?.has(dateKey))).length
-
-// Növbəti şənbə tarixini filtrə yazır
-const setWeekend = () => {
-  const d = new Date()
-  d.setHours(0, 0, 0, 0)
-  d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7 || 7))
-  filters.date = toDateKey(d)
-}
-
 const state = reactive({
   favs: new Set()
 })
-
-const quickFilters = reactive({
-  big: false,
-  cheap: false,
-  baku: false
-})
-
-const toggleQuick = (key) => {
-  quickFilters[key] = !quickFilters[key]
-  if (key === 'big') filters.capacity = quickFilters.big ? 500 : null
-  if (key === 'cheap') filters.maxPrice = quickFilters.cheap ? 45 : null
-  if (key === 'baku') filters.city = quickFilters.baku ? 'Bakı' : ''
-}
 
 // Kartda göstərilən minimum menyu qiyməti
 const getMinMenuPrice = (venue) => {
@@ -319,11 +390,12 @@ const getMinMenuPrice = (venue) => {
 const resetFilters = () => {
   filters.searchQuery = ''
   filters.city = ''
-  filters.date = ''
   filters.capacity = null
-  filters.maxPrice = null
+  filters.budget = null
+  filters.minRating = null
+  filters.features = []
+  filters.priceRange = [options.value.minPrice, options.value.maxPrice]
   filters.sort = 'rating-desc'
-  Object.keys(quickFilters).forEach(k => quickFilters[k] = false)
 }
 
 const toggleFav = (id) => {
@@ -395,11 +467,183 @@ const onImgError = (e) => {
   text-align: left;
 }
 
+.search-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  transition: all 0.2s;
+}
+
+.search-main:focus-within {
+  border-color: #dfb15b;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(223, 177, 91, 0.15);
+}
+
+.search-icon {
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: #212529;
+  outline: none;
+}
+
+.search-clear {
+  border: none;
+  background: #e9ecef;
+  color: #6c757d;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.search-clear:hover {
+  background: #dee2e6;
+  color: #212529;
+}
+
 .search-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 0.9fr 1.1fr auto;
-  gap: 12px;
-  align-items: end;
+  grid-template-columns: 1fr 1.1fr 1fr 1.4fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.mini-chips {
+  display: flex;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.mini-chip {
+  flex: 1;
+  border: 1px solid #e9ecef;
+  background: #fff;
+  color: #6c757d;
+  padding: 4px 0;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mini-chip:hover {
+  border-color: #dfb15b;
+  color: #212529;
+}
+
+.mini-chip[aria-pressed="true"] {
+  background: #721438;
+  border-color: #721438;
+  color: #fff;
+}
+
+.input-suffix {
+  position: relative;
+}
+
+.input-suffix input {
+  padding-right: 30px;
+}
+
+.input-suffix span {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #adb5bd;
+  font-weight: 700;
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.72rem;
+  color: #adb5bd;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e9ecef;
+  align-items: center;
+}
+
+.divider-label {
+  margin-left: 10px;
+  padding-left: 14px;
+  border-left: 1px solid #e9ecef;
+}
+
+.chip-star[aria-pressed="true"] {
+  background: #b07d2b;
+  border-color: #b07d2b;
+}
+
+.field-wide {
+  min-width: 0;
+}
+
+.range-val {
+  float: right;
+  color: #721438;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.price-slider {
+  margin: 0 6px;
+}
+
+.price-slider :deep(.el-slider__bar) {
+  background-color: #721438;
+}
+
+.price-slider :deep(.el-slider__button) {
+  border-color: #721438;
+}
+
+.chip em {
+  font-style: normal;
+  opacity: 0.55;
+  font-size: 0.72rem;
+  margin-left: 3px;
+}
+
+.clear-link {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.clear-link:hover {
+  text-decoration: underline;
 }
 
 .field label {
@@ -903,9 +1147,6 @@ const onImgError = (e) => {
 @media (max-width: 900px) {
   .search-grid {
     grid-template-columns: 1fr 1fr;
-  }
-  .reset-btn {
-    grid-column: 1 / -1;
   }
 }
 
