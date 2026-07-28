@@ -23,6 +23,12 @@ const routes = [
     component: () => import('@/pages/Venue/VenueDetail.vue'),
   },
   {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/pages/Profile/MyProfile.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/favorites',
     name: 'favorites',
     component: () => import('@/pages/Favorites/MyFavorites.vue'),

@@ -1,0 +1,413 @@
+<template>
+  <div class="profile-page">
+    <div class="profile-inner">
+      <header class="page-head">
+        <div>
+          <h1 class="page-title">Hesabım</h1>
+          <p class="page-sub">Şəxsi məlumatlarınızı və parolunuzu buradan idarə edin</p>
+        </div>
+      </header>
+
+      <div class="profile-grid">
+        <!-- Hesab kartı -->
+        <aside class="account-card">
+          <div class="avatar">{{ initials }}</div>
+          <h3>{{ auth.user?.firstName }} {{ auth.user?.lastName }}</h3>
+          <span class="role-tag" :class="roleClass">{{ roleText }}</span>
+
+          <ul class="account-facts">
+            <li><span>E-poçt</span><b>{{ auth.user?.email }}</b></li>
+            <li><span>Telefon</span><b>{{ auth.user?.phone }}</b></li>
+            <li v-if="memberSince"><span>Qeydiyyat</span><b>{{ memberSince }}</b></li>
+          </ul>
+
+          <button class="logout-btn" @click="auth.logout()">Hesabdan çıx</button>
+        </aside>
+
+        <div class="forms">
+          <!-- Şəxsi məlumatlar -->
+          <section class="form-card">
+            <h2 class="card-title">Şəxsi məlumatlar</h2>
+            <p class="card-sub">E-poçt ünvanı dəyişdirilə bilmir — o, hesabınızın açarıdır.</p>
+
+            <el-form label-position="top" @submit.prevent>
+              <div class="name-row">
+                <el-form-item label="Ad">
+                  <el-input v-model="profileForm.firstName" placeholder="Ad" />
+                </el-form-item>
+                <el-form-item label="Soyad">
+                  <el-input v-model="profileForm.lastName" placeholder="Soyad" />
+                </el-form-item>
+              </div>
+
+              <el-form-item label="Telefon">
+                <el-input v-model="profileForm.phone" placeholder="+994 xx xxx xx xx" />
+              </el-form-item>
+
+              <el-form-item label="E-poçt">
+                <el-input :model-value="auth.user?.email" disabled />
+              </el-form-item>
+
+              <p v-if="profileError" class="form-error">{{ profileError }}</p>
+
+              <div class="form-foot">
+                <button class="primary-btn" :disabled="isSavingProfile || !profileChanged" @click="saveProfile">
+                  {{ isSavingProfile ? 'Saxlanılır...' : 'Yadda saxla' }}
+                </button>
+                <button v-if="profileChanged" class="link-btn" @click="resetProfileForm">İmtina</button>
+              </div>
+            </el-form>
+          </section>
+
+          <!-- Parol dəyişmə -->
+          <section class="form-card">
+            <h2 class="card-title">Parolun dəyişdirilməsi</h2>
+            <p class="card-sub">Yeni parol ən azı 6 simvol olmalıdır.</p>
+
+            <el-form label-position="top" @submit.prevent>
+              <el-form-item label="Cari parol">
+                <el-input v-model="passwordForm.currentPassword" type="password" show-password placeholder="Cari parolunuz" />
+              </el-form-item>
+
+              <el-form-item label="Yeni parol">
+                <el-input v-model="passwordForm.newPassword" type="password" show-password placeholder="Yeni parol" />
+              </el-form-item>
+
+              <el-form-item label="Yeni parol (təkrar)">
+                <el-input v-model="passwordForm.repeatPassword" type="password" show-password placeholder="Yeni parolu təkrarlayın" />
+              </el-form-item>
+
+              <p v-if="passwordError" class="form-error">{{ passwordError }}</p>
+
+              <div class="form-foot">
+                <button class="primary-btn" :disabled="isSavingPassword" @click="savePassword">
+                  {{ isSavingPassword ? 'Dəyişdirilir...' : 'Parolu dəyiş' }}
+                </button>
+              </div>
+            </el-form>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed, reactive, ref, watch } from 'vue'
+import { ElNotification } from 'element-plus'
+import { useAuthStore } from '@/store/auth'
+import { formatDateFull } from '@/utils/date'
+
+const auth = useAuthStore()
+
+const profileForm = reactive({ firstName: '', lastName: '', phone: '' })
+const passwordForm = reactive({ currentPassword: '', newPassword: '', repeatPassword: '' })
+
+const isSavingProfile = ref(false)
+const isSavingPassword = ref(false)
+const profileError = ref('')
+const passwordError = ref('')
+
+// Formanı cari profil məlumatları ilə doldurur
+const resetProfileForm = () => {
+  profileForm.firstName = auth.user?.firstName ?? ''
+  profileForm.lastName = auth.user?.lastName ?? ''
+  profileForm.phone = auth.user?.phone ?? ''
+  profileError.value = ''
+}
+
+watch(() => auth.user, resetProfileForm, { immediate: true, deep: true })
+
+const profileChanged = computed(
+  () =>
+    profileForm.firstName !== auth.user?.firstName ||
+    profileForm.lastName !== auth.user?.lastName ||
+    profileForm.phone !== auth.user?.phone,
+)
+
+const initials = computed(() => {
+  const first = auth.user?.firstName?.[0] ?? ''
+  const last = auth.user?.lastName?.[0] ?? ''
+  return `${first}${last}`.toLocaleUpperCase('az') || '?'
+})
+
+const roleText = computed(
+  () => ({ Customer: 'Müştəri', Owner: 'Restoran rəhbərliyi', Admin: 'Administrator' })[auth.user?.role] ?? '—',
+)
+
+const roleClass = computed(() => (auth.user?.role ?? 'Customer').toLowerCase())
+
+const memberSince = computed(() =>
+  auth.user?.createdAt ? formatDateFull(auth.user.createdAt.slice(0, 10)) : null,
+)
+
+// Ad və telefonu yeniləyir
+const saveProfile = async () => {
+  isSavingProfile.value = true
+  profileError.value = ''
+  try {
+    const message = await auth.updateProfile({
+      firstName: profileForm.firstName.trim(),
+      lastName: profileForm.lastName.trim(),
+      phone: profileForm.phone.trim(),
+    })
+    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+  } catch (e) {
+    profileError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
+  } finally {
+    isSavingProfile.value = false
+  }
+}
+
+// Parolu dəyişir; təkrar yoxlaması frontend tərəfdə aparılır
+const savePassword = async () => {
+  if (passwordForm.newPassword !== passwordForm.repeatPassword) {
+    passwordError.value = 'Yeni parollar üst-üstə düşmür.'
+    return
+  }
+
+  isSavingPassword.value = true
+  passwordError.value = ''
+  try {
+    const message = await auth.changePassword({
+      currentPassword: passwordForm.currentPassword,
+      newPassword: passwordForm.newPassword,
+    })
+    passwordForm.currentPassword = ''
+    passwordForm.newPassword = ''
+    passwordForm.repeatPassword = ''
+    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+  } catch (e) {
+    passwordError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
+  } finally {
+    isSavingPassword.value = false
+  }
+}
+</script>
+
+<style scoped>
+.profile-page {
+  min-height: calc(100vh - 61px);
+  background: #f4f6f8;
+  padding: 30px 40px 60px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.profile-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.page-head {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  margin: 0 0 4px;
+  color: #1a1118;
+  font-size: 1.7rem;
+}
+
+.page-sub {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.92rem;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+/* Sol hesab kartı */
+.account-card {
+  background: linear-gradient(180deg, #fff 0%, #fdfbfc 100%);
+  border: 1px solid #f2ecee;
+  border-radius: 16px;
+  padding: 24px 20px 20px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(114, 20, 56, 0.06);
+}
+
+.avatar {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #721438, #b07d2b);
+  box-shadow: 0 8px 18px rgba(114, 20, 56, 0.25);
+}
+
+.account-card h3 {
+  margin: 0 0 8px;
+  color: #1a1118;
+  font-size: 1.1rem;
+}
+
+.role-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: #f1f3f5;
+  color: #868e96;
+}
+
+.role-tag.customer {
+  background: #fdf6e9;
+  color: #8a6220;
+}
+
+.role-tag.owner {
+  background: #f6e9ee;
+  color: #721438;
+}
+
+.account-facts {
+  list-style: none;
+  margin: 18px 0 18px;
+  padding: 16px 0 0;
+  border-top: 1px solid #f2ecee;
+  text-align: left;
+}
+
+.account-facts li {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: 12px;
+}
+
+.account-facts span {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #b8a3ab;
+  font-weight: 700;
+}
+
+.account-facts b {
+  font-size: 0.88rem;
+  color: #1a1118;
+  word-break: break-all;
+}
+
+.logout-btn {
+  width: 100%;
+  background: #fff;
+  color: #c0392b;
+  border: 1px solid #eed4d0;
+  padding: 9px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: #c0392b;
+  border-color: #c0392b;
+  color: #fff;
+}
+
+/* Sağ formalar */
+.forms {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-card {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+  color: #1a1118;
+}
+
+.card-sub {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  color: #868e96;
+}
+
+.form-foot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.primary-btn {
+  background: #721438;
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.primary-btn:hover:not(:disabled) {
+  background: #590f2b;
+}
+
+.primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #868e96;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.link-btn:hover {
+  color: #721438;
+  text-decoration: underline;
+}
+
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-error {
+  margin: 0 0 10px;
+  color: #d93025;
+  font-size: 13px;
+  white-space: pre-line;
+}
+
+@media (max-width: 820px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+  .profile-page {
+    padding: 24px 16px 50px;
+  }
+}
+</style>

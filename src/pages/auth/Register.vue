@@ -5,9 +5,14 @@
       <p class="subtitle">Şadlıq Sarayları-na qoşulun</p>
 
       <el-form @submit.prevent="register">
-        <el-form-item>
-          <el-input v-model="form.fullName" placeholder="Ad Soyad" />
-        </el-form-item>
+        <div class="name-row">
+          <el-form-item>
+            <el-input v-model="form.firstName" placeholder="Ad" />
+          </el-form-item>
+          <el-form-item>
+            <el-input v-model="form.lastName" placeholder="Soyad" />
+          </el-form-item>
+        </div>
         <el-form-item>
           <el-input v-model="form.email" placeholder="E-poçt" />
         </el-form-item>
@@ -54,7 +59,7 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const form = reactive({
-  fullName: '', email: '', phone: '', password: '', role: 'Customer',
+  firstName: '', lastName: '', email: '', phone: '', password: '', role: 'Customer',
 })
 const isLoading = ref(false)
 const errorMessage = ref('')
@@ -107,6 +112,12 @@ const register = async () => {
   color: #999;
   margin-bottom: 28px;
   font-size: 14px;
+}
+
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .form-error {

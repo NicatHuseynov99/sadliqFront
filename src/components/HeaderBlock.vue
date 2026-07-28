@@ -9,7 +9,7 @@
     </nav>
 
     <div class="user-box" v-if="auth.isAuth">
-      <span class="user-name">👤 {{ auth.user?.fullName }}</span>
+      <router-link to="/profile" class="user-name">👤 {{ auth.user?.fullName }}</router-link>
       <button class="ghost-btn" @click="auth.logout()">Çıxış</button>
     </div>
     <div class="user-box" v-else>
@@ -81,6 +81,12 @@ const auth = useAuthStore()
   font-weight: 500;
   color: #fff;
   font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.user-name:hover {
+  color: #dfb15b;
 }
 
 .ghost-btn {

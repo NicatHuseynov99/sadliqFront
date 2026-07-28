@@ -42,6 +42,19 @@ export const useAuthStore = defineStore('auth', {
       this.setUser(data.data)
     },
 
+    // Ad və telefonu yeniləyir, cavabdakı profili yaddaşa yazır
+    async updateProfile(payload) {
+      const { data } = await api.put('/Auth/UpdateProfile', payload)
+      this.setUser(data.data)
+      return data.message
+    },
+
+    // Parolu dəyişir (cari parol yoxlanılır)
+    async changePassword(payload) {
+      const { data } = await api.put('/Auth/ChangePassword', payload)
+      return data.message
+    },
+
     setToken(token) {
       localStorage.setItem('token', token)
       this.token = token
