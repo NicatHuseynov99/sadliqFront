@@ -1,34 +1,11 @@
-// Saray məlumatları üçün MOCK servis qatı.
-// Hər funksiyanın üstündə uyğun real endpoint yazılıb — API qoşulanda yalnız bu fayl dəyişəcək,
-// səhifələrdəki çağırışlar olduğu kimi qalacaq.
+// Saray məlumatları üçün API servis qatı.
+// Backend entity-lərini frontend-in gözlədiyi formaya çevirir (rating, features, images,
+// dolu günlər kimi sahələr burada hazırlanır ki, səhifələr dəyişməsin).
+//
+// Dolu günlər artıq GetAll/GetById cavabının içində gəlir — hər zal üçün ayrıca
+// GetAvailability sorğusu göndərilmir.
 
-import { venues, busyDates } from '@/data/mockData'
-import { getActiveReservationDates } from '@/services/reservationService'
-
-// Şəbəkə gecikməsini imitasiya edir ki, loading vəziyyətləri realdakı kimi görünsün
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms))
-
-// Real: GET /Venues/GetAll
-export const getAllVenues = async () => {
-  await delay()
-  return venues
-}
-
-// Real: GET /Venues/GetById/{id}
-export const getVenueById = async (id) => {
-  await delay()
-  const venue = venues.find((v) => v.id === Number(id))
-  if (!venue) throw new Error('Saray tapılmadı.')
-  return venue
-}
-
-// Real: GET /Halls/GetAvailability/{hallId} — zalın bağlı (dolu/tutulmuş) günləri
-export const getHallBusyDates = async (hallId) => {
-  await delay(150)
-  const preset = busyDates[hallId] ?? []
-  const reserved = getActiveReservationDates(hallId)
-  return new Set([...preset, ...reserved])
-}
+import api from '@/services/api'
 
 // Tarixi YYYY-MM-DD formatına salır (yerli vaxt zonasına görə, UTC sürüşməsi olmadan)
 export const toDateKey = (date) => {
@@ -38,23 +15,85 @@ export const toDateKey = (date) => {
   return `${y}-${m}-${d}`
 }
 
-// Bütün zalların dolu günlərini bir dəfəyə yükləyir: { hallId: Set(tarixlər) }
-// Filtrləmə zamanı hər saray üçün ayrıca sorğu göndərməmək üçün istifadə olunur
-export const getAllBusyDates = async () => {
-  await delay(150)
+// Backend-dən gələn sarayı frontend modelinə çevirir
+const mapVenue = (v) => {
+  const reviews = (v.reviews ?? []).map((r) => ({
+    id: r.id,
+    author: r.authorName,
+    rating: r.rating,
+    text: r.comment,
+    date: (r.createdAt ?? '').slice(0, 10),
+  }))
+
+  const rating = reviews.length
+    ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10
+    : 0
+
+  return {
+    ...v,
+    features: (v.features ?? []).map((f) => f.name),
+    images: (v.images ?? [])
+      .slice()
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((i) => i.url),
+    halls: (v.halls ?? []).map((h) => ({
+      ...h,
+      // Zalın əsas şəkli media siyahısının ilk elementidir
+      imageUrl: h.media?.[0]?.url ?? v.coverImageUrl,
+      // Backend yalnız boş olmayan (Booked/Held) günləri göndərir
+      busyDates: new Set((h.availability ?? []).map((a) => a.date)),
+    })),
+    menus: (v.menus ?? []).map((m) => ({
+      ...m,
+      coverImageUrl: m.imageUrl,
+      items: m.items ?? [],
+    })),
+    reviews,
+    rating,
+    reviewCount: reviews.length,
+  }
+}
+
+// GET /Venues/GetAll — ana səhifənin bütün datası tək sorğu ilə gəlir
+export const getAllVenues = async () => {
+  const { data } = await api.get('/Venues/GetAll')
+  return (data.data ?? []).map(mapVenue)
+}
+
+// GET /Venues/Search — filtr + sıralama + səhifələmə (sonsuz scroll üçün)
+// params: { q, city, date, minPrice, maxPrice, capacity, sort, page, pageSize }
+export const searchVenues = async (params) => {
+  const { data } = await api.get('/Venues/Search', { params })
+  const paged = data.data ?? {}
+  return {
+    items: (paged.items ?? []).map(mapVenue),
+    totalCount: paged.totalCount ?? 0,
+    page: paged.page ?? 1,
+    hasMore: paged.hasMore ?? false,
+  }
+}
+
+// GET /Venues/GetById/{id}
+export const getVenueById = async (id) => {
+  const { data } = await api.get(`/Venues/GetById/${id}`)
+  return mapVenue(data.data)
+}
+
+// Yüklənmiş saraylardan { hallId: Set(dolu tarixlər) } xəritəsi qurur (sorğu göndərmir)
+export const buildBusyMap = (venues) => {
   const map = {}
   for (const venue of venues) {
-    for (const hall of venue.halls) {
-      const preset = busyDates[hall.id] ?? []
-      map[hall.id] = new Set([...preset, ...getActiveReservationDates(hall.id)])
+    for (const hall of venue.halls ?? []) {
+      map[hall.id] = hall.busyDates ?? new Set()
     }
   }
   return map
 }
 
-// Sarayın bütün zallarını yoxlayaraq bu gündən sonrakı ən yaxın boş günü tapır
-export const getNearestFreeDate = async (venue, daysAhead = 120) => {
-  const busySets = await Promise.all(venue.halls.map((h) => getHallBusyDates(h.id)))
+// Sarayın zallarını yoxlayaraq bu gündən sonrakı ən yaxın boş günü tapır (sorğu göndərmir)
+export const getNearestFreeDate = (venue, daysAhead = 120) => {
+  const halls = venue.halls ?? []
+  if (!halls.length) return null
 
   const cursor = new Date()
   cursor.setHours(0, 0, 0, 0)
@@ -63,7 +102,7 @@ export const getNearestFreeDate = async (venue, daysAhead = 120) => {
   for (let i = 0; i < daysAhead; i++) {
     const key = toDateKey(cursor)
     // Ən azı bir zal həmin gün boşdursa, saray həmin tarixdə mövcud sayılır
-    if (busySets.some((set) => !set.has(key))) return key
+    if (halls.some((h) => !h.busyDates?.has(key))) return key
     cursor.setDate(cursor.getDate() + 1)
   }
 

@@ -59,7 +59,7 @@
     <!-- Restoranlar Siyahısı -->
     <section class="venues-container" v-loading="isLoading">
       <div class="results-header">
-        <h2>Mövcud Saraylar <span>({{ filteredVenues.length }})</span></h2>
+        <h2>Mövcud Saraylar <span>({{ totalCount }})</span></h2>
         <div class="sort-box">
           <label>Sıralama:</label>
           <select v-model="filters.sort">
@@ -70,14 +70,14 @@
         </div>
       </div>
 
-      <div v-if="!isLoading && filteredVenues.length === 0" class="no-result">
+      <div v-if="!isLoading && venues.length === 0" class="no-result">
         <h3>Axtarışınıza uyğun heç bir saray tapılmadı.</h3>
         <p>Filtrləri dəyişərək yenidən yoxlaya bilərsiniz.</p>
         <button @click="resetFilters" class="btn-reset-empty">Filtrləri sıfırla</button>
       </div>
 
       <div v-else class="venues-grid">
-        <div v-for="venue in filteredVenues" :key="venue.id" class="venue-card">
+        <div v-for="venue in venues" :key="venue.id" class="venue-card">
           <div class="image-wrapper">
             <img :src="venue.coverImageUrl" :alt="venue.name" class="venue-img" @error="onImgError" />
             <span class="badge">{{ venue.city }}</span>
@@ -152,51 +152,46 @@
           </div>
         </div>
       </div>
+
+      <!-- Sonsuz scroll: bu element ekrana girəndə növbəti səhifə yüklənir -->
+      <div ref="sentinel" class="scroll-sentinel">
+        <div v-if="isLoadingMore" class="loading-more">
+          <span class="spinner"></span> Daha çox saray yüklənir...
+        </div>
+        <p v-else-if="!hasMore && venues.length > 0" class="list-end">
+          Bütün saraylar göstərildi ({{ totalCount }})
+        </p>
+      </div>
     </section>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import AddressLink from '@/components/AddressLink.vue'
-import { getAllVenues, getNearestFreeDate, getAllBusyDates, toDateKey } from '@/services/venueService'
+import { searchVenues, getNearestFreeDate, buildBusyMap, toDateKey } from '@/services/venueService'
 import { formatDate } from '@/utils/date'
+
+const PAGE_SIZE = 12
 
 const router = useRouter()
 
 const venues = ref([])
+const totalCount = ref(0)
+const page = ref(1)
+const hasMore = ref(false)
 const isLoading = ref(false)
+const isLoadingMore = ref(false)
 const nearestDates = ref({})
 const busyMap = ref({})
+const sentinel = ref(null)
 
 const todayKey = toDateKey(new Date())
 
-// Sarayları mock servisdən yükləyir (real API qoşulanda servis özü dəyişəcək)
-const loadVenues = async () => {
-  isLoading.value = true
-  try {
-    venues.value = await getAllVenues()
-    busyMap.value = await getAllBusyDates()
-    loadNearestDates()
-  } finally {
-    isLoading.value = false
-  }
-}
-
-// Hər saray üçün bu gündən sonrakı ən yaxın boş tarixi arxa planda hesablayır
-const loadNearestDates = async () => {
-  const results = await Promise.all(
-    venues.value.map(async (v) => [v.id, await getNearestFreeDate(v)]),
-  )
-  nearestDates.value = Object.fromEntries(results)
-}
-
-
-onMounted(loadVenues)
-
-// Filtr seçimində göstərmək üçün mövcud şəhərlərin unikal siyahısı
-const cities = computed(() => [...new Set(venues.value.map(v => v.city))])
+// Şəhər siyahısı bütün saraylardan asılı olduğu üçün sabit saxlanılır
+// (səhifələnmiş siyahıdan çıxarılsa, hər scroll-da dəyişərdi)
+const cities = ['Bakı', 'Sumqayıt', 'Gəncə', 'Xırdalan', 'Quba', 'Şəki', 'Lənkəran', 'Mingəçevir']
 
 const filters = reactive({
   searchQuery: '',
@@ -207,9 +202,84 @@ const filters = reactive({
   sort: 'rating-desc'
 })
 
-// Seçilən tarixdə sarayın ən azı bir zalı boşdursa true qaytarır
-const isFreeOn = (venue, dateKey) =>
-  venue.halls.some((h) => !(busyMap.value[h.id]?.has(dateKey)))
+// Filtrləri backend-in gözlədiyi query parametrlərinə çevirir
+const buildParams = (pageNumber) => ({
+  q: filters.searchQuery || undefined,
+  city: filters.city || undefined,
+  date: filters.date || undefined,
+  capacity: filters.capacity || undefined,
+  maxPrice: filters.maxPrice || undefined,
+  sort: filters.sort,
+  page: pageNumber,
+  pageSize: PAGE_SIZE,
+})
+
+// Yeni gələn sarayların dolu günlərini və ən yaxın boş tarixini hesablayıb yaddaşa yazır
+const indexVenues = (list) => {
+  busyMap.value = { ...busyMap.value, ...buildBusyMap(list) }
+  const nearest = {}
+  for (const v of list) nearest[v.id] = getNearestFreeDate(v)
+  nearestDates.value = { ...nearestDates.value, ...nearest }
+}
+
+// Siyahını sıfırdan yükləyir (ilk açılış və hər filtr dəyişikliyində)
+const loadFirstPage = async () => {
+  isLoading.value = true
+  try {
+    const result = await searchVenues(buildParams(1))
+    venues.value = result.items
+    totalCount.value = result.totalCount
+    hasMore.value = result.hasMore
+    page.value = 1
+    indexVenues(result.items)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Növbəti səhifəni yükləyib mövcud siyahının sonuna əlavə edir (sonsuz scroll)
+const loadNextPage = async () => {
+  if (!hasMore.value || isLoading.value || isLoadingMore.value) return
+
+  isLoadingMore.value = true
+  try {
+    const result = await searchVenues(buildParams(page.value + 1))
+    venues.value = [...venues.value, ...result.items]
+    totalCount.value = result.totalCount
+    hasMore.value = result.hasMore
+    page.value = result.page
+    indexVenues(result.items)
+  } finally {
+    isLoadingMore.value = false
+  }
+}
+
+// Filtr dəyişəndə sorğunu bir az gecikdiririk ki, hər hərf üçün sorğu getməsin
+let filterTimer = null
+watch(filters, () => {
+  clearTimeout(filterTimer)
+  filterTimer = setTimeout(loadFirstPage, 350)
+})
+
+// Siyahının sonundakı element ekrana girəndə növbəti səhifə yüklənir
+let observer = null
+onMounted(async () => {
+  await loadFirstPage()
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) loadNextPage()
+    },
+    { rootMargin: '300px' },
+  )
+
+  if (sentinel.value) observer.observe(sentinel.value)
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  clearTimeout(filterTimer)
+})
 
 // Seçilən tarixdə boş olan zalların sayı
 const freeHallCount = (venue, dateKey) =>
@@ -240,32 +310,7 @@ const toggleQuick = (key) => {
   if (key === 'baku') filters.city = quickFilters.baku ? 'Bakı' : ''
 }
 
-const filteredVenues = computed(() => {
-  let list = venues.value.filter(venue => {
-    const matchesSearch = filters.searchQuery === '' ||
-        venue.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
-        venue.address.toLowerCase().includes(filters.searchQuery.toLowerCase())
-
-    const matchesCity = filters.city === '' || venue.city === filters.city
-    const matchesCapacity = !filters.capacity || venue.halls.some(h => h.capacity >= filters.capacity)
-    const matchesPrice = !filters.maxPrice || venue.menus.some(m => m.pricePerPerson <= filters.maxPrice)
-    const matchesDate = !filters.date || isFreeOn(venue, filters.date)
-
-    return matchesSearch && matchesCity && matchesCapacity && matchesPrice && matchesDate
-  })
-
-  list.sort((a, b) => {
-    if (filters.sort === 'rating-desc') return b.rating - a.rating
-    const priceA = getMinMenuPrice(a)
-    const priceB = getMinMenuPrice(b)
-    if (filters.sort === 'price-asc') return priceA - priceB
-    if (filters.sort === 'price-desc') return priceB - priceA
-    return 0
-  })
-
-  return list
-})
-
+// Kartda göstərilən minimum menyu qiyməti
 const getMinMenuPrice = (venue) => {
   if (!venue.menus || venue.menus.length === 0) return 0
   return Math.min(...venue.menus.map(m => m.pricePerPerson))
@@ -459,6 +504,40 @@ const onImgError = (e) => {
   background: #1a1118;
   border-color: #1a1118;
   color: #fff;
+}
+
+.scroll-sentinel {
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  margin-top: 28px;
+}
+
+.loading-more {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e9ecef;
+  border-top-color: #721438;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.list-end {
+  color: #adb5bd;
+  font-size: 0.85rem;
+  margin: 0;
 }
 
 .venues-container {

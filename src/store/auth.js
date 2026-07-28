@@ -1,31 +1,14 @@
 import { defineStore } from 'pinia'
+import api from '@/services/api'
 
-// MOCK auth — heç bir API çağırışı yoxdur, istifadəçilər localStorage-da saxlanılır.
-// Real API qoşulanda login/register/fetchMe içindəki mock hissələr
-// api.post('/Auth/Login') və s. çağırışları ilə əvəz olunacaq (köhnə kod git tarixçəsindədir).
+// Backend UserRole enum-u JSON-da rəqəm kimi gəlir (0=Customer, 1=Owner, 2=Admin).
+// Gələcəkdə string kimi gəlsə də işləsin deyə hər iki formatı mətnə çeviririk.
+const ROLE_NAMES = ['Customer', 'Owner', 'Admin']
 
-const USERS_KEY = 'mock_users'
+const normalizeRole = (role) =>
+  typeof role === 'number' ? (ROLE_NAMES[role] ?? 'Customer') : (role ?? 'Customer')
 
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms))
-
-// Qeydiyyatdan keçmiş mock istifadəçiləri oxuyur; ilk dəfə demo hesab yaradır
-const readUsers = () => {
-  const raw = localStorage.getItem(USERS_KEY)
-  if (raw) return JSON.parse(raw)
-
-  const seed = [
-    {
-      id: 1,
-      fullName: 'Demo Müştəri',
-      email: 'demo@sadliq.az',
-      phone: '+994 50 123 45 67',
-      password: 'demo123',
-      role: 'Customer',
-    },
-  ]
-  localStorage.setItem(USERS_KEY, JSON.stringify(seed))
-  return seed
-}
+const normalizeUser = (user) => (user ? { ...user, role: normalizeRole(user.role) } : null)
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -41,57 +24,23 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    // Real: POST /Auth/Login — mock: email/şifrəni localStorage-dakı istifadəçilərlə yoxlayır
+    // Backend-ə login sorğusu göndərir, uğurlu olarsa token-i saxlayıb profili çəkir
     async login(payload) {
-      await delay()
-      const users = readUsers()
-      const found = users.find((u) => u.email === payload.email)
-
-      if (!found) {
-        const err = new Error('İstifadəçi tapılmadı.')
-        err.userMessage = err.message
-        throw err
-      }
-      if (found.password !== payload.password) {
-        const err = new Error('Şifrə yanlışdır.')
-        err.userMessage = err.message
-        throw err
-      }
-
-      this.setToken(`mock-token-${found.id}-${Date.now()}`)
-      this.setUser({
-        id: found.id,
-        fullName: found.fullName,
-        email: found.email,
-        phone: found.phone,
-        role: found.role,
-      })
+      const { data } = await api.post('/Auth/Login', payload)
+      this.setToken(data.data.token)
+      await this.fetchMe()
     },
 
-    // Real: POST /Auth/Register — mock: istifadəçini localStorage-a əlavə edir
+    // Yeni istifadəçi qeydiyyatı (Customer/Owner)
     async register(payload) {
-      await delay()
-      const users = readUsers()
-
-      if (users.some((u) => u.email === payload.email)) {
-        const err = new Error('Bu email artıq qeydiyyatdan keçib.')
-        err.userMessage = err.message
-        throw err
-      }
-
-      users.push({
-        id: users.length ? Math.max(...users.map((u) => u.id)) + 1 : 1,
-        fullName: payload.fullName,
-        email: payload.email,
-        phone: payload.phone,
-        password: payload.password,
-        role: payload.role,
-      })
-      localStorage.setItem(USERS_KEY, JSON.stringify(users))
+      await api.post('/Auth/Register', payload)
     },
 
-    // Real: GET /Auth/Me — mock rejimdə user artıq login zamanı yazılır
-    async fetchMe() {},
+    // Cari istifadəçinin məlumatını backend-dən çəkir
+    async fetchMe() {
+      const { data } = await api.get('/Auth/Me')
+      this.setUser(data.data)
+    },
 
     setToken(token) {
       localStorage.setItem('token', token)
@@ -99,8 +48,9 @@ export const useAuthStore = defineStore('auth', {
     },
 
     setUser(user) {
-      localStorage.setItem('user', JSON.stringify(user))
-      this.user = user
+      const normalized = normalizeUser(user)
+      localStorage.setItem('user', JSON.stringify(normalized))
+      this.user = normalized
     },
 
     logout() {

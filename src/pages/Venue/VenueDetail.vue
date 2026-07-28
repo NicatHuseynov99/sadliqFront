@@ -94,7 +94,7 @@
             </div>
 
             <div v-if="openCalendars.has(h.id)" class="hall-calendar">
-              <AvailabilityCalendar :hall-id="h.id" @select="(key) => onDateSelect(h, key)" />
+              <AvailabilityCalendar :busy-dates="hallBusy[h.id]" @select="(key) => onDateSelect(h, key)" />
             </div>
           </div>
         </div>
@@ -125,10 +125,6 @@
             </ul>
 
             <div class="menu-foot">
-              <div class="calc">
-                <span class="calc-label">100 nəfər üçün</span>
-                <strong>{{ (m.pricePerPerson * 100).toLocaleString() }} ₼</strong>
-              </div>
               <button class="photo-btn" @click="openMenu(m)">📷 Yeməklərin şəkilləri</button>
             </div>
           </div>
@@ -195,8 +191,7 @@
             :disabled-date="disabledDate"
             style="width: 100%"
           />
-          <span class="field-hint" v-if="availLoading">Dolu günlər yoxlanılır...</span>
-          <span class="field-hint" v-else>Dolu günlər təqvimdə bağlıdır.</span>
+          <span class="field-hint">Dolu günlər təqvimdə bağlıdır.</span>
         </el-form-item>
 
         <el-form-item label="Menyu">
@@ -251,7 +246,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
 import AddressLink from '@/components/AddressLink.vue'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
-import { getVenueById, getHallBusyDates, toDateKey } from '@/services/venueService'
+import { getVenueById, toDateKey } from '@/services/venueService'
 import { formatDate, formatDateFull, weekdayShort } from '@/utils/date'
 import { createReservation } from '@/services/reservationService'
 import { useAuthStore } from '@/store/auth'
@@ -274,7 +269,6 @@ const reserveVisible = ref(false)
 const selectedHall = ref(null)
 const isSubmitting = ref(false)
 const reserveError = ref('')
-const availLoading = ref(false)
 const busyDates = ref(new Set())
 
 const reserveForm = reactive({
@@ -291,18 +285,11 @@ const loadVenue = async () => {
   try {
     venue.value = await getVenueById(route.params.id)
     activeImage.value = venue.value.coverImageUrl
-    await loadHallBusy()
+    // Dolu günlər sarayla birlikdə gəlir — zallar üçün ayrıca sorğu göndərilmir
+    hallBusy.value = Object.fromEntries(venue.value.halls.map((h) => [h.id, h.busyDates]))
   } finally {
     isLoading.value = false
   }
-}
-
-// Hər zalın dolu günlərini yükləyir — rezervlər zal əsaslı olduğu üçün ayrı-ayrı saxlanılır
-const loadHallBusy = async () => {
-  const entries = await Promise.all(
-    venue.value.halls.map(async (h) => [h.id, await getHallBusyDates(h.id)]),
-  )
-  hallBusy.value = Object.fromEntries(entries)
 }
 
 // Zalın yaxın 14 gününü vəziyyəti ilə birlikdə qaytarır
@@ -354,19 +341,9 @@ const groupedItems = computed(() => {
   return groups
 })
 
-// Rezerv təqvimi üçün seçilən zalın dolu günlərini yükləyir (artıq yüklənibsə təkrar sorğu getmir)
-const loadAvailability = async (hallId) => {
-  if (hallBusy.value[hallId]) {
-    busyDates.value = hallBusy.value[hallId]
-    return
-  }
-
-  availLoading.value = true
-  try {
-    busyDates.value = await getHallBusyDates(hallId)
-  } finally {
-    availLoading.value = false
-  }
+// Rezerv təqvimində bağlanacaq günləri artıq yüklənmiş datadan götürür
+const loadAvailability = (hallId) => {
+  busyDates.value = hallBusy.value[hallId] ?? new Set()
 }
 
 // Keçmiş günləri və dolu günləri təqvimdə seçilməz edir
@@ -437,15 +414,10 @@ const submitReserve = async () => {
   isSubmitting.value = true
   reserveError.value = ''
   try {
-    const menu = venue.value.menus.find((m) => m.id === reserveForm.menuId)
     const result = await createReservation({
       venueId: venue.value.id,
-      venueName: venue.value.name,
       hallId: selectedHall.value.id,
-      hallName: selectedHall.value.name,
       menuId: reserveForm.menuId,
-      menuName: menu?.name,
-      pricePerPerson: menu?.pricePerPerson,
       eventDate: reserveForm.eventDate,
       guestCount: reserveForm.guestCount,
       contactPhone: reserveForm.contactPhone,
@@ -459,7 +431,7 @@ const submitReserve = async () => {
       zIndex: 99999,
     })
     // Yeni rezerv edilən gün dərhal dolu kimi görünsün
-    await loadHallBusy()
+    await loadVenue()
   } catch (e) {
     reserveError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
@@ -918,42 +890,20 @@ onMounted(loadVenue)
 }
 
 .menu-foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
   margin-top: auto;
   padding-top: 12px;
   border-top: 1px solid #f1f3f5;
 }
 
-.calc {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-
-.calc-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #adb5bd;
-  font-weight: 600;
-}
-
-.calc strong {
-  font-size: 1.05rem;
-  color: #721438;
-}
-
 .photo-btn {
+  width: 100%;
   background: #fff;
   color: #721438;
   border: 1px solid #e5cdd6;
-  padding: 7px 14px;
+  padding: 9px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
   transition: all 0.2s;

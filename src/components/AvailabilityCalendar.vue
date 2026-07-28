@@ -38,19 +38,20 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
-import { getHallBusyDates, toDateKey } from '@/services/venueService'
+import { computed, ref } from 'vue'
+import { toDateKey } from '@/services/venueService'
 import { WEEKDAYS_SHORT, formatMonthTitle, formatDateFull } from '@/utils/date'
 
+// Dolu günlər saray sorğusu ilə birlikdə gəlir — komponent özü sorğu göndərmir
 const props = defineProps({
-  hallId: { type: Number, required: true },
+  busyDates: { type: Set, default: () => new Set() },
 })
 
 defineEmits(['select'])
 
 const weekDays = WEEKDAYS_SHORT
 
-const busy = ref(new Set())
+const busy = computed(() => props.busyDates ?? new Set())
 const isLoading = ref(false)
 
 const today = new Date()
@@ -58,18 +59,6 @@ today.setHours(0, 0, 0, 0)
 
 const viewYear = ref(today.getFullYear())
 const viewMonth = ref(today.getMonth())
-
-// Zalın dolu günlərini yükləyir
-const load = async () => {
-  isLoading.value = true
-  try {
-    busy.value = await getHallBusyDates(props.hallId)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-watch(() => props.hallId, load, { immediate: true })
 
 const monthLabel = computed(() => formatMonthTitle(viewYear.value, viewMonth.value))
 
