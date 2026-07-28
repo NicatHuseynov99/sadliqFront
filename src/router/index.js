@@ -23,6 +23,12 @@ const routes = [
     component: () => import('@/pages/Venue/VenueDetail.vue'),
   },
   {
+    path: '/favorites',
+    name: 'favorites',
+    component: () => import('@/pages/Favorites/MyFavorites.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/my-reservations',
     name: 'my-reservations',
     component: () => import('@/pages/Reservations/MyReservations.vue'),

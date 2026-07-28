@@ -16,9 +16,11 @@ export const toDateKey = (date) => {
 }
 
 // Backend-dən gələn sarayı frontend modelinə çevirir
-const mapVenue = (v) => {
+export const mapVenue = (v) => {
   const reviews = (v.reviews ?? []).map((r) => ({
     id: r.id,
+    // Öz rəyini tanımaq üçün lazımdır (redaktə/silmə düymələri buna görə çıxır)
+    customerId: r.customerId,
     author: r.authorName,
     rating: r.rating,
     text: r.comment,

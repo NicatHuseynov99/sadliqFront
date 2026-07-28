@@ -131,75 +131,15 @@
       </div>
 
       <div v-else class="venues-grid">
-        <div v-for="venue in venues" :key="venue.id" class="venue-card">
-          <div class="image-wrapper">
-            <img :src="venue.coverImageUrl" :alt="venue.name" class="venue-img" @error="onImgError" />
-            <span class="badge">{{ venue.city }}</span>
-            <button class="fav-btn" :aria-pressed="state.favs.has(venue.id)" @click="toggleFav(venue.id)" aria-label="Seçilmişlərə əlavə et">♥</button>
-
-            <div class="card-price-tag">
-              <strong>Min. {{ getMinMenuPrice(venue) }} ₼</strong>
-              <span>1 nəfər üçün</span>
-            </div>
-          </div>
-
-          <div class="venue-info">
-            <div class="title-row">
-              <h3>{{ venue.name }}</h3>
-              <span class="rating-pill">★ {{ venue.rating }}</span>
-            </div>
-
-            <div class="avail-row" v-if="nearestDates[venue.id] !== undefined">
-              <span v-if="nearestDates[venue.id]" class="avail-badge free">
-                ✅ Ən yaxın boş tarix: <b>{{ formatDate(nearestDates[venue.id]) }}</b>
-              </span>
-              <span v-else class="avail-badge busy">⛔ Yaxın 4 ayda boş tarix yoxdur</span>
-            </div>
-            <div class="address-row">
-              <AddressLink
-                compact
-                :address="venue.address"
-                :city="venue.city"
-                :latitude="venue.latitude"
-                :longitude="venue.longitude"
-              />
-              <span class="rev-count">· {{ venue.reviewCount }} rəy</span>
-            </div>
-            <p class="description">{{ venue.description }}</p>
-
-            <div class="halls-preview">
-              <span v-for="hall in venue.halls" :key="hall.id" class="hall-tag">
-                {{ hall.name }} (Max: {{ hall.capacity }} nəfər)
-              </span>
-            </div>
-
-            <!-- Menyuların şəkilli önizləməsi -->
-            <div class="menu-preview">
-              <span class="menu-preview-label">Menyular</span>
-              <div class="menu-chips">
-                <div
-                  v-for="m in venue.menus"
-                  :key="m.id"
-                  class="menu-chip"
-                  @click="selectVenue(venue)"
-                >
-                  <img :src="m.coverImageUrl" :alt="m.name" @error="onImgError" />
-                  <div class="menu-chip-text">
-                    <strong>{{ m.name }}</strong>
-                    <span>{{ m.pricePerPerson }} ₼</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="venue-footer">
-              <div class="menus-summary">
-                <small>{{ venue.halls.length }} zal · {{ venue.menus.length }} menyu</small>
-              </div>
-              <button @click="selectVenue(venue)" class="detail-btn">Seç / Bax</button>
-            </div>
-          </div>
-        </div>
+        <VenueCard
+          v-for="venue in venues"
+          :key="venue.id"
+          :venue="venue"
+          :is-favorite="favoriteIds.has(venue.id)"
+          :nearest-date="nearestDates[venue.id]"
+          @select="selectVenue"
+          @toggle-favorite="onToggleFavorite"
+        />
       </div>
 
       <!-- Sonsuz scroll: bu element ekrana girəndə növbəti səhifə yüklənir -->
@@ -218,14 +158,16 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import AddressLink from '@/components/AddressLink.vue'
+import { ElNotification } from 'element-plus'
+import VenueCard from '@/components/VenueCard.vue'
 import {
   searchVenues,
   getFilterOptions,
   getNearestFreeDate,
   buildBusyMap,
 } from '@/services/venueService'
-import { formatDate } from '@/utils/date'
+import { getMyFavoriteIds, toggleFavorite } from '@/services/favoriteService'
+import { useAuthStore } from '@/store/auth'
 
 const PAGE_SIZE = 12
 
@@ -236,6 +178,9 @@ const capacityOptions = [150, 250, 400, 600]
 const ratingOptions = [4.5, 4]
 
 const router = useRouter()
+const auth = useAuthStore()
+
+const favoriteIds = ref(new Set())
 
 const venues = ref([])
 const totalCount = ref(0)
@@ -360,6 +305,9 @@ onMounted(async () => {
   options.value = await getFilterOptions()
   filters.priceRange = [options.value.minPrice, options.value.maxPrice]
 
+  // Giriş edilibsə hansı sarayların ürəyi dolu olacağını öyrənirik
+  if (auth.isAuth) favoriteIds.value = await getMyFavoriteIds()
+
   await loadFirstPage()
 
   observer = new IntersectionObserver(
@@ -377,16 +325,6 @@ onBeforeUnmount(() => {
   clearTimeout(filterTimer)
 })
 
-const state = reactive({
-  favs: new Set()
-})
-
-// Kartda göstərilən minimum menyu qiyməti
-const getMinMenuPrice = (venue) => {
-  if (!venue.menus || venue.menus.length === 0) return 0
-  return Math.min(...venue.menus.map(m => m.pricePerPerson))
-}
-
 const resetFilters = () => {
   filters.searchQuery = ''
   filters.city = ''
@@ -398,18 +336,37 @@ const resetFilters = () => {
   filters.sort = 'rating-desc'
 }
 
-const toggleFav = (id) => {
-  state.favs.has(id) ? state.favs.delete(id) : state.favs.add(id)
+// Ürəyə basanda: giriş yoxdursa login-ə yönləndirir, varsa backend-də əlavə edir/silir
+const onToggleFavorite = async (venue) => {
+  if (!auth.isAuth) {
+    ElNotification({
+      title: 'Giriş tələb olunur',
+      message: 'Seçilmişlərə əlavə etmək üçün daxil olun.',
+      type: 'info',
+      zIndex: 99999,
+    })
+    router.push('/login')
+    return
+  }
+
+  try {
+    const { isFavorite } = await toggleFavorite(venue.id)
+    const updated = new Set(favoriteIds.value)
+    isFavorite ? updated.add(venue.id) : updated.delete(venue.id)
+    favoriteIds.value = updated
+  } catch (e) {
+    ElNotification({
+      title: 'Xəta',
+      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
+      type: 'error',
+      zIndex: 99999,
+    })
+  }
 }
 
 // Kart seçiləndə sarayın detal səhifəsinə keçid edir
 const selectVenue = (venue) => {
   router.push({ name: 'venue-detail', params: { id: venue.id } })
-}
-
-// Şəkil yüklənməsə ehtiyat şəkil qoyur ki, kart boş görünməsin
-const onImgError = (e) => {
-  e.target.src = 'https://picsum.photos/seed/sadliq/900/600'
 }
 </script>
 

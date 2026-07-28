@@ -132,18 +132,90 @@
       </div>
 
       <!-- Rəylər -->
-      <h2 class="section-title">Qonaq rəyləri</h2>
-      <div class="review-list" v-if="venue.reviews?.length">
-        <div v-for="r in venue.reviews" :key="r.id" class="review-card">
-          <div class="review-head">
-            <span class="review-author">{{ r.author }}</span>
-            <span class="review-stars">{{ '★'.repeat(r.rating) }}{{ '☆'.repeat(5 - r.rating) }}</span>
+      <h2 class="section-title">
+        Qonaq rəyləri
+        <span class="review-summary" v-if="reviews.length">
+          ★ {{ averageRating }} · {{ reviews.length }} rəy
+        </span>
+      </h2>
+
+      <!-- Rəy yazma / redaktə formu -->
+      <div class="review-form" ref="reviewFormRef">
+        <template v-if="auth.isAuth">
+          <h4>{{ editingId ? 'Rəyi redaktə edin' : 'Rəyinizi yazın' }}</h4>
+
+          <div class="star-picker">
+            <button
+              v-for="n in 5"
+              :key="n"
+              class="star-btn"
+              :class="{ filled: n <= (hoverRating || reviewForm.rating) }"
+              @click="reviewForm.rating = n"
+              @mouseenter="hoverRating = n"
+              @mouseleave="hoverRating = 0"
+            >
+              ★
+            </button>
+            <span class="star-hint">{{ ratingHint }}</span>
           </div>
-          <p class="review-text">{{ r.text }}</p>
-          <span class="review-date">{{ formatDateFull(r.date) }}</span>
+
+          <el-input
+            v-model="reviewForm.comment"
+            type="textarea"
+            :rows="3"
+            maxlength="500"
+            show-word-limit
+            placeholder="Təcrübənizi qonaqlarla bölüşün — xidmət, yeməklər, zalın vəziyyəti..."
+          />
+
+          <p v-if="reviewError" class="form-error">{{ reviewError }}</p>
+
+          <div class="review-form-foot">
+            <button class="reserve-btn" :disabled="isSendingReview" @click="submitReview">
+              {{ isSendingReview ? 'Göndərilir...' : editingId ? 'Yadda saxla' : 'Rəyi göndər' }}
+            </button>
+            <button v-if="editingId" class="link-btn" @click="cancelEdit">İmtina</button>
+          </div>
+        </template>
+
+        <div v-else class="review-login">
+          <span>Rəy yazmaq üçün hesabınıza daxil olun.</span>
+          <router-link to="/login"><button class="reserve-btn">Daxil ol</button></router-link>
         </div>
       </div>
-      <el-empty v-else description="Hələ rəy yoxdur" />
+
+      <div class="review-list" v-if="reviews.length">
+        <div v-for="r in reviews" :key="r.id" class="review-card" :class="{ mine: isMine(r), editing: editingId === r.id }">
+          <div class="review-head">
+            <span class="review-author">
+              {{ r.author }}
+              <em v-if="isMine(r)" class="mine-tag">siz</em>
+            </span>
+            <span class="review-stars">{{ '★'.repeat(r.rating) }}{{ '☆'.repeat(5 - r.rating) }}</span>
+          </div>
+
+          <p class="review-text">{{ r.text }}</p>
+
+          <div class="review-foot">
+            <span class="review-date">{{ formatDateFull(r.date) }}</span>
+
+            <div class="review-actions" v-if="isMine(r)">
+              <button class="icon-btn" title="Redaktə et" @click="startEdit(r)">✏️</button>
+              <el-popconfirm
+                title="Bu rəyi silmək istəyirsiniz?"
+                confirm-button-text="Bəli, sil"
+                cancel-button-text="Xeyr"
+                @confirm="removeReview(r)"
+              >
+                <template #reference>
+                  <button class="icon-btn danger" title="Sil">🗑️</button>
+                </template>
+              </el-popconfirm>
+            </div>
+          </div>
+        </div>
+      </div>
+      <el-empty v-else description="Hələ rəy yoxdur — ilk rəyi siz yazın" />
     </div>
 
     <!-- Menyu detalı dialoqu — yeməklərin şəkilləri ilə -->
@@ -247,6 +319,7 @@ import { ElNotification } from 'element-plus'
 import AddressLink from '@/components/AddressLink.vue'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
 import { getVenueById, toDateKey } from '@/services/venueService'
+import { getVenueReviews, createReview, updateReview, deleteReview } from '@/services/reviewService'
 import { formatDate, formatDateFull, weekdayShort } from '@/utils/date'
 import { createReservation } from '@/services/reservationService'
 import { useAuthStore } from '@/store/auth'
@@ -264,6 +337,14 @@ const selectedMenu = ref(null)
 
 const hallBusy = ref({})
 const openCalendars = ref(new Set())
+
+const reviews = ref([])
+const hoverRating = ref(0)
+const isSendingReview = ref(false)
+const reviewError = ref('')
+const editingId = ref(null)
+const reviewFormRef = ref(null)
+const reviewForm = reactive({ rating: 5, comment: '' })
 
 const reserveVisible = ref(false)
 const selectedHall = ref(null)
@@ -287,8 +368,86 @@ const loadVenue = async () => {
     activeImage.value = venue.value.coverImageUrl
     // Dolu günlər sarayla birlikdə gəlir — zallar üçün ayrıca sorğu göndərilmir
     hallBusy.value = Object.fromEntries(venue.value.halls.map((h) => [h.id, h.busyDates]))
+    reviews.value = venue.value.reviews ?? []
   } finally {
     isLoading.value = false
+  }
+}
+
+// Rəy cari istifadəçiyə aiddirmi — redaktə/silmə ikonları buna görə göstərilir
+const isMine = (review) => Boolean(review.customerId) && review.customerId === auth.user?.id
+
+const averageRating = computed(() => {
+  if (!reviews.value.length) return 0
+  const sum = reviews.value.reduce((total, r) => total + r.rating, 0)
+  return Math.round((sum / reviews.value.length) * 10) / 10
+})
+
+const ratingHint = computed(() =>
+  ({ 1: 'Çox pis', 2: 'Pis', 3: 'Normal', 4: 'Yaxşı', 5: 'Əla' })[hoverRating.value || reviewForm.rating] ?? '',
+)
+
+const loadReviews = async () => {
+  reviews.value = await getVenueReviews(route.params.id)
+}
+
+const resetForm = () => {
+  editingId.value = null
+  reviewForm.rating = 5
+  reviewForm.comment = ''
+  reviewError.value = ''
+}
+
+// Redaktə düyməsi: rəyi formaya yükləyib formaya sürüşdürür
+const startEdit = (review) => {
+  editingId.value = review.id
+  reviewForm.rating = review.rating
+  reviewForm.comment = review.text
+  reviewError.value = ''
+  reviewFormRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
+const cancelEdit = () => resetForm()
+
+// Redaktə rejimindədirsə yeniləyir, əks halda yeni rəy əlavə edir
+const submitReview = async () => {
+  if (!reviewForm.comment.trim()) {
+    reviewError.value = 'Rəy mətnini yazın.'
+    return
+  }
+
+  isSendingReview.value = true
+  reviewError.value = ''
+  try {
+    const comment = reviewForm.comment.trim()
+    const { message } = editingId.value
+      ? await updateReview(editingId.value, reviewForm.rating, comment)
+      : await createReview(venue.value.id, reviewForm.rating, comment)
+
+    resetForm()
+    await loadReviews()
+    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+  } catch (e) {
+    reviewError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
+  } finally {
+    isSendingReview.value = false
+  }
+}
+
+// İstifadəçi öz rəyini silir
+const removeReview = async (review) => {
+  try {
+    const { message } = await deleteReview(review.id)
+    if (editingId.value === review.id) resetForm()
+    await loadReviews()
+    ElNotification({ title: 'Silindi', message, type: 'success', zIndex: 99999 })
+  } catch (e) {
+    ElNotification({
+      title: 'Xəta',
+      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
+      type: 'error',
+      zIndex: 99999,
+    })
   }
 }
 
@@ -1003,6 +1162,152 @@ onMounted(loadVenue)
 
 .submit-btn {
   margin-left: 10px;
+}
+
+.review-summary {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #b07d2b;
+  margin-left: 10px;
+}
+
+/* Rəy yazma formu */
+.review-form {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.review-form h4 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: #1a1118;
+}
+
+.star-picker {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #e9ecef;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s, color 0.12s;
+}
+
+.star-btn:hover {
+  transform: scale(1.15);
+}
+
+.star-btn.filled {
+  color: #dfb15b;
+}
+
+.star-hint {
+  margin-left: 10px;
+  font-size: 0.83rem;
+  color: #868e96;
+}
+
+.review-form-foot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #c0392b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+.review-login {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.review-login a {
+  text-decoration: none;
+}
+
+.mine-tag {
+  background: #fdf3e0;
+  color: #b07d2b;
+  font-style: normal;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  margin-left: 6px;
+}
+
+.review-card.mine {
+  border-color: #dfb15b;
+  background: #fffdf7;
+}
+
+.review-card.editing {
+  border-color: #721438;
+  box-shadow: 0 0 0 3px rgba(114, 20, 56, 0.1);
+}
+
+.review-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.review-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.icon-btn {
+  background: #f8f9fa;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  width: 30px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+}
+
+.icon-btn:hover {
+  background: #fff;
+  border-color: #dfb15b;
+  transform: translateY(-1px);
+}
+
+.icon-btn.danger:hover {
+  border-color: #c0392b;
+  background: #fdeaea;
 }
 
 .review-list {

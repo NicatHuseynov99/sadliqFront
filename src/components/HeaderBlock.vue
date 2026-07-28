@@ -4,6 +4,7 @@
 
     <nav class="nav-links">
       <router-link to="/">Ana səhifə</router-link>
+      <router-link v-if="auth.isAuth" to="/favorites">♥ Seçilmişlər</router-link>
       <router-link v-if="auth.isCustomer" to="/my-reservations">Rezervlərim</router-link>
     </nav>
 

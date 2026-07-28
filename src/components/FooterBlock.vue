@@ -11,6 +11,7 @@
       <div class="footer-col">
         <h5>Keçidlər</h5>
         <router-link to="/">Ana səhifə</router-link>
+        <router-link to="/favorites">Seçilmişlər</router-link>
         <router-link to="/my-reservations">Rezervlərim</router-link>
         <router-link to="/login">Daxil ol</router-link>
         <router-link to="/register">Qeydiyyat</router-link>
