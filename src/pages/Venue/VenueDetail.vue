@@ -95,6 +95,43 @@
 
             <div v-if="openCalendars.has(h.id)" class="hall-calendar">
               <AvailabilityCalendar :busy-dates="hallBusy[h.id]" @select="(key) => onDateSelect(h, key)" />
+
+              <aside class="calendar-side">
+                <div class="side-block">
+                  <span class="side-label">Ən yaxın boş günlər</span>
+                  <div class="free-days">
+                    <button
+                      v-for="d in nextFreeDays(h.id)"
+                      :key="d.key"
+                      class="free-day"
+                      :class="{ weekend: d.isWeekend }"
+                      @click="onDateSelect(h, d.key)"
+                    >
+                      <span class="fd-weekday">{{ d.weekday }}</span>
+                      <span class="fd-day">{{ d.number }}</span>
+                      <span class="fd-month">{{ d.month }}</span>
+                    </button>
+                  </div>
+                  <span class="side-note">Qızılı günlər həftə sonudur — toylar üçün ən çox seçilən günlər.</span>
+                </div>
+
+                <div class="side-block stats">
+                  <div class="stat">
+                    <span class="stat-value">{{ h.capacity }}</span>
+                    <span class="stat-label">qonaq tutumu</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-value">{{ h.minPrice }} ₼</span>
+                    <span class="stat-label">nəfərbaşı, ən az</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-value">{{ busyCountIn90(h.id) }}</span>
+                    <span class="stat-label">3 ayda dolu gün</span>
+                  </div>
+                </div>
+
+                <button class="reserve-btn wide" @click="openReserve(h)">Bu zalı rezerv et</button>
+              </aside>
             </div>
           </div>
         </div>
@@ -320,7 +357,7 @@ import AddressLink from '@/components/AddressLink.vue'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
 import { getVenueById, toDateKey } from '@/services/venueService'
 import { getVenueReviews, createReview, updateReview, deleteReview } from '@/services/reviewService'
-import { formatDate, formatDateFull, weekdayShort } from '@/utils/date'
+import { formatDate, formatDateFull, weekdayShort, MONTHS } from '@/utils/date'
 import { createReservation } from '@/services/reservationService'
 import { useAuthStore } from '@/store/auth'
 
@@ -475,6 +512,42 @@ const nextDays = (hallId) => {
 
 // Zalın yaxın 14 gün ərzindəki ilk boş tarixi
 const nextFreeOf = (hallId) => nextDays(hallId).find((d) => d.status === 'free')?.key ?? null
+
+// Təqvimin yanındakı panel üçün: növbəti 90 gündə ilk 6 boş tarix
+const nextFreeDays = (hallId, count = 6) => {
+  const busy = hallBusy.value[hallId]
+  const result = []
+  const cursor = new Date()
+  cursor.setHours(0, 0, 0, 0)
+  cursor.setDate(cursor.getDate() + 1)
+
+  for (let i = 0; i < 90 && result.length < count; i++) {
+    const key = toDateKey(cursor)
+    if (!busy?.has(key)) {
+      const weekday = cursor.getDay()
+      result.push({
+        key,
+        number: cursor.getDate(),
+        month: MONTHS[cursor.getMonth()].slice(0, 3),
+        weekday: weekdayShort(cursor),
+        isWeekend: weekday === 0 || weekday === 6,
+      })
+    }
+    cursor.setDate(cursor.getDate() + 1)
+  }
+
+  return result
+}
+
+// Yaxın 3 ayda neçə gün doludur
+const busyCountIn90 = (hallId) => {
+  const busy = hallBusy.value[hallId]
+  if (!busy) return 0
+
+  const limit = new Date()
+  limit.setDate(limit.getDate() + 90)
+  return [...busy].filter((d) => new Date(d) <= limit).length
+}
 
 const toggleCalendar = (hallId) => {
   const set = new Set(openCalendars.value)
@@ -841,7 +914,11 @@ onMounted(loadVenue)
 
 .strip-free {
   font-size: 0.78rem;
-  color: #1e7e34;
+  color: #8a6220;
+}
+
+.strip-free b {
+  color: #721438;
 }
 
 .day-strip {
@@ -877,19 +954,23 @@ onMounted(loadVenue)
 }
 
 .strip-day.free {
-  background: #e8f6ec;
-  color: #1e7e34;
+  background: #fff;
+  border: 1px solid #efe7ea;
+  color: #1a1118;
 }
 
 .strip-day.free:hover {
-  background: #1e7e34;
+  background: #721438;
+  border-color: #721438;
   color: #fff;
   transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(114, 20, 56, 0.22);
 }
 
 .strip-day.busy {
-  background: #fdeaea;
-  color: #c0392b;
+  background: #f6f7f8;
+  border: 1px solid transparent;
+  color: #ced4da;
   cursor: not-allowed;
   text-decoration: line-through;
 }
@@ -918,8 +999,151 @@ onMounted(loadVenue)
 }
 
 .hall-calendar {
-  margin-top: 14px;
-  max-width: 420px;
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fbf7f8 0%, #f8f4f5 100%);
+  border: 1px solid #f2ecee;
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.calendar-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.side-block {
+  background: linear-gradient(180deg, #fdfbfc, #faf7f8);
+  border: 1px solid #f2ecee;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.side-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #b8a3ab;
+  margin-bottom: 12px;
+}
+
+/* Ən yaxın boş günlər — tez seçim kartları */
+.free-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.free-day {
+  background: #fff;
+  border: 1px solid #efe7ea;
+  border-radius: 12px;
+  padding: 9px 8px 8px;
+  min-width: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.free-day:hover {
+  background: #721438;
+  border-color: #721438;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(114, 20, 56, 0.22);
+}
+
+.free-day:hover span {
+  color: #fff !important;
+}
+
+/* Həftə sonu — toy günləri, qızılı vurğu */
+.free-day.weekend {
+  background: #fdf6e9;
+  border-color: #f0dfbe;
+}
+
+.free-day.weekend .fd-day {
+  color: #8a6220;
+}
+
+.fd-weekday {
+  font-size: 0.6rem;
+  color: #c2b2b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fd-day {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #721438;
+  line-height: 1.05;
+}
+
+.fd-month {
+  font-size: 0.68rem;
+  color: #a89aa0;
+  text-transform: lowercase;
+}
+
+.side-note {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: #b8a3ab;
+  line-height: 1.5;
+}
+
+/* Zal statistikası */
+.side-block.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  text-align: center;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1a1118;
+  line-height: 1.1;
+}
+
+.stat-label {
+  font-size: 0.66rem;
+  color: #b8a3ab;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.reserve-btn.wide {
+  width: 100%;
+  padding: 11px;
+  font-size: 0.92rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(114, 20, 56, 0.2);
+}
+
+@media (max-width: 820px) {
+  .hall-calendar {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Menyular — süfrə şəkli + tərkib */

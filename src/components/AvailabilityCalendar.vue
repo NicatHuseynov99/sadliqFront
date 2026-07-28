@@ -1,13 +1,23 @@
 <template>
-  <div class="calendar" v-loading="isLoading">
+  <div class="calendar">
     <div class="cal-head">
       <button class="nav-btn" :disabled="!canGoBack" @click="shiftMonth(-1)">‹</button>
       <span class="cal-title">{{ monthLabel }}</span>
       <button class="nav-btn" @click="shiftMonth(1)">›</button>
     </div>
 
+    <!-- Ayın doluluq göstəricisi -->
+    <div class="occupancy">
+      <div class="occ-bar">
+        <span class="occ-fill" :style="{ width: occupancy + '%' }"></span>
+      </div>
+      <span class="occ-text">
+        <b>{{ freeCount }}</b> boş · <b>{{ busyCount }}</b> dolu
+      </span>
+    </div>
+
     <div class="week-days">
-      <span v-for="d in weekDays" :key="d">{{ d }}</span>
+      <span v-for="(d, i) in weekDays" :key="d" :class="{ weekend: i >= 5 }">{{ d }}</span>
     </div>
 
     <div class="days">
@@ -16,7 +26,7 @@
         v-for="d in days"
         :key="d.key"
         class="day"
-        :class="d.status"
+        :class="[d.status, { weekend: d.isWeekend, today: d.isToday }]"
         :disabled="d.status !== 'free'"
         :title="dayTitle(d)"
         @click="$emit('select', d.key)"
@@ -26,14 +36,10 @@
     </div>
 
     <div class="legend">
-      <span><i class="box free"></i> Boş</span>
-      <span><i class="box busy"></i> Dolu</span>
-      <span><i class="box past"></i> Keçmiş</span>
+      <span><i class="dot free"></i> Boş</span>
+      <span><i class="dot weekend"></i> Həftə sonu</span>
+      <span><i class="dot busy"></i> Dolu</span>
     </div>
-
-    <p class="summary" v-if="!isLoading">
-      Bu ayda <b>{{ freeCount }}</b> boş, <b>{{ busyCount }}</b> dolu gün var.
-    </p>
   </div>
 </template>
 
@@ -52,10 +58,10 @@ defineEmits(['select'])
 const weekDays = WEEKDAYS_SHORT
 
 const busy = computed(() => props.busyDates ?? new Set())
-const isLoading = ref(false)
 
 const today = new Date()
 today.setHours(0, 0, 0, 0)
+const todayKey = toDateKey(today)
 
 const viewYear = ref(today.getFullYear())
 const viewMonth = ref(today.getMonth())
@@ -80,7 +86,7 @@ const leadingBlanks = computed(() => {
   return (firstDay + 6) % 7
 })
 
-// Ayın hər günü üçün vəziyyət hesablayır: keçmiş / dolu / boş
+// Ayın hər günü üçün vəziyyət hesablayır: keçmiş / dolu / boş (+ həftə sonu, bu gün)
 const days = computed(() => {
   const total = new Date(viewYear.value, viewMonth.value + 1, 0).getDate()
   const result = []
@@ -88,12 +94,20 @@ const days = computed(() => {
   for (let n = 1; n <= total; n++) {
     const date = new Date(viewYear.value, viewMonth.value, n)
     const key = toDateKey(date)
+    const weekday = date.getDay()
 
     let status = 'free'
     if (date <= today) status = 'past'
     else if (busy.value.has(key)) status = 'busy'
 
-    result.push({ number: n, key, status })
+    result.push({
+      number: n,
+      key,
+      status,
+      // Toylar əsasən həftə sonu olur — o günləri ayrıca vurğulayırıq
+      isWeekend: weekday === 0 || weekday === 6,
+      isToday: key === todayKey,
+    })
   }
 
   return result
@@ -101,6 +115,12 @@ const days = computed(() => {
 
 const freeCount = computed(() => days.value.filter((d) => d.status === 'free').length)
 const busyCount = computed(() => days.value.filter((d) => d.status === 'busy').length)
+
+// Gələcək günlərin neçə faizi doludur (keçmiş günlər hesaba alınmır)
+const occupancy = computed(() => {
+  const total = freeCount.value + busyCount.value
+  return total === 0 ? 0 : Math.round((busyCount.value / total) * 100)
+})
 
 const dayTitle = (d) =>
   ({
@@ -113,37 +133,38 @@ const dayTitle = (d) =>
 <style scoped>
 .calendar {
   background: #fff;
-  border: 1px solid #eaeaea;
-  border-radius: 12px;
-  padding: 16px 18px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #efe9eb;
+  border-radius: 14px;
+  padding: 16px 18px 14px;
+  box-shadow: 0 6px 20px rgba(114, 20, 56, 0.06);
 }
 
 .cal-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .cal-title {
   font-weight: 700;
   color: #1a1118;
   text-transform: capitalize;
-  font-size: 1rem;
+  font-size: 1.02rem;
+  letter-spacing: 0.01em;
 }
 
 .nav-btn {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1px solid #eaeaea;
+  border: 1px solid #f0e6ea;
   background: #fff;
   color: #721438;
   font-size: 1.1rem;
   cursor: pointer;
   line-height: 1;
-  transition: all 0.2s;
+  transition: all 0.18s;
 }
 
 .nav-btn:hover:not(:disabled) {
@@ -153,8 +174,42 @@ const dayTitle = (d) =>
 }
 
 .nav-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: not-allowed;
+}
+
+/* Doluluq göstəricisi */
+.occupancy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.occ-bar {
+  flex: 1;
+  height: 5px;
+  background: #f3f0f1;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.occ-fill {
+  display: block;
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #dfb15b, #721438);
+  transition: width 0.35s ease;
+}
+
+.occ-text {
+  font-size: 0.72rem;
+  color: #adb5bd;
+  white-space: nowrap;
+}
+
+.occ-text b {
+  color: #1a1118;
 }
 
 .week-days,
@@ -165,54 +220,81 @@ const dayTitle = (d) =>
 }
 
 .week-days {
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 }
 
 .week-days span {
   text-align: center;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  color: #adb5bd;
+  color: #ced4da;
   text-transform: uppercase;
+}
+
+.week-days span.weekend {
+  color: #b07d2b;
 }
 
 .day {
   aspect-ratio: 1;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 9px;
   font-size: 0.85rem;
   font-weight: 600;
   display: grid;
   place-items: center;
   cursor: default;
+  background: transparent;
+  transition: all 0.15s;
 }
 
 .day.blank {
   background: transparent;
 }
 
+/* Boş gün — sakit, dəvətedici */
 .day.free {
-  background: #e8f6ec;
-  color: #1e7e34;
+  background: #fff;
+  border-color: #f0eaec;
+  color: #1a1118;
   cursor: pointer;
-  transition: all 0.15s;
 }
 
 .day.free:hover {
-  background: #1e7e34;
+  background: #721438;
+  border-color: #721438;
   color: #fff;
-  transform: scale(1.06);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(114, 20, 56, 0.25);
 }
 
+/* Həftə sonu — toy günləri, qızılı vurğu */
+.day.free.weekend {
+  background: #fdf6e9;
+  border-color: #f2e3c6;
+  color: #8a6220;
+}
+
+.day.free.weekend:hover {
+  background: #721438;
+  border-color: #721438;
+  color: #fff;
+}
+
+/* Dolu gün — həyəcan siqnalı deyil, sadəcə susdurulmuş */
 .day.busy {
-  background: #fdeaea;
-  color: #c0392b;
+  background: #f6f7f8;
+  color: #ced4da;
   text-decoration: line-through;
+  text-decoration-thickness: 1px;
 }
 
 .day.past {
-  background: #f8f9fa;
-  color: #ced4da;
+  color: #e9ecef;
+}
+
+.day.today {
+  box-shadow: inset 0 0 0 2px #dfb15b;
 }
 
 .legend {
@@ -220,46 +302,37 @@ const dayTitle = (d) =>
   gap: 14px;
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid #f1f3f5;
-  font-size: 0.78rem;
-  color: #6c757d;
+  border-top: 1px solid #f5f1f2;
+  font-size: 0.75rem;
+  color: #868e96;
 }
 
 .legend span {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
-.box {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
+.dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 4px;
   display: inline-block;
+  border: 1px solid transparent;
 }
 
-.box.free {
-  background: #e8f6ec;
-  border: 1px solid #1e7e34;
+.dot.free {
+  background: #fff;
+  border-color: #e5dcdf;
 }
 
-.box.busy {
-  background: #fdeaea;
-  border: 1px solid #c0392b;
+.dot.weekend {
+  background: #fdf6e9;
+  border-color: #e6cf9d;
 }
 
-.box.past {
-  background: #f8f9fa;
-  border: 1px solid #ced4da;
-}
-
-.summary {
-  margin: 10px 0 0;
-  font-size: 0.8rem;
-  color: #868e96;
-}
-
-.summary b {
-  color: #1a1118;
+.dot.busy {
+  background: #f6f7f8;
+  border-color: #e3e6e8;
 }
 </style>
