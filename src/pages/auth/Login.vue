@@ -25,6 +25,10 @@
         </el-button>
       </el-form>
 
+      <p class="forgot-link">
+        <router-link to="/forgot-password">Parolu unutmusunuz?</router-link>
+      </p>
+
       <p class="switch-link">
         Hesabınız yoxdur? <router-link to="/register">Qeydiyyatdan keçin</router-link>
       </p>
@@ -114,9 +118,25 @@ const login = async () => {
   border-color: #a3760a;
 }
 
+.forgot-link {
+  text-align: center;
+  margin: 14px 0 0;
+  font-size: 13px;
+}
+
+.forgot-link a {
+  color: #a08a5b;
+  text-decoration: none;
+}
+
+.forgot-link a:hover {
+  color: #b8860b;
+  text-decoration: underline;
+}
+
 .switch-link {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 12px;
   font-size: 14px;
   color: #666;
 }

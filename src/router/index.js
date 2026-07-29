@@ -23,6 +23,16 @@ const routes = [
     component: () => import('@/pages/Venue/VenueDetail.vue'),
   },
   {
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: () => import('@/pages/auth/ForgotPassword.vue'),
+  },
+  {
+    path: '/reset-password',
+    name: 'reset-password',
+    component: () => import('@/pages/auth/ResetPassword.vue'),
+  },
+  {
     path: '/profile',
     name: 'profile',
     component: () => import('@/pages/Profile/MyProfile.vue'),

@@ -12,6 +12,7 @@ import FooterBlock from './components/FooterBlock.vue'
 
 const route = useRoute()
 
-// Login/Register tam ekran səhifələrdir — orada header/footer göstərmirik
-const isAuthPage = computed(() => route.name === 'login' || route.name === 'register')
+// Giriş/qeydiyyat/parol bərpası tam ekran səhifələrdir — orada header/footer göstərmirik
+const AUTH_PAGES = ['login', 'register', 'forgot-password', 'reset-password']
+const isAuthPage = computed(() => AUTH_PAGES.includes(route.name))
 </script>
