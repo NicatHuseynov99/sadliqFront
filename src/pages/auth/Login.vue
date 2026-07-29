@@ -56,7 +56,8 @@ const login = async () => {
   errorMessage.value = ''
   try {
     await auth.login(form)
-    await router.push({ name: 'home' })
+    // Hər rol öz başlanğıc səhifəsinə düşür (admin panel / saray paneli / ana səhifə)
+    await router.push({ name: auth.homeRoute })
   } catch (e) {
     // Backend-dən gələn xəta mesajını formanın altında göstəririk
     errorMessage.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'

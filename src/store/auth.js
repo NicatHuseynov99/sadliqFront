@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import api from '@/services/api'
 
-// Backend UserRole enum-u JSON-da rəqəm kimi gəlir (0=Customer, 1=Owner, 2=Admin).
-// Gələcəkdə string kimi gəlsə də işləsin deyə hər iki formatı mətnə çeviririk.
-const ROLE_NAMES = ['Customer', 'Owner', 'Admin']
+// Backend UserRole enum-u JSON-da rəqəm kimi gəlir:
+// 0 = Customer, 1 = Owner (saray rəhbərliyi), 2 = SuperAdmin (platforma sahibi),
+// 3 = VenueAdmin (rəhbərliyin təyin etdiyi saray administratoru)
+const ROLE_NAMES = ['Customer', 'Owner', 'SuperAdmin', 'VenueAdmin']
 
 const normalizeRole = (role) =>
   typeof role === 'number' ? (ROLE_NAMES[role] ?? 'Customer') : (role ?? 'Customer')
@@ -20,7 +21,18 @@ export const useAuthStore = defineStore('auth', {
     isAuth: (state) => !!state.token,
     isOwner: (state) => state.user?.role === 'Owner',
     isCustomer: (state) => state.user?.role === 'Customer',
-    isAdmin: (state) => state.user?.role === 'Admin',
+    isSuperAdmin: (state) => state.user?.role === 'SuperAdmin',
+    isVenueAdmin: (state) => state.user?.role === 'VenueAdmin',
+
+    // Panelə girişi olanlar: saray rəhbərliyi və onun administratorları
+    canManageVenues: (state) => ['Owner', 'VenueAdmin'].includes(state.user?.role),
+
+    // Giriş və ya yönləndirmə zamanı istifadəçinin öz başlanğıc səhifəsi
+    homeRoute: (state) => {
+      if (state.user?.role === 'SuperAdmin') return 'admin-panel'
+      if (['Owner', 'VenueAdmin'].includes(state.user?.role)) return 'owner-panel'
+      return 'home'
+    },
   },
 
   actions: {

@@ -48,7 +48,19 @@ const routes = [
     path: '/my-reservations',
     name: 'my-reservations',
     component: () => import('@/pages/Reservations/MyReservations.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, roles: ['Customer'] },
+  },
+  {
+    path: '/panel',
+    name: 'owner-panel',
+    component: () => import('@/pages/Owner/OwnerPanel.vue'),
+    meta: { requiresAuth: true, roles: ['Owner', 'VenueAdmin'] },
+  },
+  {
+    path: '/admin',
+    name: 'admin-panel',
+    component: () => import('@/pages/Admin/AdminPanel.vue'),
+    meta: { requiresAuth: true, roles: ['SuperAdmin'] },
   },
 ]
 
@@ -58,7 +70,7 @@ const router = createRouter({
   linkActiveClass: 'menu-item-active',
 })
 
-// requiresAuth qoyulmuş səhifələrə girişi olmayanı login-ə, login olmuşu isə auth səhifələrindən ana səhifəyə yönləndirir
+// Giriş və rol yoxlaması: icazəsi olmayan istifadəçi öz başlanğıc səhifəsinə göndərilir
 router.beforeEach((to) => {
   const auth = useAuthStore()
 
@@ -66,8 +78,13 @@ router.beforeEach((to) => {
     return { name: 'login' }
   }
 
+  // Səhifə konkret rol üçündürsə, uyğun olmayanı öz başlanğıc səhifəsinə qaytarırıq
+  if (to.meta.roles && auth.isAuth && !to.meta.roles.includes(auth.user?.role)) {
+    return { name: auth.homeRoute }
+  }
+
   if ((to.name === 'login' || to.name === 'register') && auth.isAuth) {
-    return { name: 'home' }
+    return { name: auth.homeRoute }
   }
 })
 
