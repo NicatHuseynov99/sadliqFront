@@ -35,6 +35,9 @@
         <button class="section-tab" :class="{ active: section === 'reservations' }" @click="section = 'reservations'">
           Rezerv sorğuları
         </button>
+        <button class="section-tab" :class="{ active: section === 'venues' }" @click="section = 'venues'">
+          Saraylarım <em>{{ venues.length }}</em>
+        </button>
         <button class="section-tab" :class="{ active: section === 'staff' }" @click="openStaff">
           Administratorlar <em v-if="staff.length">{{ staff.length }}</em>
         </button>
@@ -45,6 +48,9 @@
         <h3>Hələ sarayınız yoxdur.</h3>
         <p>Saray əlavə olunduqdan sonra rezerv sorğuları burada görünəcək.</p>
       </div>
+
+      <!-- Saraylarım bölməsi -->
+      <VenueManager v-else-if="section === 'venues'" :venues="venues" @changed="load" />
 
       <!-- Administratorlar bölməsi -->
       <div v-else-if="section === 'staff'" class="staff-block" v-loading="isLoadingStaff">
@@ -220,6 +226,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import { ElMessageBox } from 'element-plus'
+import VenueManager from '@/components/VenueManager.vue'
 import {
   getMyVenues,
   getOwnerReservations,

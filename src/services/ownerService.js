@@ -50,6 +50,75 @@ export const getVenueReservations = async (venueId) => {
   return (data.data ?? []).map(mapReservation).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
 }
 
+// ============ Saray, zal və menyu idarəetməsi (yalnız Owner) ============
+
+// POST /Venues/Create
+export const createVenue = async (payload) => {
+  const { data } = await api.post('/Venues/Create', payload)
+  return { venue: data.data, message: data.message ?? 'Saray əlavə olundu.' }
+}
+
+// PUT /Venues/Update/{id}
+export const updateVenue = async (id, payload) => {
+  const { data } = await api.put(`/Venues/Update/${id}`, payload)
+  return data.message ?? 'Saray yeniləndi.'
+}
+
+// DELETE /Venues/Delete/{id}
+export const deleteVenue = async (id) => {
+  const { data } = await api.delete(`/Venues/Delete/${id}`)
+  return data.message ?? 'Saray silindi.'
+}
+
+// GET /Halls/GetByVenue/{venueId}
+export const getVenueHalls = async (venueId) => {
+  const { data } = await api.get(`/Halls/GetByVenue/${venueId}`)
+  return (data.data ?? []).map((h) => ({ ...h, imageUrl: h.media?.[0]?.url ?? '' }))
+}
+
+export const createHall = async (payload) => {
+  const { data } = await api.post('/Halls/Create', payload)
+  return data.message ?? 'Zal əlavə olundu.'
+}
+
+export const updateHall = async (id, payload) => {
+  const { data } = await api.put(`/Halls/Update/${id}`, payload)
+  return data.message ?? 'Zal yeniləndi.'
+}
+
+export const deleteHall = async (id) => {
+  const { data } = await api.delete(`/Halls/Delete/${id}`)
+  return data.message ?? 'Zal silindi.'
+}
+
+// PUT /Halls/SetAvailability/{hallId} — günü əl ilə bağlamaq/açmaq
+// Status: 0 = Boş, 1 = Dolu, 2 = Tutulub
+export const setHallDayStatus = async (hallId, date, status) => {
+  const { data } = await api.put(`/Halls/SetAvailability/${hallId}`, { date, status })
+  return data.message ?? 'Təqvim yeniləndi.'
+}
+
+// GET /Menus/GetByVenue/{venueId}
+export const getVenueMenus = async (venueId) => {
+  const { data } = await api.get(`/Menus/GetByVenue/${venueId}`)
+  return data.data ?? []
+}
+
+export const createMenu = async (payload) => {
+  const { data } = await api.post('/Menus/Create', payload)
+  return data.message ?? 'Menyu əlavə olundu.'
+}
+
+export const updateMenu = async (id, payload) => {
+  const { data } = await api.put(`/Menus/Update/${id}`, payload)
+  return data.message ?? 'Menyu yeniləndi.'
+}
+
+export const deleteMenu = async (id) => {
+  const { data } = await api.delete(`/Menus/Delete/${id}`)
+  return data.message ?? 'Menyu silindi.'
+}
+
 // ============ Saray administratorları (yalnız Owner) ============
 
 // GET /VenueStaff/GetMine
