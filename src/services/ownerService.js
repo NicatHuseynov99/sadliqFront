@@ -139,6 +139,12 @@ export const updateStaff = async (id, payload) => {
   return data.message
 }
 
+// PUT /VenueStaff/SetHalls/{id} — administratorun işləyə biləcəyi zallar (boş = hamısı)
+export const setStaffHalls = async (id, hallIds) => {
+  const { data } = await api.put(`/VenueStaff/SetHalls/${id}`, { hallIds })
+  return data.message
+}
+
 // DELETE /VenueStaff/Delete/{id} — təyinatı siyahıdan silir
 export const deleteStaff = async (id) => {
   const { data } = await api.delete(`/VenueStaff/Delete/${id}`)

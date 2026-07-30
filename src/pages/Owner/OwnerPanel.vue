@@ -63,9 +63,28 @@
 
           <el-form label-position="top" @submit.prevent>
             <el-form-item label="Saray">
-              <el-select v-model="staffForm.venueId" placeholder="Saray seçin" style="width: 100%">
+              <el-select
+                v-model="staffForm.venueId"
+                placeholder="Saray seçin"
+                style="width: 100%"
+                @change="onStaffVenueChange"
+              >
                 <el-option v-for="v in venues" :key="v.id" :value="v.id" :label="v.name" />
               </el-select>
+            </el-form-item>
+
+            <el-form-item label="Hansı zallarda işləyəcək?">
+              <el-select
+                v-model="staffForm.hallIds"
+                multiple
+                collapse-tags
+                placeholder="Boş buraxsanız bütün zallar"
+                style="width: 100%"
+                :disabled="!staffForm.venueId"
+              >
+                <el-option v-for="h in staffVenueHalls" :key="h.id" :value="h.id" :label="h.name" />
+              </el-select>
+              <span class="field-hint">Seçim etməsəniz sarayın bütün zallarına icazəsi olacaq.</span>
             </el-form-item>
 
             <div class="form-row">
@@ -109,11 +128,15 @@
               <b>{{ s.fullName }}</b>
               <span>{{ s.email }} · {{ s.phone || '—' }}</span>
               <em>🏛 {{ s.venueName }}</em>
+              <em class="halls-line">
+                🚪 {{ s.hallNames?.length ? s.hallNames.join(', ') : 'Bütün zallar' }}
+              </em>
             </div>
             <div class="staff-actions">
               <span class="staff-status" :class="{ on: s.isActive }">
                 {{ s.isActive ? 'Aktiv' : 'Bağlı' }}
               </span>
+              <button class="mini-btn" @click="openHallPicker(s)">Zallar</button>
               <button class="mini-btn" @click="editStaff(s)">Redaktə</button>
               <button class="mini-btn" @click="toggleStaff(s)">
                 {{ s.isActive ? 'Girişi bağla' : 'Aktivləşdir' }}
@@ -229,6 +252,23 @@
         </section>
       </div>
     </div>
+
+    <!-- Administratorun zal icazələri -->
+    <el-dialog v-model="hallPickerDialog" :title="`${hallPickerStaff?.fullName} — zal icazələri`" width="440px">
+      <p class="dialog-note">
+        Seçdiyiniz zallarda administrator rezervləri görür və təsdiqləyir, təqvimi dəyişir.
+        Heç nə seçməsəniz sarayın bütün zallarına icazəsi olur.
+      </p>
+
+      <el-select v-model="hallPickerSelection" multiple style="width: 100%" placeholder="Zal seçin">
+        <el-option v-for="h in hallPickerOptions" :key="h.id" :value="h.id" :label="h.name" />
+      </el-select>
+
+      <template #footer>
+        <el-button @click="hallPickerDialog = false">İmtina</el-button>
+        <button class="confirm-btn" :disabled="isSavingStaff" @click="saveStaffHalls">Yadda saxla</button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -248,7 +288,9 @@ import {
   updateStaff,
   deleteStaff,
   setStaffActive,
+  setStaffHalls,
   resetStaffPassword,
+  getVenueHalls,
 } from '@/services/ownerService'
 import { formatDateFull } from '@/utils/date'
 
@@ -270,12 +312,22 @@ const isSavingStaff = ref(false)
 const staffError = ref('')
 const staffForm = reactive({
   venueId: null,
+  hallIds: [],
   firstName: '',
   lastName: '',
   email: '',
   phone: '',
   password: '',
 })
+
+// Formada seçilmiş sarayın zalları
+const staffVenueHalls = ref([])
+
+// Mövcud administratorun zal icazələrini dəyişmək üçün
+const hallPickerDialog = ref(false)
+const hallPickerStaff = ref(null)
+const hallPickerOptions = ref([])
+const hallPickerSelection = ref([])
 
 const tabs = [
   { value: 0, label: 'Gözləyir' },
@@ -385,6 +437,39 @@ const loadStaff = async () => {
   }
 }
 
+// Saray dəyişəndə həmin sarayın zalları yüklənir
+const onStaffVenueChange = async (venueId) => {
+  staffForm.hallIds = []
+  staffVenueHalls.value = venueId ? await getVenueHalls(venueId) : []
+}
+
+// Mövcud administratorun zal icazələrini açır
+const openHallPicker = async (member) => {
+  hallPickerStaff.value = member
+  hallPickerSelection.value = [...(member.hallIds ?? [])]
+  hallPickerOptions.value = await getVenueHalls(member.venueId)
+  hallPickerDialog.value = true
+}
+
+const saveStaffHalls = async () => {
+  isSavingStaff.value = true
+  try {
+    const message = await setStaffHalls(hallPickerStaff.value.id, hallPickerSelection.value)
+    hallPickerDialog.value = false
+    await loadStaff()
+    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+  } catch (e) {
+    ElNotification({
+      title: 'Xəta',
+      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
+      type: 'error',
+      zIndex: 99999,
+    })
+  } finally {
+    isSavingStaff.value = false
+  }
+}
+
 // Yeni administrator hesabı yaradır və seçilmiş saraya təyin edir
 const submitStaff = async () => {
   if (!staffForm.venueId || !staffForm.firstName || !staffForm.lastName || !staffForm.email) {
@@ -396,7 +481,9 @@ const submitStaff = async () => {
   staffError.value = ''
   try {
     const { message } = await createStaff({ ...staffForm })
-    Object.assign(staffForm, { firstName: '', lastName: '', email: '', phone: '', password: '' })
+    Object.assign(staffForm, {
+      hallIds: [], firstName: '', lastName: '', email: '', phone: '', password: '',
+    })
     await loadStaff()
     ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
   } catch (e) {
@@ -740,6 +827,24 @@ onMounted(load)
   font-style: normal;
   font-size: 0.77rem;
   color: #adb5bd;
+}
+
+.halls-line {
+  color: #8a6220 !important;
+}
+
+.field-hint {
+  display: block;
+  font-size: 0.72rem;
+  color: #adb5bd;
+  line-height: 1.4;
+}
+
+.dialog-note {
+  margin: 0 0 14px;
+  font-size: 0.83rem;
+  color: #868e96;
+  line-height: 1.5;
 }
 
 .staff-actions {
