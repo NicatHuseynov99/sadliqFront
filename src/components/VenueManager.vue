@@ -3,12 +3,20 @@
     <!-- Saray siyahısı -->
     <section class="vm-list">
       <div class="vm-head">
-        <h2 class="block-title">Saraylarım <em v-if="venues.length">{{ venues.length }}</em></h2>
-        <button class="confirm-btn" @click="openVenueForm(null)">+ Yeni saray</button>
+        <h2 class="block-title">
+          {{ canEdit ? 'Saraylarım' : 'Zallarım' }}
+          <em v-if="venues.length">{{ venues.length }}</em>
+        </h2>
+        <button v-if="canEdit" class="confirm-btn" @click="openVenueForm(null)">+ Yeni saray</button>
       </div>
 
+      <p v-if="!canEdit" class="vm-note">
+        Sizə təyin olunmuş zalların məlumatlarını dəyişə və təqvimini idarə edə bilərsiniz.
+        Yeni zal açmaq, sarayın özünü redaktə etmək və menyular rəhbərliyə aiddir.
+      </p>
+
       <div v-if="!venues.length && !isLoading" class="empty-box">
-        Hələ sarayınız yoxdur — "Yeni saray" düyməsi ilə əlavə edin.
+        {{ canEdit ? 'Hələ sarayınız yoxdur — "Yeni saray" düyməsi ilə əlavə edin.' : 'Sizə hələ zal təyin olunmayıb.' }}
       </div>
 
       <div v-for="v in venues" :key="v.id" class="vm-card">
@@ -21,10 +29,11 @@
         </div>
 
         <div class="vm-actions">
-          <button class="mini-btn" @click="openVenueForm(v)">Redaktə</button>
+          <button v-if="canEdit" class="mini-btn" @click="openVenueForm(v)">Redaktə</button>
           <button class="mini-btn" @click="openHalls(v)">Zallar</button>
-          <button class="mini-btn" @click="openMenus(v)">Menyular</button>
+          <button v-if="canEdit" class="mini-btn" @click="openMenus(v)">Menyular</button>
           <el-popconfirm
+            v-if="canEdit"
             title="Saray və bütün zalları silinəcək. Əminsiniz?"
             confirm-button-text="Bəli, sil"
             cancel-button-text="Xeyr"
@@ -102,49 +111,100 @@
     </el-dialog>
 
     <!-- Zallar -->
-    <el-dialog v-model="hallDialog" :title="`${activeVenue?.name} — zallar`" width="720px">
-      <div class="sub-list">
-        <div v-for="h in halls" :key="h.id" class="sub-card">
-          <img :src="h.imageUrl" :alt="h.name" @error="onImgError" />
-          <div class="sub-text">
-            <b>{{ h.name }}</b>
-            <span>👥 {{ h.capacity }} qonaq · {{ h.minPrice }} ₼-dən</span>
-            <em>{{ h.description }}</em>
+    <el-dialog v-model="hallDialog" :title="`${activeVenue?.name} — zallar`" width="760px">
+      <div class="hall-head">
+        <span class="hall-count">{{ halls.length }} zal</span>
+        <button v-if="canEdit" class="confirm-btn" @click="openHallForm(null)">+ Yeni zal</button>
+      </div>
+
+      <div class="hall-grid">
+        <article v-for="h in halls" :key="h.id" class="hall-card">
+          <div class="hc-image">
+            <img :src="h.imageUrl" :alt="h.name" @error="onImgError" />
+            <span class="hc-price">{{ h.minPrice }} ₼-dən</span>
           </div>
-          <div class="sub-actions">
-            <button class="mini-btn" @click="openCalendar(h)">📅 Təqvim</button>
-            <button class="mini-btn" @click="editHall(h)">Redaktə</button>
-            <el-popconfirm title="Zal silinsin?" confirm-button-text="Bəli" cancel-button-text="Xeyr" @confirm="removeHall(h)">
-              <template #reference>
-                <button class="mini-btn danger">Sil</button>
-              </template>
-            </el-popconfirm>
+
+          <div class="hc-body">
+            <h4>{{ h.name }}</h4>
+            <span class="hc-capacity">👥 {{ h.capacity }} qonaq</span>
+            <p class="hc-desc">{{ h.description || 'Təsvir yazılmayıb' }}</p>
+
+            <div class="hc-actions">
+              <button class="act-btn" @click="openCalendar(h)"><span>📅</span> Təqvim</button>
+              <button class="act-btn" @click="openHallForm(h)"><span>✏️</span> Redaktə</button>
+              <el-popconfirm
+                v-if="canEdit"
+                title="Zal silinsin?"
+                confirm-button-text="Bəli, sil"
+                cancel-button-text="Xeyr"
+                @confirm="removeHall(h)"
+              >
+                <template #reference>
+                  <button class="act-btn danger"><span>🗑</span> Sil</button>
+                </template>
+              </el-popconfirm>
+            </div>
           </div>
-        </div>
+        </article>
+
         <div v-if="!halls.length" class="empty-box">Bu sarayda hələ zal yoxdur.</div>
       </div>
+    </el-dialog>
 
-      <div class="sub-form">
-        <h4>{{ hallForm.id ? 'Zalı redaktə et' : 'Yeni zal' }}</h4>
-        <div class="form-row">
-          <el-form-item label="Ad"><el-input v-model="hallForm.name" placeholder="Böyük Zal" /></el-form-item>
-          <el-form-item label="Tutum"><el-input v-model.number="hallForm.capacity" type="number" /></el-form-item>
+    <!-- Zalın forması -->
+    <el-dialog
+      v-model="hallFormDialog"
+      :title="hallForm.id ? `${hallForm.name || 'Zal'} — redaktə` : 'Yeni zal'"
+      width="640px"
+    >
+      <div class="hf-grid">
+        <!-- Şəkil önizləməsi -->
+        <div class="hf-preview">
+          <img v-if="hallForm.imageUrl" :src="hallForm.imageUrl" alt="" @error="onImgError" />
+          <div v-else class="hf-placeholder">🏛<span>Şəkil linki əlavə edin</span></div>
         </div>
-        <div class="form-row">
-          <el-form-item label="Minimum qiymət (₼)"><el-input v-model.number="hallForm.minPrice" type="number" /></el-form-item>
-          <el-form-item label="Şəkil (link)"><el-input v-model="hallForm.imageUrl" placeholder="https://..." /></el-form-item>
-        </div>
-        <el-form-item label="Təsvir"><el-input v-model="hallForm.description" type="textarea" :rows="2" /></el-form-item>
 
-        <p v-if="formError" class="form-error">{{ formError }}</p>
+        <el-form label-position="top" class="hf-fields" @submit.prevent>
+          <el-form-item label="Zalın adı">
+            <el-input v-model="hallForm.name" placeholder="Böyük Zal" />
+          </el-form-item>
 
-        <div class="sub-form-foot">
-          <button class="confirm-btn" :disabled="isSaving" @click="saveHall">
-            {{ hallForm.id ? 'Yenilə' : 'Zal əlavə et' }}
-          </button>
-          <button v-if="hallForm.id" class="mini-btn" @click="resetHallForm">İmtina</button>
-        </div>
+          <div class="form-row">
+            <el-form-item label="Tutum (qonaq)">
+              <el-input v-model.number="hallForm.capacity" type="number" min="1" />
+            </el-form-item>
+            <el-form-item label="Minimum qiymət (₼)">
+              <el-input v-model.number="hallForm.minPrice" type="number" min="0" />
+            </el-form-item>
+          </div>
+
+          <el-form-item label="Şəkil (link)">
+            <el-input v-model="hallForm.imageUrl" placeholder="https://..." />
+          </el-form-item>
+        </el-form>
       </div>
+
+      <el-form label-position="top" @submit.prevent>
+        <el-form-item label="Təsvir">
+          <el-input
+            v-model="hallForm.description"
+            type="textarea"
+            :rows="3"
+            maxlength="300"
+            show-word-limit
+            placeholder="Zalın xüsusiyyətləri: səhnə, rəqs meydançası, işıqlandırma..."
+          />
+        </el-form-item>
+      </el-form>
+
+      <p v-if="formError" class="form-error">{{ formError }}</p>
+
+      <template #footer>
+        <el-button @click="closeHallForm">İmtina</el-button>
+        <button class="confirm-btn" :disabled="isSaving" @click="saveHall">
+          {{ isSaving ? 'Saxlanılır...' : hallForm.id ? 'Yadda saxla' : 'Zal əlavə et' }}
+        </button>
+      </template>
     </el-dialog>
 
     <!-- Zalın təqvimi -->
@@ -232,6 +292,9 @@ import {
 
 const props = defineProps({
   venues: { type: Array, default: () => [] },
+
+  // Administrator sarayın özünü və menyuları redaktə edə bilmir, yalnız zalları
+  canEdit: { type: Boolean, default: true },
 })
 
 const emit = defineEmits(['changed'])
@@ -249,6 +312,7 @@ const formError = ref('')
 
 const venueDialog = ref(false)
 const hallDialog = ref(false)
+const hallFormDialog = ref(false)
 const menuDialog = ref(false)
 const calendarDialog = ref(false)
 const calendarHall = ref(null)
@@ -350,15 +414,27 @@ const resetHallForm = () => {
   formError.value = ''
 }
 
-const editHall = (hall) => {
-  Object.assign(hallForm, {
-    id: hall.id,
-    name: hall.name,
-    capacity: hall.capacity,
-    minPrice: hall.minPrice,
-    description: hall.description ?? '',
-    imageUrl: hall.imageUrl ?? '',
-  })
+// Zal forması: hall verilibsə redaktə, verilməyibsə yeni zal
+const openHallForm = (hall) => {
+  resetHallForm()
+
+  if (hall) {
+    Object.assign(hallForm, {
+      id: hall.id,
+      name: hall.name,
+      capacity: hall.capacity,
+      minPrice: hall.minPrice,
+      description: hall.description ?? '',
+      imageUrl: hall.imageUrl ?? '',
+    })
+  }
+
+  hallFormDialog.value = true
+}
+
+const closeHallForm = () => {
+  hallFormDialog.value = false
+  resetHallForm()
 }
 
 const saveHall = async () => {
@@ -383,7 +459,7 @@ const saveHall = async () => {
       : await createHall({ ...payload, venueId: activeVenue.value.id })
 
     halls.value = await getVenueHalls(activeVenue.value.id)
-    resetHallForm()
+    closeHallForm()
     notify(message)
     emit('changed')
   } catch (e) {
@@ -505,6 +581,17 @@ const onImgError = (e) => {
   align-items: center;
   gap: 14px;
   margin-bottom: 16px;
+}
+
+.vm-note {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  background: #fdf6e9;
+  border: 1px solid #f0dfbe;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  color: #8a6220;
+  line-height: 1.5;
 }
 
 .block-title {
@@ -638,7 +725,174 @@ const onImgError = (e) => {
   color: #fff;
 }
 
-/* Zal və menyu siyahıları */
+/* Zallar */
+.hall-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.hall-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #b8a3ab;
+}
+
+.hall-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.hall-card {
+  border: 1px solid #f2ecee;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  transition: all 0.18s;
+}
+
+.hall-card:hover {
+  box-shadow: 0 6px 18px rgba(114, 20, 56, 0.08);
+}
+
+.hc-image {
+  position: relative;
+  height: 130px;
+}
+
+.hc-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hc-price {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(114, 20, 56, 0.95);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.hc-body {
+  padding: 12px 14px 14px;
+}
+
+.hc-body h4 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  color: #1a1118;
+}
+
+.hc-capacity {
+  font-size: 0.78rem;
+  color: #868e96;
+}
+
+.hc-desc {
+  margin: 8px 0 12px;
+  font-size: 0.8rem;
+  color: #adb5bd;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 34px;
+}
+
+.hc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-top: 1px solid #f8f5f6;
+  padding-top: 10px;
+}
+
+.act-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #fff;
+  border: 1px solid #f0eaec;
+  color: #6c757d;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.act-btn:hover {
+  border-color: #721438;
+  color: #721438;
+  background: #fdfbfc;
+}
+
+.act-btn.danger:hover {
+  border-color: #c0392b;
+  color: #c0392b;
+  background: #fdf4f3;
+}
+
+/* Zal forması */
+.hf-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.hf-preview {
+  height: 100%;
+  min-height: 190px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #faf7f8;
+  border: 1px solid #f2ecee;
+}
+
+.hf-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hf-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 2rem;
+  color: #d9cdd2;
+}
+
+.hf-placeholder span {
+  font-size: 0.75rem;
+  color: #b8a3ab;
+}
+
+@media (max-width: 640px) {
+  .hf-grid {
+    grid-template-columns: 1fr;
+  }
+  .hf-preview {
+    min-height: 140px;
+  }
+}
+
+/* Menyu siyahısı */
 .sub-list {
   max-height: 260px;
   overflow-y: auto;

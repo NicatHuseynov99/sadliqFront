@@ -30,15 +30,20 @@
         </div>
       </div>
 
-      <!-- Bölmə seçimi (yalnız rəhbərlikdə administratorlar bölməsi var) -->
-      <div class="section-tabs" v-if="auth.canEditVenues">
+      <!-- Bölmə seçimi — administratorda yalnız rezervlər və zallar görünür -->
+      <div class="section-tabs">
         <button class="section-tab" :class="{ active: section === 'reservations' }" @click="section = 'reservations'">
           Rezerv sorğuları
         </button>
         <button class="section-tab" :class="{ active: section === 'venues' }" @click="section = 'venues'">
-          Saraylarım <em>{{ venues.length }}</em>
+          {{ auth.canEditVenues ? 'Saraylarım' : 'Zallarım' }} <em>{{ venues.length }}</em>
         </button>
-        <button class="section-tab" :class="{ active: section === 'staff' }" @click="openStaff">
+        <button
+          v-if="auth.canEditVenues"
+          class="section-tab"
+          :class="{ active: section === 'staff' }"
+          @click="openStaff"
+        >
           Administratorlar <em v-if="staff.length">{{ staff.length }}</em>
         </button>
       </div>
@@ -50,7 +55,12 @@
       </div>
 
       <!-- Saraylarım bölməsi -->
-      <VenueManager v-else-if="section === 'venues'" :venues="venues" @changed="load" />
+      <VenueManager
+        v-else-if="section === 'venues'"
+        :venues="venues"
+        :can-edit="auth.canEditVenues"
+        @changed="load"
+      />
 
       <!-- Administratorlar bölməsi -->
       <div v-else-if="section === 'staff'" class="staff-block" v-loading="isLoadingStaff">
