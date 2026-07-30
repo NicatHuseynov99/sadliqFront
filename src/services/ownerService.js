@@ -133,6 +133,18 @@ export const createStaff = async (payload) => {
   return { staff: data.data, message: data.message }
 }
 
+// PUT /VenueStaff/Update/{id} — ad, soyad və telefon
+export const updateStaff = async (id, payload) => {
+  const { data } = await api.put(`/VenueStaff/Update/${id}`, payload)
+  return data.message
+}
+
+// DELETE /VenueStaff/Delete/{id} — təyinatı siyahıdan silir
+export const deleteStaff = async (id) => {
+  const { data } = await api.delete(`/VenueStaff/Delete/${id}`)
+  return data.message
+}
+
 // PUT /VenueStaff/SetActive/{id}?isActive=true|false
 export const setStaffActive = async (id, isActive) => {
   const { data } = await api.put(`/VenueStaff/SetActive/${id}`, null, { params: { isActive } })

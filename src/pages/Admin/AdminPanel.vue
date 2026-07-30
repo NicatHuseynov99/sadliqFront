@@ -136,7 +136,8 @@ const roleFilters = [
   { value: '', label: 'Hamısı' },
   { value: 'Customer', label: 'Müştərilər' },
   { value: 'Owner', label: 'Saray rəhbərliyi' },
-  { value: 'VenueAdmin', label: 'Administratorlar' },
+  { value: 'VenueAdmin', label: 'Saray administratorları' },
+  { value: 'Support', label: 'Dəstək' },
   { value: 'SuperAdmin', label: 'SuperAdmin' },
 ]
 
@@ -144,6 +145,7 @@ const roles = [
   { value: 'Customer', label: 'Müştəri' },
   { value: 'Owner', label: 'Saray rəhbərliyi' },
   { value: 'VenueAdmin', label: 'Saray administratoru' },
+  { value: 'Support', label: 'Dəstək admini' },
   { value: 'SuperAdmin', label: 'SuperAdmin' },
 ]
 
@@ -490,6 +492,7 @@ onMounted(load)
 .role-select.owner { border-color: #e8cdd8; color: #721438; }
 .role-select.superadmin { border-color: #1a1118; color: #1a1118; }
 .role-select.venueadmin { border-color: #f0dfbe; color: #8a6220; }
+.role-select.support { border-color: #cfe3d4; color: #1e7e34; }
 
 @media (max-width: 980px) {
   .stat-row {

@@ -132,7 +132,14 @@ const initials = computed(() => {
 })
 
 const roleText = computed(
-  () => ({ Customer: 'Müştəri', Owner: 'Restoran rəhbərliyi', Admin: 'Administrator' })[auth.user?.role] ?? '—',
+  () =>
+    ({
+      Customer: 'Müştəri',
+      Owner: 'Saray rəhbərliyi',
+      VenueAdmin: 'Saray administratoru',
+      Support: 'Dəstək admini',
+      SuperAdmin: 'Platforma sahibi',
+    })[auth.user?.role] ?? '—',
 )
 
 const roleClass = computed(() => (auth.user?.role ?? 'Customer').toLowerCase())

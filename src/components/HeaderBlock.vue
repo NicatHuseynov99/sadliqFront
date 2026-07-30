@@ -5,7 +5,7 @@
     <nav class="nav-links">
       <router-link to="/">Ana səhifə</router-link>
       <router-link v-if="auth.isSuperAdmin" to="/admin" class="panel-link">⚙️ Admin panel</router-link>
-      <router-link v-if="auth.canManageVenues" to="/panel" class="panel-link">🏛 İdarəetmə paneli</router-link>
+      <router-link v-if="auth.canManageVenues" to="/panel" class="panel-link">🏛 Saraylar</router-link>
       <router-link v-if="auth.isCustomer" to="/favorites">♥ Seçilmişlər</router-link>
       <router-link v-if="auth.isCustomer" to="/my-reservations">Rezervlərim</router-link>
     </nav>

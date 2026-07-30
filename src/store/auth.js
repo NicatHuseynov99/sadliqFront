@@ -3,8 +3,8 @@ import api from '@/services/api'
 
 // Backend UserRole enum-u JSON-da rəqəm kimi gəlir:
 // 0 = Customer, 1 = Owner (saray rəhbərliyi), 2 = SuperAdmin (platforma sahibi),
-// 3 = VenueAdmin (rəhbərliyin təyin etdiyi saray administratoru)
-const ROLE_NAMES = ['Customer', 'Owner', 'SuperAdmin', 'VenueAdmin']
+// 3 = VenueAdmin (saray administratoru), 4 = Support (platformanın dəstək admini)
+const ROLE_NAMES = ['Customer', 'Owner', 'SuperAdmin', 'VenueAdmin', 'Support']
 
 const normalizeRole = (role) =>
   typeof role === 'number' ? (ROLE_NAMES[role] ?? 'Customer') : (role ?? 'Customer')
@@ -23,14 +23,19 @@ export const useAuthStore = defineStore('auth', {
     isCustomer: (state) => state.user?.role === 'Customer',
     isSuperAdmin: (state) => state.user?.role === 'SuperAdmin',
     isVenueAdmin: (state) => state.user?.role === 'VenueAdmin',
+    isSupport: (state) => state.user?.role === 'Support',
 
-    // Panelə girişi olanlar: saray rəhbərliyi və onun administratorları
-    canManageVenues: (state) => ['Owner', 'VenueAdmin'].includes(state.user?.role),
+    // Panelə girişi olanlar
+    canManageVenues: (state) =>
+      ['Owner', 'VenueAdmin', 'SuperAdmin', 'Support'].includes(state.user?.role),
+
+    // Saray/zal/menyu yaratmaq və administrator təyin etmək səlahiyyəti
+    canEditVenues: (state) => ['Owner', 'SuperAdmin', 'Support'].includes(state.user?.role),
 
     // Giriş və ya yönləndirmə zamanı istifadəçinin öz başlanğıc səhifəsi
     homeRoute: (state) => {
       if (state.user?.role === 'SuperAdmin') return 'admin-panel'
-      if (['Owner', 'VenueAdmin'].includes(state.user?.role)) return 'owner-panel'
+      if (['Owner', 'VenueAdmin', 'Support'].includes(state.user?.role)) return 'owner-panel'
       return 'home'
     },
   },

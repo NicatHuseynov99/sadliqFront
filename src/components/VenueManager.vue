@@ -112,6 +112,7 @@
             <em>{{ h.description }}</em>
           </div>
           <div class="sub-actions">
+            <button class="mini-btn" @click="openCalendar(h)">📅 Təqvim</button>
             <button class="mini-btn" @click="editHall(h)">Redaktə</button>
             <el-popconfirm title="Zal silinsin?" confirm-button-text="Bəli" cancel-button-text="Xeyr" @confirm="removeHall(h)">
               <template #reference>
@@ -144,6 +145,11 @@
           <button v-if="hallForm.id" class="mini-btn" @click="resetHallForm">İmtina</button>
         </div>
       </div>
+    </el-dialog>
+
+    <!-- Zalın təqvimi -->
+    <el-dialog v-model="calendarDialog" :title="`${calendarHall?.name} — təqvim`" width="460px">
+      <HallCalendarEditor v-if="calendarHall" :hall-id="calendarHall.id" />
     </el-dialog>
 
     <!-- Menyular -->
@@ -209,6 +215,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { ElNotification } from 'element-plus'
+import HallCalendarEditor from '@/components/HallCalendarEditor.vue'
 import {
   createVenue,
   updateVenue,
@@ -243,6 +250,8 @@ const formError = ref('')
 const venueDialog = ref(false)
 const hallDialog = ref(false)
 const menuDialog = ref(false)
+const calendarDialog = ref(false)
+const calendarHall = ref(null)
 const activeVenue = ref(null)
 
 const halls = ref([])
@@ -382,6 +391,12 @@ const saveHall = async () => {
   } finally {
     isSaving.value = false
   }
+}
+
+// Zalın günlərini əl ilə bağlamaq/açmaq üçün təqvimi açır
+const openCalendar = (hall) => {
+  calendarHall.value = hall
+  calendarDialog.value = true
 }
 
 const removeHall = async (hall) => {

@@ -6,7 +6,7 @@
           <h1 class="page-title">İdarəetmə paneli</h1>
           <p class="page-sub">Saraylarınıza gələn rezerv sorğularını buradan idarə edin</p>
         </div>
-        <span class="owner-tag">🏛 {{ auth.user?.fullName }}</span>
+        <span class="owner-tag">{{ auth.isSuperAdmin ? '⚙️' : '🏛' }} {{ auth.user?.fullName }}</span>
       </header>
 
       <!-- Ümumi göstəricilər -->
@@ -24,14 +24,14 @@
           <span class="stat-label">Sarayınız</span>
         </div>
         <!-- Gəlir göstəricisi hesabat sayılır — administrator onu görmür -->
-        <div class="stat-card" v-if="auth.isOwner">
+        <div class="stat-card" v-if="auth.canEditVenues">
           <span class="stat-value">{{ expectedIncome.toLocaleString() }} ₼</span>
           <span class="stat-label">Təsdiqlənmiş gəlir</span>
         </div>
       </div>
 
       <!-- Bölmə seçimi (yalnız rəhbərlikdə administratorlar bölməsi var) -->
-      <div class="section-tabs" v-if="auth.isOwner">
+      <div class="section-tabs" v-if="auth.canEditVenues">
         <button class="section-tab" :class="{ active: section === 'reservations' }" @click="section = 'reservations'">
           Rezerv sorğuları
         </button>
@@ -114,10 +114,21 @@
               <span class="staff-status" :class="{ on: s.isActive }">
                 {{ s.isActive ? 'Aktiv' : 'Bağlı' }}
               </span>
+              <button class="mini-btn" @click="editStaff(s)">Redaktə</button>
               <button class="mini-btn" @click="toggleStaff(s)">
                 {{ s.isActive ? 'Girişi bağla' : 'Aktivləşdir' }}
               </button>
               <button class="mini-btn" @click="askResetPassword(s)">Parolu sıfırla</button>
+              <el-popconfirm
+                title="Administrator siyahıdan silinsin?"
+                confirm-button-text="Bəli, sil"
+                cancel-button-text="Xeyr"
+                @confirm="removeStaff(s)"
+              >
+                <template #reference>
+                  <button class="mini-btn danger">Sil</button>
+                </template>
+              </el-popconfirm>
             </div>
           </div>
         </section>
@@ -234,6 +245,8 @@ import {
   updateReservationStatus,
   getMyStaff,
   createStaff,
+  updateStaff,
+  deleteStaff,
   setStaffActive,
   resetStaffPassword,
 } from '@/services/ownerService'
@@ -390,6 +403,56 @@ const submitStaff = async () => {
     staffError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
     isSavingStaff.value = false
+  }
+}
+
+// Administratorun ad, soyad və telefonunu redaktə edir
+const editStaff = async (member) => {
+  try {
+    const { value } = await ElMessageBox.prompt(
+      'Ad, soyad və telefonu vergüllə yazın: Ad, Soyad, Telefon',
+      `${member.fullName} — redaktə`,
+      {
+        confirmButtonText: 'Yadda saxla',
+        cancelButtonText: 'İmtina',
+        inputValue: `${member.fullName}, ${member.phone ?? ''}`,
+      },
+    )
+
+    const parts = value.split(',').map((p) => p.trim())
+    const message = await updateStaff(member.id, {
+      firstName: parts[0] ?? '',
+      lastName: parts[1] ?? '',
+      phone: parts[2] ?? '',
+    })
+
+    await loadStaff()
+    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+  } catch (e) {
+    if (e === 'cancel' || e === 'close') return
+
+    ElNotification({
+      title: 'Xəta',
+      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
+      type: 'error',
+      zIndex: 99999,
+    })
+  }
+}
+
+// Administratoru siyahıdan silir (hesabın özü qalır)
+const removeStaff = async (member) => {
+  try {
+    const message = await deleteStaff(member.id)
+    await loadStaff()
+    ElNotification({ title: 'Silindi', message, type: 'success', zIndex: 99999 })
+  } catch (e) {
+    ElNotification({
+      title: 'Xəta',
+      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
+      type: 'error',
+      zIndex: 99999,
+    })
   }
 }
 
