@@ -6,8 +6,29 @@
           <h1 class="page-title">Platforma idarəetməsi</h1>
           <p class="page-sub">Bütün istifadəçilər, saraylar və göstəricilər</p>
         </div>
-        <span class="admin-tag">⚙️ SuperAdmin · {{ auth.user?.fullName }}</span>
+        <span class="admin-tag" :class="{ support: auth.isSupport }">
+          {{ auth.isSupport ? '🛟 Dəstək' : '⚙️ SuperAdmin' }} · {{ auth.user?.fullName }}
+        </span>
       </header>
+
+      <!-- Bölmələr -->
+      <div class="section-tabs">
+        <button
+          v-if="auth.isSuperAdmin"
+          class="section-tab"
+          :class="{ active: section === 'overview' }"
+          @click="section = 'overview'"
+        >
+          İcmal
+        </button>
+        <button class="section-tab" :class="{ active: section === 'audit' }" @click="section = 'audit'">
+          Fəaliyyət jurnalı
+        </button>
+      </div>
+
+      <AuditLogView v-if="section === 'audit'" />
+
+      <template v-else>
 
       <!-- Göstəricilər -->
       <div class="stat-row">
@@ -107,6 +128,7 @@
           </table>
         </div>
       </section>
+      </template>
     </div>
   </div>
 </template>
@@ -115,6 +137,7 @@
 import { onMounted, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
+import AuditLogView from '@/components/AuditLogView.vue'
 import {
   getPlatformStats,
   getUsers,
@@ -131,6 +154,9 @@ const users = ref([])
 const pendingVenues = ref([])
 const roleFilter = ref('')
 const isLoading = ref(false)
+
+// Dəstək admini yalnız jurnalı görür, icmal SuperAdmin üçündür
+const section = ref(auth.isSuperAdmin ? 'overview' : 'audit')
 
 const roleFilters = [
   { value: '', label: 'Hamısı' },
@@ -150,6 +176,9 @@ const roles = [
 ]
 
 const load = async () => {
+  // İcmal məlumatları yalnız SuperAdmin-ə açıqdır
+  if (!auth.isSuperAdmin) return
+
   isLoading.value = true
   try {
     const [platformStats, userList, pending] = await Promise.all([
@@ -251,6 +280,40 @@ onMounted(load)
   padding: 8px 16px;
   border-radius: 20px;
   white-space: nowrap;
+}
+
+.admin-tag.support {
+  background: #e3f6e8;
+  color: #1e7e34;
+}
+
+/* Bölmə seçimi */
+.section-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.section-tab {
+  background: #fff;
+  border: 1px solid #f0eaec;
+  color: #6c757d;
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.section-tab:hover {
+  border-color: #dfb15b;
+}
+
+.section-tab.active {
+  background: #721438;
+  border-color: #721438;
+  color: #fff;
 }
 
 /* Göstəricilər */
