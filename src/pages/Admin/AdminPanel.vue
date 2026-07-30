@@ -49,6 +49,9 @@
         <div class="stat-card">
           <span class="stat-value">{{ stats.reviews ?? 0 }}</span>
           <span class="stat-label">Rəy</span>
+          <span class="stat-sub" :class="{ warn: stats.blockedUsers }">
+            {{ stats.blockedUsers ?? 0 }} bloklanmış hesab
+          </span>
         </div>
       </div>
 
@@ -71,7 +74,17 @@
       <!-- İstifadəçilər -->
       <section class="block">
         <div class="block-head">
-          <h2 class="block-title">İstifadəçilər</h2>
+          <h2 class="block-title">İstifadəçilər <em>{{ users.length }}</em></h2>
+          <input
+            v-model="search"
+            class="search-box"
+            type="search"
+            placeholder="Ad, e-poçt və ya telefon üzrə axtar…"
+            @input="onSearchInput"
+          />
+        </div>
+
+        <div class="filter-row">
           <div class="filter-chips">
             <button
               v-for="f in roleFilters"
@@ -81,6 +94,17 @@
               @click="setRoleFilter(f.value)"
             >
               {{ f.label }}
+            </button>
+          </div>
+          <div class="filter-chips">
+            <button
+              v-for="s in statusFilters"
+              :key="s.value"
+              class="chip status"
+              :class="{ active: statusFilter === s.value }"
+              @click="setStatusFilter(s.value)"
+            >
+              {{ s.label }}
             </button>
           </div>
         </div>
@@ -94,19 +118,26 @@
                 <th>Telefon</th>
                 <th>Saray</th>
                 <th>Qeydiyyat</th>
+                <th>Status</th>
                 <th>Rol</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="u in users" :key="u.id">
+              <tr v-for="u in users" :key="u.id" :class="{ blocked: !u.isActive }">
                 <td>
-                  <b>{{ u.fullName }}</b>
+                  <b class="name-link" @click="openDetail(u)">{{ u.fullName }}</b>
                   <em v-if="u.id === auth.user?.id" class="you-tag">siz</em>
                 </td>
                 <td class="muted">{{ u.email }}</td>
                 <td class="muted">{{ u.phone }}</td>
                 <td class="muted">{{ u.venueCount || '—' }}</td>
                 <td class="muted">{{ formatDateFull(u.createdAt.slice(0, 10)) }}</td>
+                <td>
+                  <span class="status-badge" :class="u.isActive ? 'ok' : 'off'">
+                    {{ u.isActive ? 'Aktiv' : 'Bloklanıb' }}
+                  </span>
+                </td>
                 <td>
                   <select
                     class="role-select"
@@ -118,12 +149,64 @@
                     <option v-for="r in roles" :key="r.value" :value="r.value">{{ r.label }}</option>
                   </select>
                 </td>
+                <td class="row-actions">
+                  <button class="mini-btn" @click="openDetail(u)">Kart</button>
+                  <button class="mini-btn" @click="openPassword(u)">Parol</button>
+                  <button
+                    class="mini-btn"
+                    :class="u.isActive ? 'danger' : 'ok'"
+                    :disabled="u.id === auth.user?.id"
+                    @click="toggleActive(u)"
+                  >
+                    {{ u.isActive ? 'Blokla' : 'Bloku aç' }}
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="!users.length">
+                <td colspan="8" class="empty-row">Bu şərtlərə uyğun istifadəçi tapılmadı.</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
       </template>
+
+      <!-- İstifadəçi kartı -->
+      <el-dialog v-model="detailOpen" :title="detail?.user?.fullName || 'İstifadəçi'" width="520px">
+        <div v-if="detail" class="detail">
+          <div class="detail-head">
+            <span class="status-badge" :class="detail.user.isActive ? 'ok' : 'off'">
+              {{ detail.user.isActive ? 'Aktiv' : 'Bloklanıb' }}
+            </span>
+            <span class="detail-role">{{ roleLabel(detail.user.role) }}</span>
+          </div>
+          <dl class="detail-list">
+            <div><dt>E-poçt</dt><dd>{{ detail.user.email }}</dd></div>
+            <div><dt>Telefon</dt><dd>{{ detail.user.phone || '—' }}</dd></div>
+            <div><dt>Qeydiyyat</dt><dd>{{ formatDateFull(detail.user.createdAt.slice(0, 10)) }}</dd></div>
+            <div><dt>Rezervlər</dt><dd>{{ detail.reservationCount }} ({{ detail.pendingReservationCount }} cavabsız)</dd></div>
+            <div><dt>Rəylər</dt><dd>{{ detail.reviewCount }}</dd></div>
+            <div>
+              <dt>Son rezerv</dt>
+              <dd>{{ detail.lastReservationAt ? formatDateFull(detail.lastReservationAt.slice(0, 10)) : '—' }}</dd>
+            </div>
+            <div v-if="detail.venues.length">
+              <dt>Saraylar</dt>
+              <dd>{{ detail.venues.join(', ') }}</dd>
+            </div>
+          </dl>
+        </div>
+      </el-dialog>
+
+      <!-- Parolun sıfırlanması -->
+      <el-dialog v-model="passwordOpen" title="Yeni parol təyin et" width="420px">
+        <p class="dialog-sub">{{ passwordTarget?.fullName }} üçün yeni parol.</p>
+        <input v-model="newPassword" class="dialog-input" type="text" placeholder="Ən azı 6 simvol" />
+        <template #footer>
+          <button class="mini-btn" @click="passwordOpen = false">İmtina</button>
+          <button class="mini-btn ok" @click="submitPassword">Təyin et</button>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -136,7 +219,10 @@ import AuditLogView from '@/components/AuditLogView.vue'
 import {
   getPlatformStats,
   getUsers,
+  getUserDetail,
   changeUserRole,
+  setUserActive,
+  resetUserPassword,
   getPendingVenues,
   approveVenue,
 } from '@/services/adminService'
@@ -148,7 +234,15 @@ const stats = ref({})
 const users = ref([])
 const pendingVenues = ref([])
 const roleFilter = ref('')
+const statusFilter = ref('')
+const search = ref('')
 const isLoading = ref(false)
+
+const detailOpen = ref(false)
+const detail = ref(null)
+const passwordOpen = ref(false)
+const passwordTarget = ref(null)
+const newPassword = ref('')
 
 const section = ref('overview')
 
@@ -171,12 +265,26 @@ const roles = computed(() => [
   ...(auth.isSuperAdmin ? [{ value: 'SuperAdmin', label: 'SuperAdmin' }] : []),
 ])
 
+const statusFilters = [
+  { value: '', label: 'Hamısı' },
+  { value: 'active', label: 'Aktiv' },
+  { value: 'blocked', label: 'Bloklanmış' },
+]
+
+const roleLabel = (value) => roles.value.find((r) => r.value === value)?.label ?? value
+
+const currentQuery = () => ({
+  role: roleFilter.value,
+  q: search.value,
+  status: statusFilter.value,
+})
+
 const load = async () => {
   isLoading.value = true
   try {
     const [platformStats, userList, pending] = await Promise.all([
       getPlatformStats(),
-      getUsers(roleFilter.value),
+      getUsers(currentQuery()),
       getPendingVenues(),
     ])
     stats.value = platformStats
@@ -187,9 +295,71 @@ const load = async () => {
   }
 }
 
+const reloadUsers = async () => {
+  users.value = await getUsers(currentQuery())
+}
+
 const setRoleFilter = async (value) => {
   roleFilter.value = value
-  users.value = await getUsers(value)
+  await reloadUsers()
+}
+
+const setStatusFilter = async (value) => {
+  statusFilter.value = value
+  await reloadUsers()
+}
+
+// Hər hərfdə sorğu getməsin deyə yazmaq bitəndən sonra axtarırıq
+let searchTimer = null
+const onSearchInput = () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(reloadUsers, 350)
+}
+
+const notifyError = (e) =>
+  ElNotification({
+    title: 'Xəta',
+    message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
+    type: 'error',
+    zIndex: 99999,
+  })
+
+const openDetail = async (user) => {
+  detail.value = null
+  detailOpen.value = true
+  try {
+    detail.value = await getUserDetail(user.id)
+  } catch (e) {
+    detailOpen.value = false
+    notifyError(e)
+  }
+}
+
+// Hesabı bloklayır və ya blokunu götürür — məlumat silinmir
+const toggleActive = async (user) => {
+  try {
+    const message = await setUserActive(user.id, !user.isActive)
+    ElNotification({ title: 'Hazırdır', message, type: 'success', zIndex: 99999 })
+    await load()
+  } catch (e) {
+    notifyError(e)
+  }
+}
+
+const openPassword = (user) => {
+  passwordTarget.value = user
+  newPassword.value = ''
+  passwordOpen.value = true
+}
+
+const submitPassword = async () => {
+  try {
+    const message = await resetUserPassword(passwordTarget.value.id, newPassword.value)
+    ElNotification({ title: 'Hazırdır', message, type: 'success', zIndex: 99999 })
+    passwordOpen.value = false
+  } catch (e) {
+    notifyError(e)
+  }
 }
 
 // İstifadəçinin rolunu dəyişir və siyahını yeniləyir
@@ -456,6 +626,34 @@ onMounted(load)
   background: #17692b;
 }
 
+/* Axtarış və süzgəc sətri */
+.search-box {
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+  border: 1px solid #f0eaec;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-size: 0.85rem;
+  color: #1a1118;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-box:focus {
+  border-color: #dfb15b;
+}
+
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
 /* Filtr çipləri */
 .filter-chips {
   display: flex;
@@ -516,6 +714,156 @@ onMounted(load)
 .user-table .muted {
   color: #868e96;
   font-size: 0.83rem;
+}
+
+/* Bloklanmış sətir solğun görünür */
+.user-table tr.blocked td {
+  background: #fdf6f7;
+  opacity: 0.75;
+}
+
+.name-link {
+  cursor: pointer;
+  border-bottom: 1px dashed #d8c3cb;
+}
+
+.name-link:hover {
+  color: #721438;
+  border-bottom-color: #721438;
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.status-badge.ok {
+  background: #e8f6ec;
+  color: #1a7f37;
+}
+
+.status-badge.off {
+  background: #fdecec;
+  color: #b3261e;
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.mini-btn {
+  background: #fff;
+  border: 1px solid #ece5e8;
+  color: #4a3f44;
+  padding: 5px 11px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mini-btn:hover:not(:disabled) {
+  border-color: #dfb15b;
+  color: #1a1118;
+}
+
+.mini-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mini-btn.danger:hover:not(:disabled) {
+  background: #fdecec;
+  border-color: #b3261e;
+  color: #b3261e;
+}
+
+.mini-btn.ok {
+  background: #1a7f37;
+  border-color: #1a7f37;
+  color: #fff;
+}
+
+.mini-btn.ok:hover:not(:disabled) {
+  background: #17692b;
+  color: #fff;
+}
+
+.empty-row {
+  text-align: center;
+  color: #a6969c;
+  padding: 26px 10px !important;
+  font-size: 0.85rem;
+}
+
+/* İstifadəçi kartı pəncərəsi */
+.detail-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.detail-role {
+  font-size: 0.8rem;
+  color: #721438;
+  font-weight: 600;
+}
+
+.detail-list {
+  margin: 0;
+  display: grid;
+  gap: 1px;
+  background: #f2ecee;
+  border: 1px solid #f2ecee;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.detail-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  background: #fff;
+  padding: 10px 14px;
+}
+
+.detail-list dt {
+  color: #868e96;
+  font-size: 0.8rem;
+}
+
+.detail-list dd {
+  margin: 0;
+  color: #1a1118;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.dialog-sub {
+  margin: 0 0 12px;
+  color: #868e96;
+  font-size: 0.85rem;
+}
+
+.dialog-input {
+  width: 100%;
+  border: 1px solid #ece5e8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.dialog-input:focus {
+  border-color: #dfb15b;
 }
 
 .you-tag {
