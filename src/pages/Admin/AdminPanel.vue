@@ -13,12 +13,7 @@
 
       <!-- Bölmələr -->
       <div class="section-tabs">
-        <button
-          v-if="auth.isSuperAdmin"
-          class="section-tab"
-          :class="{ active: section === 'overview' }"
-          @click="section = 'overview'"
-        >
+        <button class="section-tab" :class="{ active: section === 'overview' }" @click="section = 'overview'">
           İcmal
         </button>
         <button class="section-tab" :class="{ active: section === 'audit' }" @click="section = 'audit'">
@@ -134,7 +129,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import AuditLogView from '@/components/AuditLogView.vue'
@@ -155,30 +150,28 @@ const pendingVenues = ref([])
 const roleFilter = ref('')
 const isLoading = ref(false)
 
-// Dəstək admini yalnız jurnalı görür, icmal SuperAdmin üçündür
-const section = ref(auth.isSuperAdmin ? 'overview' : 'audit')
+const section = ref('overview')
 
-const roleFilters = [
+// Dəstək admini SuperAdmin hesablarını görmür — həm süzgəcdən, həm də
+// rol seçimindən bu variant çıxarılır
+const roleFilters = computed(() => [
   { value: '', label: 'Hamısı' },
   { value: 'Customer', label: 'Müştərilər' },
   { value: 'Owner', label: 'Saray rəhbərliyi' },
   { value: 'VenueAdmin', label: 'Saray administratorları' },
   { value: 'Support', label: 'Dəstək' },
-  { value: 'SuperAdmin', label: 'SuperAdmin' },
-]
+  ...(auth.isSuperAdmin ? [{ value: 'SuperAdmin', label: 'SuperAdmin' }] : []),
+])
 
-const roles = [
+const roles = computed(() => [
   { value: 'Customer', label: 'Müştəri' },
   { value: 'Owner', label: 'Saray rəhbərliyi' },
   { value: 'VenueAdmin', label: 'Saray administratoru' },
   { value: 'Support', label: 'Dəstək admini' },
-  { value: 'SuperAdmin', label: 'SuperAdmin' },
-]
+  ...(auth.isSuperAdmin ? [{ value: 'SuperAdmin', label: 'SuperAdmin' }] : []),
+])
 
 const load = async () => {
-  // İcmal məlumatları yalnız SuperAdmin-ə açıqdır
-  if (!auth.isSuperAdmin) return
-
   isLoading.value = true
   try {
     const [platformStats, userList, pending] = await Promise.all([
