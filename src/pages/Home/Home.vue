@@ -167,6 +167,7 @@ import {
   buildBusyMap,
 } from '@/services/venueService'
 import { getMyFavoriteIds, toggleFavorite } from '@/services/favoriteService'
+import { trackPage } from '@/services/visitService'
 import { useAuthStore } from '@/store/auth'
 
 const PAGE_SIZE = 12
@@ -291,11 +292,28 @@ const loadNextPage = async () => {
   }
 }
 
-// Filtr dəyişəndə sorğunu bir az gecikdiririk ki, hər hərf üçün sorğu getməsin
+// Filtr dəyişəndə sorğunu bir az gecikdiririk ki, hər hərf üçün sorğu getməsin.
+// Eyni anda ziyarətçinin nə axtardığını da qeyd edirik.
+// Boş süzgəcləri atırıq ki, statistikada «q=undefined&city=undefined» kimi
+// mənasız yollar yığılmasın — yalnız həqiqətən seçilmiş filtrlər qalsın.
+const cleanParams = (params) =>
+  Object.fromEntries(
+    Object.entries(params).filter(
+      ([, value]) => value !== undefined && value !== null && value !== '',
+    ),
+  )
+
 let filterTimer = null
 watch(filters, () => {
   clearTimeout(filterTimer)
-  filterTimer = setTimeout(loadFirstPage, 350)
+  filterTimer = setTimeout(() => {
+    loadFirstPage()
+    trackPage({
+      pageType: 'search',
+      path: '/?' + new URLSearchParams(cleanParams(buildParams(1))).toString(),
+      title: 'Axtarış',
+    })
+  }, 350)
 })
 
 // Siyahının sonundakı element ekrana girəndə növbəti səhifə yüklənir

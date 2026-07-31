@@ -16,12 +16,16 @@
         <button class="section-tab" :class="{ active: section === 'overview' }" @click="section = 'overview'">
           İcmal
         </button>
+        <button class="section-tab" :class="{ active: section === 'visitors' }" @click="section = 'visitors'">
+          Ziyarətçilər
+        </button>
         <button class="section-tab" :class="{ active: section === 'audit' }" @click="section = 'audit'">
           Fəaliyyət jurnalı
         </button>
       </div>
 
       <AuditLogView v-if="section === 'audit'" />
+      <VisitorsView v-else-if="section === 'visitors'" />
 
       <template v-else>
 
@@ -216,6 +220,7 @@ import { computed, onMounted, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import AuditLogView from '@/components/AuditLogView.vue'
+import VisitorsView from '@/components/VisitorsView.vue'
 import {
   getPlatformStats,
   getUsers,

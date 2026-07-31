@@ -1,26 +1,31 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
+import { trackPage } from '@/services/visitService'
 
 const routes = [
   {
     path: '/login',
     name: 'login',
     component: () => import('@/pages/auth/Login.vue'),
+    meta: { track: 'login' },
   },
   {
     path: '/register',
     name: 'register',
     component: () => import('@/pages/auth/Register.vue'),
+    meta: { track: 'register' },
   },
   {
     path: '/',
     name: 'home',
     component: () => import('@/pages/Home/Home.vue'),
+    meta: { track: 'home' },
   },
   {
     path: '/venue/:id',
     name: 'venue-detail',
     component: () => import('@/pages/Venue/VenueDetail.vue'),
+    meta: { track: 'venue' },
   },
   {
     path: '/forgot-password',
@@ -36,19 +41,19 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: () => import('@/pages/Profile/MyProfile.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, track: 'profile' },
   },
   {
     path: '/favorites',
     name: 'favorites',
     component: () => import('@/pages/Favorites/MyFavorites.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, track: 'favorites' },
   },
   {
     path: '/my-reservations',
     name: 'my-reservations',
     component: () => import('@/pages/Reservations/MyReservations.vue'),
-    meta: { requiresAuth: true, roles: ['Customer'] },
+    meta: { requiresAuth: true, roles: ['Customer'], track: 'reservations' },
   },
   {
     path: '/panel',
@@ -86,6 +91,19 @@ router.beforeEach((to) => {
   if ((to.name === 'login' || to.name === 'register') && auth.isAuth) {
     return { name: auth.homeRoute }
   }
+})
+
+// Ziyarət qeydiyyatı: yalnız meta.track olan səhifələr sayılır.
+// Admin və sahib panelləri qəsdən sayılmır — onlar ziyarətçi deyil.
+router.afterEach((to) => {
+  if (!to.meta.track) return
+
+  trackPage({
+    pageType: to.meta.track,
+    path: to.fullPath,
+    venueId: to.meta.track === 'venue' ? Number(to.params.id) || null : null,
+    title: document.title || null,
+  })
 })
 
 export default router
