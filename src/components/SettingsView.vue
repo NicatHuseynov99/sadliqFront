@@ -57,18 +57,31 @@
       <section class="block">
         <div class="block-head">
           <h3 class="block-title">Şəhərlər <em>{{ cities.length }}</em></h3>
-          <input v-model="cityQuery" class="mini-search" type="search" placeholder="Axtar…" />
+          <div class="head-tools">
+            <input v-model="cityQuery" class="mini-search" type="search" placeholder="Axtar…" />
+            <label class="switch">
+              <input type="checkbox" v-model="showDeleted" @change="loadAll" />
+              silinmişlər
+            </label>
+            <button v-if="canEdit" class="add-btn" @click="startCreate('city')">+ Yeni</button>
+          </div>
         </div>
         <p class="hint block-hint">
-          Şəhər adı sarayın öz məlumatında saxlanılır. Adı dəyişəndə həmin şəhərdəki
-          bütün saraylar yenilənir; mövcud adı yazsanız iki siyahı birləşir.
+          Şəhər siyahısı ayrıca saxlanılır. Adı dəyişəndə həmin şəhərdəki bütün saraylar
+          da yenilənir; sarayı olan şəhəri silmək olmur.
         </p>
         <ul class="ref-list">
-          <li v-for="c in filteredCities" :key="c.name">
+          <li v-for="c in filteredCities" :key="c.id" :class="{ removed: c.isDeleted }">
             <span class="bar" :style="{ width: share(c.venueCount, maxCity) }"></span>
             <span class="ref-name">{{ c.name }}</span>
             <span class="ref-count">{{ c.venueCount }} saray</span>
-            <button v-if="canEdit" class="mini-btn" @click="startRename('city', c)">Adı dəyiş</button>
+            <template v-if="canEdit">
+              <button v-if="c.isDeleted" class="mini-btn ok" @click="restore('city', c)">Geri qaytar</button>
+              <template v-else>
+                <button class="mini-btn" @click="startEdit('city', c)">Redaktə</button>
+                <button class="mini-btn danger" @click="remove('city', c)">Sil</button>
+              </template>
+            </template>
           </li>
           <li v-if="!filteredCities.length" class="empty-line">Uyğun şəhər tapılmadı.</li>
         </ul>
@@ -78,20 +91,31 @@
       <section class="block">
         <div class="block-head">
           <h3 class="block-title">Özəlliklər <em>{{ features.length }}</em></h3>
-          <input v-model="featureQuery" class="mini-search" type="search" placeholder="Axtar…" />
+          <div class="head-tools">
+            <input v-model="featureQuery" class="mini-search" type="search" placeholder="Axtar…" />
+            <button v-if="canEdit" class="add-btn" @click="startCreate('feature')">+ Yeni</button>
+          </div>
         </div>
         <p class="hint block-hint">
           Az sarayda olan özəlliklər axtarış filtrində görünmür — narıncı rəqəm ona işarədir.
-          Səhv yazılışları düzəltmək və ya oxşarları birləşdirmək üçün adı dəyişin.
+          Silinən özəllik sarayların siyahısından da çıxarılır.
         </p>
         <ul class="ref-list">
-          <li v-for="f in filteredFeatures" :key="f.name" :class="{ rare: f.venueCount < 3 }">
+          <li
+            v-for="f in filteredFeatures"
+            :key="f.id"
+            :class="{ rare: f.venueCount < 3 && !f.isDeleted, removed: f.isDeleted }"
+          >
             <span class="bar" :style="{ width: share(f.venueCount, maxFeature) }"></span>
+            <span v-if="f.icon" class="ref-icon">{{ f.icon }}</span>
             <span class="ref-name">{{ f.name }}</span>
             <span class="ref-count">{{ f.venueCount }} saray</span>
             <template v-if="canEdit">
-              <button class="mini-btn" @click="startRename('feature', f)">Adı dəyiş</button>
-              <button class="mini-btn danger" @click="removeFeature(f)">Sil</button>
+              <button v-if="f.isDeleted" class="mini-btn ok" @click="restore('feature', f)">Geri qaytar</button>
+              <template v-else>
+                <button class="mini-btn" @click="startEdit('feature', f)">Redaktə</button>
+                <button class="mini-btn danger" @click="remove('feature', f)">Sil</button>
+              </template>
             </template>
           </li>
           <li v-if="!filteredFeatures.length" class="empty-line">Uyğun özəllik tapılmadı.</li>
@@ -99,26 +123,131 @@
       </section>
     </div>
 
-    <!-- Ad dəyişmə -->
-    <el-dialog v-model="renameOpen" :title="renameTitle" width="420px">
-      <p class="hint">
-        <template v-if="renameKind === 'city'">
-          «{{ renameTarget?.name }}» yazılan {{ renameTarget?.venueCount }} saray yenilənəcək.
+    <!-- İnterfeys mətnləri -->
+    <section class="block">
+      <div class="block-head">
+        <h3 class="block-title">
+          İnterfeys mətnləri
+          <em>{{ texts.length }}</em>
+        </h3>
+        <div class="head-tools">
+          <input v-model="textQuery" class="mini-search wide" type="search" placeholder="Açar və ya mətn üzrə axtar…" @input="onTextSearch" />
+          <button v-if="canEdit" class="add-btn" @click="startTextCreate">+ Yeni mətn</button>
+        </div>
+      </div>
+
+      <p class="hint block-hint">
+        Saytda görünən sabit sözlər burada saxlanılır — kodda yalnız açar qalır.
+        Dəyişiklik dərhal qüvvəyə minir.
+      </p>
+
+      <div class="filter-chips">
+        <button
+          v-for="c in textCategories"
+          :key="c.name"
+          class="chip"
+          :class="{ active: textCategory === c.name }"
+          :title="c.description"
+          @click="selectCategory(c.name)"
+        >
+          {{ c.label }} <em>{{ c.count }}</em>
+        </button>
+      </div>
+
+      <p v-if="currentCategory" class="hint category-note">{{ currentCategory.description }}</p>
+
+      <div class="table-wrap">
+        <table class="text-table">
+          <thead>
+            <tr>
+              <th>Açar</th>
+              <th>Mətn</th>
+              <th v-if="currentCategory?.usesExtra">Əməliyyat kodu</th>
+              <th v-if="canEdit"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="t in texts" :key="t.id">
+              <td class="key-cell">{{ t.key }}</td>
+              <td>{{ t.value }}</td>
+              <td v-if="currentCategory?.usesExtra" class="key-cell muted">{{ t.extra ?? '—' }}</td>
+              <td v-if="canEdit" class="row-actions">
+                <button class="mini-btn" @click="startTextEdit(t)">Redaktə</button>
+                <button class="mini-btn danger" @click="removeText(t)">Sil</button>
+              </td>
+            </tr>
+            <tr v-if="!texts.length">
+              <td :colspan="4" class="empty-line">Mətn tapılmadı.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Mətn formu -->
+    <el-dialog
+      v-model="textFormOpen"
+      :title="textFormMode === 'create' ? 'Yeni mətn' : 'Mətni düzəlt'"
+      width="460px"
+    >
+      <label class="form-label">Kateqoriya</label>
+      <select v-model="textForm.category" class="value-box full" :disabled="textFormMode === 'edit'">
+        <option v-for="c in textCategories" :key="c.name" :value="c.name">{{ c.label }}</option>
+      </select>
+
+      <label class="form-label">Açar</label>
+      <input v-model="textForm.key" class="value-box full mono" placeholder="UserLoggedIn" />
+      <p class="hint small">Açar kodda işlənir — mövcud sətirdə onu dəyişmək tövsiyə olunmur.</p>
+
+      <label class="form-label">Mətn</label>
+      <input v-model="textForm.value" class="value-box full" placeholder="Sistemə giriş" />
+
+      <template v-if="usesExtra(textForm.category)">
+        <label class="form-label">Əməliyyat kodu</label>
+        <input v-model="textForm.extra" class="value-box full mono" placeholder="UserLoggedIn" />
+        <p class="hint small">Jurnalda bu sorğunun hansı əməliyyat kimi yazılacağını bildirir.</p>
+      </template>
+
+      <template #footer>
+        <button class="mini-btn" @click="textFormOpen = false">İmtina</button>
+        <button
+          class="mini-btn ok"
+          :disabled="!textForm.key.trim() || !textForm.value.trim()"
+          @click="submitText"
+        >
+          {{ textFormMode === 'create' ? 'Əlavə et' : 'Yadda saxla' }}
+        </button>
+      </template>
+    </el-dialog>
+
+    <!-- Yeni / redaktə -->
+    <el-dialog v-model="formOpen" :title="formTitle" width="420px">
+      <p v-if="formMode === 'edit' && formTarget?.venueCount" class="hint">
+        <template v-if="formKind === 'city'">
+          Ad dəyişsə «{{ formTarget.name }}» yazılan {{ formTarget.venueCount }} saray da yenilənəcək.
         </template>
         <template v-else>
-          «{{ renameTarget?.name }}» {{ renameTarget?.venueCount }} sarayda dəyişəcək.
+          Ad dəyişsə {{ formTarget.venueCount }} sarayda bu özəllik yenilənəcək.
           Mövcud adı yazsanız özəlliklər birləşəcək.
         </template>
       </p>
-      <input v-model="renameValue" class="value-box full" placeholder="Yeni ad" />
+
+      <label class="form-label">Ad</label>
+      <input v-model="form.name" class="value-box full" placeholder="Məsələn: Şəki" />
+
+      <template v-if="formKind === 'feature'">
+        <label class="form-label">İşarə (məcburi deyil)</label>
+        <input v-model="form.icon" class="value-box full" placeholder="🅿️" />
+      </template>
+
+      <label class="form-label">Sıra nömrəsi</label>
+      <input v-model.number="form.sortOrder" class="value-box full" type="number" min="0" />
+      <p class="hint small">Kiçik rəqəm siyahıda daha öndə göstərilir.</p>
+
       <template #footer>
-        <button class="mini-btn" @click="renameOpen = false">İmtina</button>
-        <button
-          class="mini-btn ok"
-          :disabled="!renameValue.trim() || renameValue.trim() === renameTarget?.name"
-          @click="confirmRename"
-        >
-          Dəyiş
+        <button class="mini-btn" @click="formOpen = false">İmtina</button>
+        <button class="mini-btn ok" :disabled="!form.name.trim()" @click="submitForm">
+          {{ formMode === 'create' ? 'Əlavə et' : 'Yadda saxla' }}
         </button>
       </template>
     </el-dialog>
@@ -132,11 +261,13 @@ import { useAuthStore } from '@/store/auth'
 import {
   getSettings,
   updateSetting,
-  getCities,
-  renameCity,
-  getFeatures,
-  renameFeature,
-  deleteFeature,
+  cityApi,
+  featureApi,
+  getTextCategories,
+  getTexts,
+  createText,
+  updateText,
+  deleteText,
 } from '@/services/platformService'
 
 const auth = useAuthStore()
@@ -188,19 +319,128 @@ const maxFeature = computed(() => Math.max(1, ...features.value.map((f) => f.ven
 // Sətrin arxasındakı zolaq — hansı adın nə qədər işləndiyi gözlə görünsün
 const share = (count, max) => `${Math.round((count / max) * 100)}%`
 
-const renameOpen = ref(false)
-const renameKind = ref('city')
-const renameTarget = ref(null)
-const renameValue = ref('')
+// İnterfeys mətnləri
+const textCategories = ref([])
+const textCategory = ref('audit_action')
+const texts = ref([])
+const textQuery = ref('')
 
-const renameTitle = computed(() =>
-  renameKind.value === 'city' ? 'Şəhərin adını dəyiş' : 'Özəlliyin adını dəyiş',
+const currentCategory = computed(() =>
+  textCategories.value.find((c) => c.name === textCategory.value),
+)
+
+const usesExtra = (name) => textCategories.value.find((c) => c.name === name)?.usesExtra ?? false
+
+const textFormOpen = ref(false)
+const textFormMode = ref('create')
+const textFormTarget = ref(null)
+const textForm = reactive({ category: 'audit_action', key: '', value: '', extra: '' })
+
+const loadTexts = async () => {
+  texts.value = await getTexts(textCategory.value, textQuery.value)
+}
+
+const selectCategory = async (name) => {
+  textCategory.value = name
+  textQuery.value = ''
+  await loadTexts()
+}
+
+// Hər hərfdə sorğu getməsin deyə yazmaq bitəndən sonra axtarırıq
+let textTimer = null
+const onTextSearch = () => {
+  clearTimeout(textTimer)
+  textTimer = setTimeout(loadTexts, 350)
+}
+
+const startTextCreate = () => {
+  textFormMode.value = 'create'
+  textFormTarget.value = null
+  Object.assign(textForm, { category: textCategory.value, key: '', value: '', extra: '' })
+  textFormOpen.value = true
+}
+
+const startTextEdit = (text) => {
+  textFormMode.value = 'edit'
+  textFormTarget.value = text
+  Object.assign(textForm, {
+    category: text.category,
+    key: text.key,
+    value: text.value,
+    extra: text.extra ?? '',
+  })
+  textFormOpen.value = true
+}
+
+const submitText = async () => {
+  const payload = {
+    category: textForm.category,
+    key: textForm.key.trim(),
+    value: textForm.value.trim(),
+    extra: textForm.extra?.trim() || null,
+  }
+
+  const result =
+    textFormMode.value === 'create'
+      ? await createText(payload)
+      : await updateText(textFormTarget.value.id, payload)
+
+  if (!result.success) return ElMessage.error(result.message)
+
+  textFormOpen.value = false
+  ElMessage.success(result.message)
+  await Promise.all([loadTexts(), refreshCategories()])
+}
+
+// Mətn silinsə kod açarın özünü göstərəcək — ona görə xəbərdarlıq edirik
+const removeText = async (text) => {
+  try {
+    await ElMessageBox.confirm(
+      `«${text.key}» açarının mətni silinəcək və saytda açarın özü görünəcək.`,
+      'Mətni sil',
+      { confirmButtonText: 'Sil', cancelButtonText: 'İmtina', type: 'warning' },
+    )
+  } catch {
+    return
+  }
+
+  const result = await deleteText(text.id)
+  if (!result.success) return ElMessage.error(result.message)
+
+  ElMessage.success(result.message)
+  await Promise.all([loadTexts(), refreshCategories()])
+}
+
+const refreshCategories = async () => {
+  textCategories.value = await getTextCategories()
+}
+
+const showDeleted = ref(false)
+
+const formOpen = ref(false)
+const formMode = ref('create')
+const formKind = ref('city')
+const formTarget = ref(null)
+const form = reactive({ name: '', icon: '', sortOrder: 0 })
+
+// Hər iki kitabça eyni cür işlədiyi üçün servis obyektini növə görə seçirik
+const apiOf = (kind) => (kind === 'city' ? cityApi : featureApi)
+const wordOf = (kind) => (kind === 'city' ? 'Şəhər' : 'Özəllik')
+
+const formTitle = computed(
+  () => `${wordOf(formKind.value)} — ${formMode.value === 'create' ? 'yeni' : 'redaktə'}`,
 )
 
 const loadAll = async () => {
   isLoading.value = true
   try {
-    const [s, c, f] = await Promise.all([getSettings(), getCities(), getFeatures()])
+    const [s, c, f] = await Promise.all([
+      getSettings(),
+      cityApi.list(showDeleted.value),
+      featureApi.list(showDeleted.value),
+      refreshCategories(),
+      loadTexts(),
+    ])
     settings.value = s
     cities.value = c
     features.value = f
@@ -220,36 +460,68 @@ const save = async (setting) => {
   settings.value = await getSettings()
 }
 
-const startRename = (kind, item) => {
-  renameKind.value = kind
-  renameTarget.value = item
-  renameValue.value = item.name
-  renameOpen.value = true
+const startCreate = (kind) => {
+  formKind.value = kind
+  formMode.value = 'create'
+  formTarget.value = null
+  Object.assign(form, { name: '', icon: '', sortOrder: 0 })
+  formOpen.value = true
 }
 
-const confirmRename = async () => {
-  const action = renameKind.value === 'city' ? renameCity : renameFeature
-  const result = await action(renameTarget.value.name, renameValue.value.trim())
+const startEdit = (kind, item) => {
+  formKind.value = kind
+  formMode.value = 'edit'
+  formTarget.value = item
+  Object.assign(form, { name: item.name, icon: item.icon ?? '', sortOrder: item.sortOrder ?? 0 })
+  formOpen.value = true
+}
+
+const submitForm = async () => {
+  const api = apiOf(formKind.value)
+  const payload = {
+    name: form.name.trim(),
+    icon: form.icon?.trim() || null,
+    sortOrder: Number(form.sortOrder) || 0,
+  }
+
+  const result =
+    formMode.value === 'create'
+      ? await api.create(payload)
+      : await api.update(formTarget.value.id, payload)
+
   if (!result.success) return ElMessage.error(result.message)
 
-  renameOpen.value = false
+  formOpen.value = false
   ElMessage.success(result.message)
   await loadAll()
 }
 
-// Silmək bütün saraylardan çıxarır — geri qaytarmaq mümkün deyil
-const removeFeature = async (feature) => {
+const remove = async (kind, item) => {
+  const note =
+    kind === 'city'
+      ? 'Şəhər siyahıdan çıxarılacaq. Sarayı olan şəhəri silmək olmur.'
+      : `«${item.name}» ${item.venueCount} saraydan da çıxarılacaq. Siyahıya geri qaytarmaq olar, ` +
+        'amma saraylara əl ilə yenidən əlavə etmək lazım gələcək.'
+
   try {
-    await ElMessageBox.confirm(
-      `«${feature.name}» ${feature.venueCount} saraydan silinəcək və geri qaytarıla bilməyəcək.`,
-      'Özəlliyi sil',
-      { confirmButtonText: 'Sil', cancelButtonText: 'İmtina', type: 'warning' },
-    )
+    await ElMessageBox.confirm(note, `${wordOf(kind)} sil`, {
+      confirmButtonText: 'Sil',
+      cancelButtonText: 'İmtina',
+      type: 'warning',
+    })
   } catch {
     return
   }
 
-  const result = await deleteFeature(feature.name)
+  const result = await apiOf(kind).remove(item.id)
+  if (!result.success) return ElMessage.error(result.message)
+
+  ElMessage.success(result.message)
+  await loadAll()
+}
+
+const restore = async (kind, item) => {
+  const result = await apiOf(kind).restore(item.id)
   if (!result.success) return ElMessage.error(result.message)
 
   ElMessage.success(result.message)
@@ -516,6 +788,163 @@ onMounted(loadAll)
   font-size: 0.8rem;
   padding: 12px 0;
   justify-content: center;
+}
+
+.head-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  color: #868e96;
+  cursor: pointer;
+}
+
+.add-btn {
+  background: #721438;
+  color: #fff;
+  border: none;
+  padding: 6px 13px;
+  border-radius: 9px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background: #5c1029;
+}
+
+.ref-icon {
+  font-size: 0.9rem;
+}
+
+/* Silinmiş sətir sönük göstərilir */
+.ref-list li.removed .ref-name {
+  color: #b8a3ab;
+  text-decoration: line-through;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b8a3ab;
+  font-weight: 700;
+  margin: 12px 0 5px;
+}
+
+.hint.small {
+  margin: 6px 0 0;
+  font-size: 0.72rem;
+}
+
+/* İnterfeys mətnləri */
+.filter-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.chip {
+  background: #fff;
+  border: 1px solid #f0eaec;
+  color: #6c757d;
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chip em {
+  font-style: normal;
+  color: #b8a3ab;
+  margin-left: 4px;
+}
+
+.chip:hover {
+  border-color: #dfb15b;
+}
+
+.chip.active {
+  background: #721438;
+  border-color: #721438;
+  color: #fff;
+}
+
+.chip.active em {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.category-note {
+  margin: -4px 0 12px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.text-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.text-table th {
+  text-align: left;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b8a3ab;
+  padding: 8px 10px;
+  border-bottom: 1px solid #f2ecee;
+  white-space: nowrap;
+}
+
+.text-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #faf7f8;
+  color: #1a1118;
+}
+
+.text-table tr:hover td {
+  background: #fbf7f8;
+}
+
+/* Açar kodda işlənir — monospace yazı onu mətndən ayırır */
+.key-cell,
+.value-box.mono {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.78rem;
+}
+
+.key-cell {
+  color: #721438;
+  white-space: nowrap;
+}
+
+.key-cell.muted {
+  color: #a6969c;
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.mini-search.wide {
+  width: 210px;
 }
 
 .ref-name {

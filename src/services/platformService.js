@@ -13,27 +13,61 @@ export const updateSetting = async (key, value) => {
   return data
 }
 
-export const getCities = async () => {
-  const { data } = await api.get('/Platform/GetCities')
+// Şəhər və özəllik kitabçaları ayrıca cədvəllərdir — tam CRUD dəstəklənir.
+// Hər iki kitabça eyni cür işlədiyi üçün sorğular ümumi funksiyalarla qurulur.
+
+const reference = (entity) => ({
+  list: async (includeDeleted = false) => {
+    const { data } = await api.get(`/Platform/Get${entity}s`, { params: { includeDeleted } })
+    return data.data ?? []
+  },
+  create: async (payload) => {
+    const { data } = await api.post(`/Platform/Create${entity}`, payload)
+    return data
+  },
+  update: async (id, payload) => {
+    const { data } = await api.put(`/Platform/Update${entity}/${id}`, payload)
+    return data
+  },
+  remove: async (id) => {
+    const { data } = await api.delete(`/Platform/Delete${entity}/${id}`)
+    return data
+  },
+  restore: async (id) => {
+    const { data } = await api.put(`/Platform/Restore${entity}/${id}`)
+    return data
+  },
+})
+
+export const cityApi = reference('City')
+export const featureApi = reference('Feature')
+
+// İnterfeys mətnləri: kodda yalnız açar qalır, göstərilən söz bazadan gəlir
+export const getTextCategories = async () => {
+  const { data } = await api.get('/Platform/GetTextCategories')
   return data.data ?? []
 }
 
-export const renameCity = async (oldName, newName) => {
-  const { data } = await api.put('/Platform/RenameCity', { oldName, newName })
-  return data
-}
-
-export const getFeatures = async () => {
-  const { data } = await api.get('/Platform/GetFeatures')
+export const getTexts = async (category, q) => {
+  const { data } = await api.get(`/Platform/GetTexts/${category}`, { params: { q: q || undefined } })
   return data.data ?? []
 }
 
-export const renameFeature = async (oldName, newName) => {
-  const { data } = await api.put('/Platform/RenameFeature', { oldName, newName })
+export const createText = async (payload) => {
+  const { data } = await api.post('/Platform/CreateText', payload)
   return data
 }
 
-export const deleteFeature = async (name) => {
-  const { data } = await api.delete(`/Platform/DeleteFeature/${encodeURIComponent(name)}`)
+export const updateText = async (id, payload) => {
+  const { data } = await api.put(`/Platform/UpdateText/${id}`, payload)
   return data
 }
+
+export const deleteText = async (id) => {
+  const { data } = await api.delete(`/Platform/DeleteText/${id}`)
+  return data
+}
+
+// Saray formaları üçün sadə siyahı
+export const getCities = async () => cityApi.list()
+export const getFeatures = async () => featureApi.list()
