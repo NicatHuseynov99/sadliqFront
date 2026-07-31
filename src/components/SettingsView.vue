@@ -1,9 +1,5 @@
 <template>
   <div class="settings" v-loading="isLoading">
-    <p v-if="!canEdit" class="readonly-note">
-      Bu bölmə yalnız baxış üçün açıqdır — parametrləri və kitabçaları platforma sahibi dəyişir.
-    </p>
-
     <!-- Parametrlər -->
     <section class="block">
       <h3 class="block-title">Platforma parametrləri</h3>
@@ -123,102 +119,6 @@
       </section>
     </div>
 
-    <!-- İnterfeys mətnləri -->
-    <section class="block">
-      <div class="block-head">
-        <h3 class="block-title">
-          İnterfeys mətnləri
-          <em>{{ texts.length }}</em>
-        </h3>
-        <div class="head-tools">
-          <input v-model="textQuery" class="mini-search wide" type="search" placeholder="Açar və ya mətn üzrə axtar…" @input="onTextSearch" />
-          <button v-if="canEdit" class="add-btn" @click="startTextCreate">+ Yeni mətn</button>
-        </div>
-      </div>
-
-      <p class="hint block-hint">
-        Saytda görünən sabit sözlər burada saxlanılır — kodda yalnız açar qalır.
-        Dəyişiklik dərhal qüvvəyə minir.
-      </p>
-
-      <div class="filter-chips">
-        <button
-          v-for="c in textCategories"
-          :key="c.name"
-          class="chip"
-          :class="{ active: textCategory === c.name }"
-          :title="c.description"
-          @click="selectCategory(c.name)"
-        >
-          {{ c.label }} <em>{{ c.count }}</em>
-        </button>
-      </div>
-
-      <p v-if="currentCategory" class="hint category-note">{{ currentCategory.description }}</p>
-
-      <div class="table-wrap">
-        <table class="text-table">
-          <thead>
-            <tr>
-              <th>Açar</th>
-              <th>Mətn</th>
-              <th v-if="currentCategory?.usesExtra">Əməliyyat kodu</th>
-              <th v-if="canEdit"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="t in texts" :key="t.id">
-              <td class="key-cell">{{ t.key }}</td>
-              <td>{{ t.value }}</td>
-              <td v-if="currentCategory?.usesExtra" class="key-cell muted">{{ t.extra ?? '—' }}</td>
-              <td v-if="canEdit" class="row-actions">
-                <button class="mini-btn" @click="startTextEdit(t)">Redaktə</button>
-                <button class="mini-btn danger" @click="removeText(t)">Sil</button>
-              </td>
-            </tr>
-            <tr v-if="!texts.length">
-              <td :colspan="4" class="empty-line">Mətn tapılmadı.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Mətn formu -->
-    <el-dialog
-      v-model="textFormOpen"
-      :title="textFormMode === 'create' ? 'Yeni mətn' : 'Mətni düzəlt'"
-      width="460px"
-    >
-      <label class="form-label">Kateqoriya</label>
-      <select v-model="textForm.category" class="value-box full" :disabled="textFormMode === 'edit'">
-        <option v-for="c in textCategories" :key="c.name" :value="c.name">{{ c.label }}</option>
-      </select>
-
-      <label class="form-label">Açar</label>
-      <input v-model="textForm.key" class="value-box full mono" placeholder="UserLoggedIn" />
-      <p class="hint small">Açar kodda işlənir — mövcud sətirdə onu dəyişmək tövsiyə olunmur.</p>
-
-      <label class="form-label">Mətn</label>
-      <input v-model="textForm.value" class="value-box full" placeholder="Sistemə giriş" />
-
-      <template v-if="usesExtra(textForm.category)">
-        <label class="form-label">Əməliyyat kodu</label>
-        <input v-model="textForm.extra" class="value-box full mono" placeholder="UserLoggedIn" />
-        <p class="hint small">Jurnalda bu sorğunun hansı əməliyyat kimi yazılacağını bildirir.</p>
-      </template>
-
-      <template #footer>
-        <button class="mini-btn" @click="textFormOpen = false">İmtina</button>
-        <button
-          class="mini-btn ok"
-          :disabled="!textForm.key.trim() || !textForm.value.trim()"
-          @click="submitText"
-        >
-          {{ textFormMode === 'create' ? 'Əlavə et' : 'Yadda saxla' }}
-        </button>
-      </template>
-    </el-dialog>
 
     <!-- Yeni / redaktə -->
     <el-dialog v-model="formOpen" :title="formTitle" width="420px">
@@ -233,16 +133,7 @@
       </p>
 
       <label class="form-label">Ad</label>
-      <input v-model="form.name" class="value-box full" placeholder="Məsələn: Şəki" />
-
-      <template v-if="formKind === 'feature'">
-        <label class="form-label">İşarə (məcburi deyil)</label>
-        <input v-model="form.icon" class="value-box full" placeholder="🅿️" />
-      </template>
-
-      <label class="form-label">Sıra nömrəsi</label>
-      <input v-model.number="form.sortOrder" class="value-box full" type="number" min="0" />
-      <p class="hint small">Kiçik rəqəm siyahıda daha öndə göstərilir.</p>
+      <input v-model="form.name" class="value-box full" placeholder="Məsələn: Şəki" @keyup.enter="submitForm" />
 
       <template #footer>
         <button class="mini-btn" @click="formOpen = false">İmtina</button>
@@ -263,17 +154,14 @@ import {
   updateSetting,
   cityApi,
   featureApi,
-  getTextCategories,
-  getTexts,
-  createText,
-  updateText,
-  deleteText,
 } from '@/services/platformService'
 
 const auth = useAuthStore()
 
-// Dəstək admini bölməni görür, amma dəyişə bilmir — server də eyni cür yoxlayır
-const canEdit = computed(() => auth.user?.role === 'SuperAdmin')
+// Bu bölmədə dəstək admini platforma sahibi ilə eyni səlahiyyətdədir:
+// parametrlərin və kitabçaların SuperAdmin hesabları ilə əlaqəsi yoxdur.
+// Server də eyni cür yoxlayır — interfeys tək qoruma deyil.
+const canEdit = computed(() => ['SuperAdmin', 'Support'].includes(auth.user?.role))
 
 // Hər parametrin nə haqda olduğu ikonadan da bilinsin
 const SETTING_ICONS = {
@@ -319,109 +207,13 @@ const maxFeature = computed(() => Math.max(1, ...features.value.map((f) => f.ven
 // Sətrin arxasındakı zolaq — hansı adın nə qədər işləndiyi gözlə görünsün
 const share = (count, max) => `${Math.round((count / max) * 100)}%`
 
-// İnterfeys mətnləri
-const textCategories = ref([])
-const textCategory = ref('audit_action')
-const texts = ref([])
-const textQuery = ref('')
-
-const currentCategory = computed(() =>
-  textCategories.value.find((c) => c.name === textCategory.value),
-)
-
-const usesExtra = (name) => textCategories.value.find((c) => c.name === name)?.usesExtra ?? false
-
-const textFormOpen = ref(false)
-const textFormMode = ref('create')
-const textFormTarget = ref(null)
-const textForm = reactive({ category: 'audit_action', key: '', value: '', extra: '' })
-
-const loadTexts = async () => {
-  texts.value = await getTexts(textCategory.value, textQuery.value)
-}
-
-const selectCategory = async (name) => {
-  textCategory.value = name
-  textQuery.value = ''
-  await loadTexts()
-}
-
-// Hər hərfdə sorğu getməsin deyə yazmaq bitəndən sonra axtarırıq
-let textTimer = null
-const onTextSearch = () => {
-  clearTimeout(textTimer)
-  textTimer = setTimeout(loadTexts, 350)
-}
-
-const startTextCreate = () => {
-  textFormMode.value = 'create'
-  textFormTarget.value = null
-  Object.assign(textForm, { category: textCategory.value, key: '', value: '', extra: '' })
-  textFormOpen.value = true
-}
-
-const startTextEdit = (text) => {
-  textFormMode.value = 'edit'
-  textFormTarget.value = text
-  Object.assign(textForm, {
-    category: text.category,
-    key: text.key,
-    value: text.value,
-    extra: text.extra ?? '',
-  })
-  textFormOpen.value = true
-}
-
-const submitText = async () => {
-  const payload = {
-    category: textForm.category,
-    key: textForm.key.trim(),
-    value: textForm.value.trim(),
-    extra: textForm.extra?.trim() || null,
-  }
-
-  const result =
-    textFormMode.value === 'create'
-      ? await createText(payload)
-      : await updateText(textFormTarget.value.id, payload)
-
-  if (!result.success) return ElMessage.error(result.message)
-
-  textFormOpen.value = false
-  ElMessage.success(result.message)
-  await Promise.all([loadTexts(), refreshCategories()])
-}
-
-// Mətn silinsə kod açarın özünü göstərəcək — ona görə xəbərdarlıq edirik
-const removeText = async (text) => {
-  try {
-    await ElMessageBox.confirm(
-      `«${text.key}» açarının mətni silinəcək və saytda açarın özü görünəcək.`,
-      'Mətni sil',
-      { confirmButtonText: 'Sil', cancelButtonText: 'İmtina', type: 'warning' },
-    )
-  } catch {
-    return
-  }
-
-  const result = await deleteText(text.id)
-  if (!result.success) return ElMessage.error(result.message)
-
-  ElMessage.success(result.message)
-  await Promise.all([loadTexts(), refreshCategories()])
-}
-
-const refreshCategories = async () => {
-  textCategories.value = await getTextCategories()
-}
-
 const showDeleted = ref(false)
 
 const formOpen = ref(false)
 const formMode = ref('create')
 const formKind = ref('city')
 const formTarget = ref(null)
-const form = reactive({ name: '', icon: '', sortOrder: 0 })
+const form = reactive({ name: '' })
 
 // Hər iki kitabça eyni cür işlədiyi üçün servis obyektini növə görə seçirik
 const apiOf = (kind) => (kind === 'city' ? cityApi : featureApi)
@@ -438,8 +230,6 @@ const loadAll = async () => {
       getSettings(),
       cityApi.list(showDeleted.value),
       featureApi.list(showDeleted.value),
-      refreshCategories(),
-      loadTexts(),
     ])
     settings.value = s
     cities.value = c
@@ -464,7 +254,7 @@ const startCreate = (kind) => {
   formKind.value = kind
   formMode.value = 'create'
   formTarget.value = null
-  Object.assign(form, { name: '', icon: '', sortOrder: 0 })
+  form.name = ''
   formOpen.value = true
 }
 
@@ -472,16 +262,18 @@ const startEdit = (kind, item) => {
   formKind.value = kind
   formMode.value = 'edit'
   formTarget.value = item
-  Object.assign(form, { name: item.name, icon: item.icon ?? '', sortOrder: item.sortOrder ?? 0 })
+  form.name = item.name
   formOpen.value = true
 }
 
 const submitForm = async () => {
   const api = apiOf(formKind.value)
+
+  // Paneldə yalnız ad dəyişdirilir; işarə və sıra nömrəsi olduğu kimi qalır
   const payload = {
     name: form.name.trim(),
-    icon: form.icon?.trim() || null,
-    sortOrder: Number(form.sortOrder) || 0,
+    icon: formTarget.value?.icon ?? null,
+    sortOrder: formTarget.value?.sortOrder ?? 0,
   }
 
   const result =
@@ -846,106 +638,6 @@ onMounted(loadAll)
   font-size: 0.72rem;
 }
 
-/* İnterfeys mətnləri */
-.filter-chips {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
-.chip {
-  background: #fff;
-  border: 1px solid #f0eaec;
-  color: #6c757d;
-  padding: 5px 13px;
-  border-radius: 20px;
-  font-size: 0.76rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.chip em {
-  font-style: normal;
-  color: #b8a3ab;
-  margin-left: 4px;
-}
-
-.chip:hover {
-  border-color: #dfb15b;
-}
-
-.chip.active {
-  background: #721438;
-  border-color: #721438;
-  color: #fff;
-}
-
-.chip.active em {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.category-note {
-  margin: -4px 0 12px;
-}
-
-.table-wrap {
-  overflow-x: auto;
-}
-
-.text-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.84rem;
-}
-
-.text-table th {
-  text-align: left;
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #b8a3ab;
-  padding: 8px 10px;
-  border-bottom: 1px solid #f2ecee;
-  white-space: nowrap;
-}
-
-.text-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid #faf7f8;
-  color: #1a1118;
-}
-
-.text-table tr:hover td {
-  background: #fbf7f8;
-}
-
-/* Açar kodda işlənir — monospace yazı onu mətndən ayırır */
-.key-cell,
-.value-box.mono {
-  font-family: 'Consolas', 'Courier New', monospace;
-  font-size: 0.78rem;
-}
-
-.key-cell {
-  color: #721438;
-  white-space: nowrap;
-}
-
-.key-cell.muted {
-  color: #a6969c;
-}
-
-.row-actions {
-  display: flex;
-  gap: 6px;
-  white-space: nowrap;
-}
-
-.mini-search.wide {
-  width: 210px;
-}
 
 .ref-name {
   flex: 1;

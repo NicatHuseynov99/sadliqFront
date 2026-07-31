@@ -43,7 +43,7 @@
       <ReservationsView v-else-if="section === 'bookings'" />
       <SettingsView v-else-if="section === 'settings'" />
       <VenuesView v-else-if="section === 'venues'" @changed="loadStats" />
-      <DataView v-else-if="section === 'data'" />
+      <DataView v-else-if="section === 'data' && auth.isSuperAdmin" />
 
       <template v-else>
 
@@ -370,7 +370,9 @@ const tabs = computed(() => [
   { value: 'visitors', label: 'Ziyarətçilər', icon: '👣' },
   { value: 'audit', label: 'Jurnal', icon: '📜' },
   { value: 'settings', label: 'Parametrlər', icon: '⚙️' },
-  { value: 'data', label: 'Baza', icon: '🗄' },
+
+  // Baza bölməsi bütün cədvəllərə birbaşa çıxış verir — yalnız platforma sahibinə
+  ...(auth.isSuperAdmin ? [{ value: 'data', label: 'Baza', icon: '🗄' }] : []),
 ])
 
 // Dəstək admini SuperAdmin hesablarını görmür — həm süzgəcdən, həm də
