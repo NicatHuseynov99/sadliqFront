@@ -79,10 +79,15 @@
       </div>
 
       <ul v-if="rows.length" class="res-list">
-        <li v-for="r in rows" :key="r.id" class="res-item" :class="{ past: r.isPast }">
+        <li v-for="r in rows" :key="r.id" class="res-item" :class="{ past: r.isPast, removed: r.isDeleted }">
+          <img class="venue-cover" :src="r.venueImageUrl" :alt="r.venueName" @error="onImgError" />
+
+          <div class="res-content">
           <div class="res-head">
-            <span class="status-badge" :class="statusClass(r.status)">{{ r.statusLabel }}</span>
+            <span v-if="r.isDeleted" class="status-badge removed-badge">Silinib</span>
+            <span v-else class="status-badge" :class="statusClass(r.status)">{{ r.statusLabel }}</span>
             <b class="venue">{{ r.venueName }}</b>
+            <span v-if="r.city" class="city">{{ r.city }}</span>
             <span class="hall">{{ r.hallName }}</span>
             <span class="spacer"></span>
             <span class="event-date">{{ formatDate(r.eventDate) }}</span>
@@ -109,7 +114,11 @@
 
           <p v-if="r.note" class="note">“{{ r.note }}”</p>
 
-          <div class="res-actions">
+          <div v-if="r.isDeleted" class="res-actions">
+            <button class="mini-btn ok" @click="restore(r)">Geri qaytar</button>
+            <a class="mini-btn link" :href="`/venue/${r.venueId}`" target="_blank">Saraya bax</a>
+          </div>
+          <div v-else class="res-actions">
             <button
               v-if="r.status !== RESERVATION_STATUS.confirmed"
               class="mini-btn ok"
@@ -131,6 +140,8 @@
             >
               Gözləməyə qaytar
             </button>
+            <a class="mini-btn link" :href="`/venue/${r.venueId}`" target="_blank">Saraya bax</a>
+          </div>
           </div>
         </li>
       </ul>
@@ -161,10 +172,18 @@ import {
   getReservationStats,
   searchReservations,
   updateReservationStatus,
+  restoreReservation,
   STATUS_FILTERS,
   RESERVATION_STATUS,
   statusClass,
 } from '@/services/adminReservationService'
+
+const FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=60'
+
+const onImgError = (event) => {
+  event.target.src = FALLBACK_IMAGE
+}
 
 const isLoading = ref(false)
 const stats = ref({})
@@ -261,6 +280,15 @@ let searchTimer = null
 const onSearchInput = () => {
   clearTimeout(searchTimer)
   searchTimer = setTimeout(reload, 350)
+}
+
+// Silinmiş rezervi geri qaytarır
+const restore = async (reservation) => {
+  const result = await restoreReservation(reservation.id)
+  if (!result.success) return ElMessage.error(result.message)
+
+  ElMessage.success(result.message)
+  await refresh()
 }
 
 // Admin sahibin yerinə qərar verir — səhvən basmamaq üçün təsdiq istəyirik
@@ -503,13 +531,82 @@ onMounted(refresh)
 }
 
 .res-item {
+  display: flex;
+  gap: 16px;
   border: 1px solid #f4eff1;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 14px 16px;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.res-item:hover {
+  box-shadow: 0 8px 22px rgba(26, 17, 24, 0.07);
+  transform: translateY(-1px);
 }
 
 .res-item.past {
   background: #fbf9fa;
+}
+
+.res-item.past .venue-cover {
+  filter: grayscale(0.6);
+}
+
+/* Silinmiş rezerv sönük göstərilir, amma məlumatı oxunaqlı qalır */
+.res-item.removed {
+  background: #fbf8f9;
+  border-color: #f0e0e4;
+}
+
+.res-item.removed .venue-cover {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.status-badge.removed-badge {
+  background: #f8e3e8;
+  color: #a02c4a;
+}
+
+/* Sarayın şəkli — sətri bir baxışda tanımaq üçün */
+.venue-cover {
+  width: 132px;
+  height: 100px;
+  flex: none;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #f6f1f3;
+}
+
+.res-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.city {
+  font-size: 0.74rem;
+  color: #868e96;
+  background: #f6f1f3;
+  padding: 2px 9px;
+  border-radius: 20px;
+}
+
+.mini-btn.link {
+  color: #1c5cab;
+  border-color: #dce8f7;
+  text-decoration: none;
+  display: inline-block;
+}
+
+@media (max-width: 640px) {
+  .res-item {
+    flex-direction: column;
+  }
+
+  .venue-cover {
+    width: 100%;
+    height: 130px;
+  }
 }
 
 .res-head {

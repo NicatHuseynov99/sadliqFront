@@ -93,7 +93,7 @@
     <!-- Ziyarət siyahısı -->
     <section class="block">
       <div class="block-head">
-        <h3 class="block-title">Ziyarətlər <em>{{ total }}</em></h3>
+        <h3 class="block-title">Qeydiyyatsız ziyarətlər <em>{{ total }}</em></h3>
         <input
           v-model="filters.q"
           class="search-box"
@@ -106,11 +106,6 @@
       <div class="filter-row">
         <select v-model="filters.pageType" class="select" @change="reload">
           <option v-for="p in PAGE_TYPES" :key="p.value" :value="p.value">{{ p.label }}</option>
-        </select>
-        <select v-model="filters.audience" class="select" @change="reload">
-          <option value="">Hamısı</option>
-          <option value="guest">Yalnız qeydiyyatsız</option>
-          <option value="user">Yalnız giriş etmiş</option>
         </select>
         <input v-model="filters.from" type="date" class="select" @change="reload" />
         <input v-model="filters.to" type="date" class="select" @change="reload" />
@@ -132,8 +127,7 @@
             <tr v-for="v in visits" :key="v.id">
               <td class="muted nowrap">{{ formatTime(v.createdAt) }}</td>
               <td>
-                <b v-if="v.userFullName">{{ v.userFullName }}</b>
-                <span v-else class="guest-tag">Qonaq</span>
+                <span class="guest-tag">Qonaq</span>
                 <em class="session" :title="v.sessionId">{{ v.sessionId.slice(0, 8) }}</em>
               </td>
               <td>
@@ -181,10 +175,12 @@ const visits = ref([])
 const total = ref(0)
 const days = ref(14)
 
+// Bu bölmə yalnız qeydiyyatdan keçməmiş ziyarətçilər üçündür — giriş etmiş
+// istifadəçinin fəaliyyəti onsuz da jurnalda görünür.
 const filters = reactive({
   q: '',
   pageType: '',
-  audience: '',
+  audience: 'guest',
   from: '',
   to: '',
   page: 1,

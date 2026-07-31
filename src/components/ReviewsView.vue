@@ -56,42 +56,71 @@
       </div>
 
       <ul v-if="reviews.length" class="review-list">
-        <li v-for="r in reviews" :key="r.id" class="review-item" :class="{ hidden: r.isHidden }">
-          <div class="review-head">
-            <span class="stars">{{ '★'.repeat(r.rating) }}<i>{{ '★'.repeat(5 - r.rating) }}</i></span>
-            <b class="author">{{ r.authorName }}</b>
-            <span class="venue-name">{{ r.venueName }}</span>
-            <span class="spacer"></span>
-            <span v-if="r.isHidden" class="tag off">Gizlədilib</span>
-            <button
-              v-if="r.reportCount"
-              class="tag warn"
-              :title="'Şikayətlərə bax'"
-              @click="openReports(r)"
-            >
-              {{ r.reportCount }} şikayət<template v-if="r.openReportCount">
-                · {{ r.openReportCount }} açıq</template>
-            </button>
-            <span class="date">{{ formatDate(r.createdAt) }}</span>
-          </div>
+        <li
+          v-for="r in reviews"
+          :key="r.id"
+          class="review-item"
+          :class="{ hidden: r.isHidden && !r.isDeleted, removed: r.isDeleted }"
+        >
+          <!-- Rəyin hansı saraya yazıldığı sətrin əvvəlində görünür -->
+          <a class="venue-box" :href="`/venue/${r.venueId}`" target="_blank" :title="r.venueName">
+            <img :src="r.venueImageUrl" :alt="r.venueName" @error="onImgError" />
+            <span class="venue-title">{{ r.venueName }}</span>
+            <span class="venue-city">{{ r.venueCity }}</span>
+          </a>
 
-          <p class="comment">{{ r.comment }}</p>
+          <div class="review-body">
+            <div class="review-head">
+              <span class="stars">{{ '★'.repeat(r.rating) }}<i>{{ '★'.repeat(5 - r.rating) }}</i></span>
+              <b class="author">{{ r.authorName }}</b>
+              <span class="spacer"></span>
+              <span v-if="r.isDeleted" class="tag off">Silinib</span>
+              <span v-else-if="r.isHidden" class="tag off">Gizlədilib</span>
 
-          <p v-if="r.isHidden && r.hiddenReason" class="hidden-reason">
-            Səbəb: {{ r.hiddenReason }}
-          </p>
+              <!-- Yalnız platforma sahibinə görünür: rəy admin tərəfindən dəyişdirilib -->
+              <button
+                v-if="isSuperAdmin && r.editCount"
+                class="tag edited"
+                :title="`Son dəyişən: ${r.lastEditedBy}`"
+                @click="openEdits(r)"
+              >
+                ✎ Dəyişdirilib ({{ r.editCount }})
+              </button>
 
-          <div class="review-actions">
-            <button v-if="!r.isHidden" class="mini-btn danger" @click="openHide(r)">Gizlət</button>
-            <button v-else class="mini-btn ok" @click="unhide(r)">Yenidən göstər</button>
-            <button
-              v-if="r.openReportCount"
-              class="mini-btn"
-              @click="resolve(r)"
-            >
-              Şikayətləri bağla
-            </button>
-            <button class="mini-btn danger" @click="remove(r)">Sil</button>
+              <button
+                v-if="r.reportCount"
+                class="tag warn"
+                :title="'Şikayətlərə bax'"
+                @click="openReports(r)"
+              >
+                {{ r.reportCount }} şikayət<template v-if="r.openReportCount">
+                  · {{ r.openReportCount }} açıq</template>
+              </button>
+              <span class="date">{{ formatDate(r.createdAt) }}</span>
+            </div>
+
+            <p class="comment">{{ r.comment }}</p>
+
+            <p v-if="r.isHidden && r.hiddenReason" class="hidden-reason">
+              Səbəb: {{ r.hiddenReason }}
+            </p>
+
+            <div v-if="r.isDeleted" class="review-actions">
+              <button class="mini-btn ok" @click="restore(r)">Geri qaytar</button>
+            </div>
+            <div v-else class="review-actions">
+              <button class="mini-btn" @click="openEdit(r)">Redaktə</button>
+              <button v-if="!r.isHidden" class="mini-btn danger" @click="openHide(r)">Gizlət</button>
+              <button v-else class="mini-btn ok" @click="unhide(r)">Yenidən göstər</button>
+              <button
+                v-if="r.openReportCount"
+                class="mini-btn"
+                @click="resolve(r)"
+              >
+                Şikayətləri bağla
+              </button>
+              <button class="mini-btn danger" @click="remove(r)">Sil</button>
+            </div>
           </div>
         </li>
       </ul>
@@ -107,6 +136,78 @@
         </button>
       </div>
     </section>
+
+    <!-- Dəyişiklik tarixçəsi — yalnız platforma sahibi görür -->
+    <el-dialog v-model="editsOpen" title="Rəyin dəyişiklik tarixçəsi" width="560px">
+      <p class="dialog-note top">
+        Bu pəncərə yalnız sizə görünür. Dəstək admini nə bu nişanı, nə də köhnə mətni görmür.
+      </p>
+
+      <ul v-if="edits.length" class="edit-list">
+        <li v-for="e in edits" :key="e.id">
+          <div class="edit-head">
+            <b>{{ e.editedByName }}</b>
+            <span class="role-tag">{{ roleWord(e.editedByRole) }}</span>
+            <span class="spacer"></span>
+            <span class="date">{{ formatDateTime(e.createdAt) }}</span>
+          </div>
+
+          <div class="diff">
+            <div class="diff-col old">
+              <span class="diff-label">Əvvəl</span>
+              <span class="stars small">{{ '★'.repeat(e.oldRating) }}<i>{{ '★'.repeat(5 - e.oldRating) }}</i></span>
+              <p>{{ e.oldComment }}</p>
+            </div>
+            <div class="diff-col new">
+              <span class="diff-label">Sonra</span>
+              <span class="stars small">{{ '★'.repeat(e.newRating) }}<i>{{ '★'.repeat(5 - e.newRating) }}</i></span>
+              <p>{{ e.newComment }}</p>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <p v-else class="empty">Dəyişiklik qeydə alınmayıb.</p>
+    </el-dialog>
+
+    <!-- Rəyin redaktəsi -->
+    <el-dialog v-model="editOpen" title="Rəyi düzəlt" width="480px">
+      <div v-if="editTarget" class="edit-venue">
+        <img :src="editTarget.venueImageUrl" :alt="editTarget.venueName" @error="onImgError" />
+        <div>
+          <b>{{ editTarget.venueName }}</b>
+          <span>{{ editTarget.venueCity }} · müəllif: {{ editTarget.authorName }}</span>
+        </div>
+      </div>
+
+      <label class="field-label">Bal</label>
+      <div class="star-pick">
+        <button
+          v-for="n in 5"
+          :key="n"
+          class="star-btn"
+          :class="{ filled: n <= editRating }"
+          @click="editRating = n"
+        >
+          ★
+        </button>
+        <span class="star-hint">{{ RATING_WORDS[editRating] }}</span>
+      </div>
+
+      <label class="field-label">Mətn</label>
+      <textarea v-model="editComment" class="value-box area" rows="4"></textarea>
+
+      <p class="dialog-note">
+        Düzəliş jurnala yazılır. Rəyi tamamilə dəyişmək əvəzinə yalnız uyğunsuz hissəni
+        çıxarmaq daha düzgündür — mətn müştərinin öz fikridir.
+      </p>
+
+      <template #footer>
+        <button class="mini-btn" @click="editOpen = false">İmtina</button>
+        <button class="mini-btn ok" :disabled="!editComment.trim()" @click="submitEdit">
+          Yadda saxla
+        </button>
+      </template>
+    </el-dialog>
 
     <!-- Gizlətmə səbəbi -->
     <el-dialog v-model="hideOpen" title="Rəyi gizlət" width="440px">
@@ -163,9 +264,15 @@ import {
   setReviewHidden,
   resolveReviewReports,
   deleteReview,
+  restoreReview,
+  updateReview,
+  getReviewEdits,
   REVIEW_STATUSES,
   HIDE_REASONS,
 } from '@/services/reviewModerationService'
+import { useAuthStore } from '@/store/auth'
+
+const auth = useAuthStore()
 
 const isLoading = ref(false)
 const stats = ref({})
@@ -181,6 +288,66 @@ const filters = reactive({
 })
 
 const lastPage = computed(() => Math.max(1, Math.ceil(total.value / filters.pageSize)))
+
+const FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=400&q=60'
+
+const RATING_WORDS = { 1: 'Çox pis', 2: 'Pis', 3: 'Normal', 4: 'Yaxşı', 5: 'Əla' }
+
+const onImgError = (event) => {
+  event.target.src = FALLBACK_IMAGE
+}
+
+// Dəyişiklik nişanı və tarixçəsi yalnız platforma sahibinə göstərilir —
+// server də eyni yoxlamanı aparır, interfeys tək qoruma deyil.
+const isSuperAdmin = computed(() => auth.user?.role === 'SuperAdmin')
+
+const editsOpen = ref(false)
+const edits = ref([])
+
+const roleWord = (role) =>
+  ({ SuperAdmin: 'platforma sahibi', Support: 'dəstək admini' })[role] ?? role
+
+const formatDateTime = (value) => {
+  const d = new Date(value)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+const openEdits = async (review) => {
+  edits.value = []
+  editsOpen.value = true
+  try {
+    edits.value = await getReviewEdits(review.id)
+  } catch (e) {
+    editsOpen.value = false
+    ElMessage.error(e?.userMessage ?? e?.message ?? 'Tarixçə yüklənmədi')
+  }
+}
+
+const editOpen = ref(false)
+const editTarget = ref(null)
+const editRating = ref(5)
+const editComment = ref('')
+
+const openEdit = (review) => {
+  editTarget.value = review
+  editRating.value = review.rating
+  editComment.value = review.comment
+  editOpen.value = true
+}
+
+const submitEdit = async () => {
+  const result = await updateReview(editTarget.value.id, {
+    rating: editRating.value,
+    comment: editComment.value.trim(),
+  })
+  if (!result.success) return ElMessage.error(result.message)
+
+  editOpen.value = false
+  ElMessage.success(result.message)
+  await refresh()
+}
 
 const hideOpen = ref(false)
 const hideReason = ref('')
@@ -283,11 +450,20 @@ const resolve = async (review) => {
   await refresh()
 }
 
-// Silmək geri qaytarıla bilmir — ona görə ayrıca təsdiq istəyirik
+// Silinmiş rəyi geri qaytarır
+const restore = async (review) => {
+  const result = await restoreReview(review.id)
+  if (!result.success) return ElMessage.error(result.message)
+
+  ElMessage.success(result.message)
+  await refresh()
+}
+
 const remove = async (review) => {
   try {
     await ElMessageBox.confirm(
-      'Rəy tamamilə silinəcək və geri qaytarıla bilməyəcək. Gizlətmək daha təhlükəsizdir.',
+      'Rəy silinmiş kimi işarələnəcək — «Silinmiş» süzgəcindən geri qaytarmaq olar. ' +
+        'Müəllifə görünməsin deyə gizlətmək daha yumşaq yoldur.',
       'Rəyi sil',
       { confirmButtonText: 'Sil', cancelButtonText: 'İmtina', type: 'warning' },
     )
@@ -472,9 +648,61 @@ onMounted(refresh)
 }
 
 .review-item {
+  display: flex;
+  gap: 14px;
   border: 1px solid #f4eff1;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 14px 16px;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.review-item:hover {
+  box-shadow: 0 8px 22px rgba(26, 17, 24, 0.07);
+  transform: translateY(-1px);
+}
+
+.review-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Rəyin ünvanı: hansı saraya yazılıb */
+.venue-box {
+  width: 108px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-decoration: none;
+}
+
+.venue-box img {
+  width: 108px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #f6f1f3;
+  transition: filter 0.15s;
+}
+
+.venue-box:hover img {
+  filter: brightness(1.06);
+}
+
+.venue-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #721438;
+  line-height: 1.25;
+}
+
+.venue-box:hover .venue-title {
+  text-decoration: underline;
+}
+
+.venue-city {
+  font-size: 0.7rem;
+  color: #a6969c;
 }
 
 .review-item.hidden {
@@ -484,6 +712,141 @@ onMounted(refresh)
 
 .review-item.hidden .comment {
   color: #a6969c;
+}
+
+/* Silinmiş rəy sönük və üstündən xətli göstərilir */
+.review-item.removed {
+  background: #fbf8f9;
+  border-color: #f0e0e4;
+}
+
+.review-item.removed .comment {
+  color: #b8a3ab;
+  text-decoration: line-through;
+}
+
+.review-item.removed .venue-box img {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+/* Redaktə pəncərəsi */
+.edit-venue {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #fbf9fa;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+
+.edit-venue img {
+  width: 66px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 9px;
+  background: #f6f1f3;
+}
+
+.edit-venue b {
+  display: block;
+  font-size: 0.86rem;
+  color: #1a1118;
+}
+
+.edit-venue span {
+  font-size: 0.75rem;
+  color: #868e96;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b8a3ab;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.star-pick {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 14px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #ece5e8;
+  cursor: pointer;
+  padding: 0 1px;
+  transition: color 0.12s, transform 0.12s;
+}
+
+.star-btn:hover {
+  transform: scale(1.15);
+}
+
+.star-btn.filled {
+  color: #dfb15b;
+}
+
+.star-hint {
+  margin-left: 8px;
+  font-size: 0.78rem;
+  color: #868e96;
+}
+
+.value-box {
+  width: 100%;
+  border: 1px solid #f0eaec;
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-size: 0.85rem;
+  color: #1a1118;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.value-box:focus {
+  border-color: #dfb15b;
+}
+
+.value-box.area {
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.dialog-note {
+  margin: 12px 0 0;
+  font-size: 0.76rem;
+  color: #a6969c;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .review-item {
+    flex-direction: column;
+  }
+
+  .venue-box {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .venue-box img {
+    width: 76px;
+    height: 56px;
+  }
 }
 
 .review-head {
@@ -510,13 +873,6 @@ onMounted(refresh)
   color: #1a1118;
 }
 
-.venue-name {
-  font-size: 0.76rem;
-  color: #721438;
-  background: #f6e9ee;
-  padding: 2px 9px;
-  border-radius: 20px;
-}
 
 .spacer {
   flex: 1;
@@ -551,6 +907,108 @@ onMounted(refresh)
 .tag.off {
   background: #f8e3e8;
   color: #a02c4a;
+}
+
+/* Yalnız platforma sahibinin gördüyü nişan */
+.tag.edited {
+  background: #ece6f7;
+  color: #5b3fa0;
+  border: none;
+  cursor: pointer;
+}
+
+.tag.edited:hover {
+  background: #e0d7f3;
+}
+
+/* Dəyişiklik tarixçəsi */
+.dialog-note.top {
+  margin: 0 0 14px;
+  background: #f6f2fc;
+  border: 1px solid #e4dbf5;
+  color: #5b3fa0;
+  padding: 9px 13px;
+  border-radius: 10px;
+}
+
+.edit-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  margin-bottom: 8px;
+}
+
+.role-tag {
+  font-size: 0.7rem;
+  background: #f1f3f5;
+  color: #6c757d;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.diff {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.diff-col {
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.diff-col.old {
+  background: #fdf4f6;
+  border: 1px solid #f5e0e6;
+}
+
+.diff-col.new {
+  background: #f2f9f4;
+  border: 1px solid #d9ecdf;
+}
+
+.diff-label {
+  display: block;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.diff-col.old .diff-label {
+  color: #a02c4a;
+}
+
+.diff-col.new .diff-label {
+  color: #217a41;
+}
+
+.diff-col p {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #4a3f44;
+}
+
+.stars.small {
+  font-size: 0.76rem;
+}
+
+@media (max-width: 560px) {
+  .diff {
+    grid-template-columns: 1fr;
+  }
 }
 
 .comment {

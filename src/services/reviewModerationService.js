@@ -53,11 +53,30 @@ export const REPORT_REASONS = [
   { value: 'other', label: 'Digər' },
 ]
 
+// PUT /ReviewModeration/Update/{reviewId} — bal və mətn düzəlişi
+export const updateReview = async (reviewId, { rating, comment }) => {
+  const { data } = await api.put(`/ReviewModeration/Update/${reviewId}`, { rating, comment })
+  return data
+}
+
+// GET /ReviewModeration/GetEdits/{reviewId} — yalnız SuperAdmin üçün açıqdır
+export const getReviewEdits = async (reviewId) => {
+  const { data } = await api.get(`/ReviewModeration/GetEdits/${reviewId}`)
+  return data.data ?? []
+}
+
+// PUT /ReviewModeration/Restore/{reviewId}
+export const restoreReview = async (reviewId) => {
+  const { data } = await api.put(`/ReviewModeration/Restore/${reviewId}`)
+  return data
+}
+
 export const REVIEW_STATUSES = [
   { value: '', label: 'Hamısı' },
   { value: 'reported', label: 'Şikayət olunan' },
   { value: 'hidden', label: 'Gizlədilmiş' },
   { value: 'visible', label: 'Görünən' },
+  { value: 'deleted', label: 'Silinmiş' },
 ]
 
 // Hazır gizlətmə səbəbləri — moderator tez seçsin deyə

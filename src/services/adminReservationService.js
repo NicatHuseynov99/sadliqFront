@@ -29,12 +29,19 @@ export const RESERVATION_STATUS = {
   cancelled: 3,
 }
 
+// PUT /AdminReservations/Restore/{id} — silinmiş rezervi geri qaytarır
+export const restoreReservation = async (reservationId) => {
+  const { data } = await api.put(`/AdminReservations/Restore/${reservationId}`)
+  return data
+}
+
 export const STATUS_FILTERS = [
   { value: '', label: 'Hamısı' },
   { value: 'Pending', label: 'Gözləyir' },
   { value: 'Confirmed', label: 'Təsdiqlənib' },
   { value: 'Rejected', label: 'Rədd edilib' },
   { value: 'Cancelled', label: 'Ləğv edilib' },
+  { value: 'Deleted', label: 'Silinmiş' },
 ]
 
 // Status kodunu rəng sinfinə çevirir

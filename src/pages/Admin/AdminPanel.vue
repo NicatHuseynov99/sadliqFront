@@ -43,6 +43,7 @@
       <ReservationsView v-else-if="section === 'bookings'" />
       <SettingsView v-else-if="section === 'settings'" />
       <VenuesView v-else-if="section === 'venues'" @changed="loadStats" />
+      <DataView v-else-if="section === 'data'" />
 
       <template v-else>
 
@@ -154,7 +155,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="u in users" :key="u.id" :class="{ blocked: !u.isActive }">
+              <tr
+                v-for="u in users"
+                :key="u.id"
+                :class="{ blocked: !u.isActive && !u.isDeleted, removed: u.isDeleted }"
+              >
                 <td>
                   <b class="name-link" @click="openDetail(u)">{{ u.fullName }}</b>
                   <em v-if="u.id === auth.user?.id" class="you-tag">siz</em>
@@ -164,7 +169,8 @@
                 <td class="muted">{{ u.venueCount || '—' }}</td>
                 <td class="muted">{{ formatDateFull(u.createdAt.slice(0, 10)) }}</td>
                 <td>
-                  <span class="status-badge" :class="u.isActive ? 'ok' : 'off'">
+                  <span v-if="u.isDeleted" class="status-badge off">Silinib</span>
+                  <span v-else class="status-badge" :class="u.isActive ? 'ok' : 'off'">
                     {{ u.isActive ? 'Aktiv' : 'Bloklanıb' }}
                   </span>
                 </td>
@@ -179,7 +185,11 @@
                     <option v-for="r in roles" :key="r.value" :value="r.value">{{ r.label }}</option>
                   </select>
                 </td>
-                <td class="row-actions">
+                <td v-if="u.isDeleted" class="row-actions">
+                  <button class="mini-btn" @click="openDetail(u)">Ətraflı</button>
+                  <button class="mini-btn ok" @click="restore(u)">Geri qaytar</button>
+                </td>
+                <td v-else class="row-actions">
                   <button class="mini-btn" @click="openDetail(u)">Ətraflı</button>
                   <button class="mini-btn" @click="openEdit(u)">Redaktə</button>
                   <button class="mini-btn" @click="openPassword(u)">Parol</button>
@@ -291,6 +301,7 @@ import ReviewsView from '@/components/ReviewsView.vue'
 import ReservationsView from '@/components/ReservationsView.vue'
 import SettingsView from '@/components/SettingsView.vue'
 import VenuesView from '@/components/VenuesView.vue'
+import DataView from '@/components/DataView.vue'
 import {
   getPlatformStats,
   getUsers,
@@ -303,6 +314,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  restoreUser,
 } from '@/services/adminService'
 import { formatDateFull } from '@/utils/date'
 
@@ -358,6 +370,7 @@ const tabs = computed(() => [
   { value: 'visitors', label: 'Ziyarətçilər', icon: '👣' },
   { value: 'audit', label: 'Jurnal', icon: '📜' },
   { value: 'settings', label: 'Parametrlər', icon: '⚙️' },
+  { value: 'data', label: 'Baza', icon: '🗄' },
 ])
 
 // Dəstək admini SuperAdmin hesablarını görmür — həm süzgəcdən, həm də
@@ -383,6 +396,7 @@ const statusFilters = [
   { value: '', label: 'Hamısı' },
   { value: 'active', label: 'Aktiv' },
   { value: 'blocked', label: 'Bloklanmış' },
+  { value: 'deleted', label: 'Silinmiş' },
 ]
 
 const roleLabel = (value) => roles.value.find((r) => r.value === value)?.label ?? value
@@ -523,11 +537,24 @@ const submitForm = async () => {
   }
 }
 
+// Silinmiş hesabı geri qaytarır
+const restore = async (user) => {
+  try {
+    const result = await restoreUser(user.id)
+    if (!result.success) return notifyError({ userMessage: result.message })
+
+    ElNotification({ title: 'Hazırdır', message: result.message, type: 'success', zIndex: 99999 })
+    await load()
+  } catch (e) {
+    notifyError(e)
+  }
+}
+
 // Silmək yalnız «təmiz» hesablar üçün işləyir — server sarayı və rezervi yoxlayır
 const removeUser = async (user) => {
   try {
     await ElMessageBox.confirm(
-      `${user.fullName} hesabı tamamilə silinəcək. Fəaliyyəti olan hesab üçün blok daha təhlükəsizdir.`,
+      `${user.fullName} hesabı silinmiş kimi işarələnəcək — «Silinmiş» süzgəcindən geri qaytarmaq olar.`,
       'Hesabı sil',
       { confirmButtonText: 'Sil', cancelButtonText: 'İmtina', type: 'warning' },
     )
@@ -1059,6 +1086,16 @@ button.stat-card:hover {
 .user-table tr.blocked td {
   background: #fdf6f7;
   opacity: 0.75;
+}
+
+/* Silinmiş hesab sönük və üstündən xətli — amma yerində qalır */
+.user-table tr.removed td {
+  background: #fbf8f9;
+  color: #b8a3ab;
+}
+
+.user-table tr.removed td:not(.row-actions) {
+  text-decoration: line-through;
 }
 
 .name-link {

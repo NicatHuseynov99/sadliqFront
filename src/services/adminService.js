@@ -62,6 +62,18 @@ export const deleteUser = async (userId) => {
   return data
 }
 
+// PUT /Admin/RestoreUser/{userId} — silinmiş hesabı geri qaytarır
+export const restoreUser = async (userId) => {
+  const { data } = await api.put(`/Admin/RestoreUser/${userId}`)
+  return data
+}
+
+// PUT /AdminVenues/Restore/{venueId} — zalları və menyuları ilə birlikdə
+export const restoreVenue = async (venueId) => {
+  const { data } = await api.put(`/AdminVenues/Restore/${venueId}`)
+  return data
+}
+
 // GET /AdminVenues/Search — bütün saraylar, süzgəclərlə
 export const searchVenues = async (params) => {
   const { data } = await api.get('/AdminVenues/Search', { params })

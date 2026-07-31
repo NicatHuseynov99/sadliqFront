@@ -38,29 +38,34 @@
         </select>
       </div>
 
-      <ul v-if="rows.length" class="venue-list">
-        <li v-for="v in rows" :key="v.id" class="venue-item" :class="{ pending: !v.isApproved }">
-          <img class="cover" :src="v.coverImageUrl" :alt="v.name" @error="onImgError" />
-
-          <div class="venue-main">
-            <div class="venue-head">
+      <ul v-if="rows.length" class="venue-grid">
+        <li
+          v-for="v in rows"
+          :key="v.id"
+          class="venue-card"
+          :class="{ pending: !v.isApproved && !v.isDeleted, removed: v.isDeleted }"
+        >
+          <div class="cover-wrap">
+            <img class="cover" :src="v.coverImageUrl" :alt="v.name" @error="onImgError" />
+            <span v-if="v.isDeleted" class="status-badge off">Silinib</span>
+            <span v-else class="status-badge" :class="v.isApproved ? 'ok' : 'wait'">
+              {{ v.isApproved ? 'Saytda' : 'Təsdiq gözləyir' }}
+            </span>
+            <span v-if="v.rating" class="rating">★ {{ v.rating }}</span>
+            <div class="cover-shade">
               <b class="venue-name">{{ v.name }}</b>
-              <span class="status-badge" :class="v.isApproved ? 'ok' : 'wait'">
-                {{ v.isApproved ? 'Saytda' : 'Təsdiq gözləyir' }}
-              </span>
-              <span v-if="v.rating" class="rating">★ {{ v.rating }}</span>
+              <span class="venue-sub">{{ v.city }} · {{ v.address }}</span>
             </div>
+          </div>
 
-            <span class="venue-sub">{{ v.city }} · {{ v.address }} · {{ v.phone }}</span>
-
+          <div class="card-body">
             <div class="chips-line">
-              <span class="mini-chip">{{ v.hallCount }} zal</span>
-              <span class="mini-chip">{{ v.menuCount }} menyu</span>
-              <span class="mini-chip">{{ v.imageCount }} şəkil</span>
-              <span class="mini-chip">{{ v.featureCount }} özəllik</span>
-              <span class="mini-chip">{{ v.reviewCount }} rəy</span>
+              <span class="mini-chip">🏛 {{ v.hallCount }} zal</span>
+              <span class="mini-chip">🍽 {{ v.menuCount }} menyu</span>
+              <span class="mini-chip">🖼 {{ v.imageCount }} şəkil</span>
+              <span class="mini-chip">⭐ {{ v.reviewCount }} rəy</span>
               <span class="mini-chip" :class="{ warn: v.pendingReservationCount }">
-                {{ v.reservationCount }} rezerv<template v-if="v.pendingReservationCount">
+                📅 {{ v.reservationCount }} rezerv<template v-if="v.pendingReservationCount">
                   · {{ v.pendingReservationCount }} cavabsız</template>
               </span>
             </div>
@@ -71,20 +76,24 @@
             </span>
           </div>
 
-          <div class="venue-actions">
+          <!-- Silinmiş saray üçün yeganə mənalı əməliyyat geri qaytarmaqdır -->
+          <div v-if="v.isDeleted" class="venue-actions single">
+            <button class="act ok" @click="restore(v)">Geri qaytar</button>
+            <button class="act" @click="openPreview(v)">Məlumatına bax</button>
+          </div>
+          <div v-else class="venue-actions">
             <button
-              class="mini-btn"
+              class="act"
               :class="v.isApproved ? 'danger' : 'ok'"
               @click="toggleApproved(v)"
             >
               {{ v.isApproved ? 'Təsdiqi geri al' : 'Təsdiqlə' }}
             </button>
-            <button class="mini-btn" @click="openEdit(v)">Redaktə</button>
-            <button class="mini-btn" @click="openOwner(v)">Sahibi dəyiş</button>
-            <a class="mini-btn link" :href="`/venue/${v.id}`" target="_blank">Səhifəyə bax</a>
-            <!-- Zal, menyu və şəkillər sahib panelində idarə olunur; admin oraya tam çıxışlıdır -->
-            <a class="mini-btn link" href="/panel" target="_blank">Zal / menyu</a>
-            <button class="mini-btn danger" @click="remove(v)">Sil</button>
+            <button class="act" @click="openEdit(v)">Redaktə</button>
+            <button class="act" @click="openOwner(v)">Sahibi dəyiş</button>
+            <button class="act" @click="openPreview(v)">Səhifəyə bax</button>
+            <button class="act" @click="openContent(v)">Zal / menyu</button>
+            <button class="act danger" @click="remove(v)">Sil</button>
           </div>
         </li>
       </ul>
@@ -101,8 +110,77 @@
       </div>
     </section>
 
+    <!-- Sarayın önizləməsi -->
+    <el-dialog v-model="previewOpen" :title="previewTarget?.name" width="620px" class="venue-dialog">
+      <div v-if="previewTarget" class="preview">
+        <img class="preview-cover" :src="previewTarget.coverImageUrl" :alt="previewTarget.name" @error="onImgError" />
+
+        <div class="preview-badges">
+          <span class="status-badge" :class="previewTarget.isApproved ? 'ok' : 'wait'">
+            {{ previewTarget.isApproved ? 'Saytda görünür' : 'Təsdiq gözləyir' }}
+          </span>
+          <span v-if="previewTarget.rating" class="mini-chip">★ {{ previewTarget.rating }}</span>
+          <span class="mini-chip">{{ previewTarget.reviewCount }} rəy</span>
+        </div>
+
+        <p class="preview-text">{{ previewTarget.description || 'Təsvir yazılmayıb.' }}</p>
+
+        <dl class="preview-list">
+          <div><dt>Şəhər</dt><dd>{{ previewTarget.city }}</dd></div>
+          <div><dt>Ünvan</dt><dd>{{ previewTarget.address }}</dd></div>
+          <div><dt>Telefon</dt><dd>{{ previewTarget.phone }}</dd></div>
+          <div><dt>Sahib</dt><dd>{{ previewTarget.ownerName }} · {{ previewTarget.ownerEmail }}</dd></div>
+          <div><dt>Əlavə olunub</dt><dd>{{ formatDate(previewTarget.createdAt) }}</dd></div>
+          <div v-if="previewTarget.features?.length">
+            <dt>Özəlliklər</dt><dd>{{ previewTarget.features.join(', ') }}</dd>
+          </div>
+        </dl>
+      </div>
+      <template #footer>
+        <a class="mini-btn link" :href="`/venue/${previewTarget?.id}`" target="_blank">Saytda aç</a>
+        <button class="mini-btn" @click="previewOpen = false">Bağla</button>
+      </template>
+    </el-dialog>
+
+    <!-- Zallar və menyular -->
+    <el-dialog
+      v-model="contentOpen"
+      :title="`${contentTarget?.name} — zallar və menyular`"
+      width="620px"
+      class="venue-dialog"
+    >
+      <div v-loading="contentLoading" class="content-wrap">
+        <h4 class="sub-title">Zallar <em>{{ halls.length }}</em></h4>
+        <ul v-if="halls.length" class="inner-list">
+          <li v-for="h in halls" :key="h.id">
+            <b>{{ h.name }}</b>
+            <span class="inner-sub">{{ h.capacity }} nəfər</span>
+          </li>
+        </ul>
+        <p v-else class="empty">Zal əlavə olunmayıb.</p>
+
+        <h4 class="sub-title">Menyular <em>{{ menus.length }}</em></h4>
+        <ul v-if="menus.length" class="inner-list">
+          <li v-for="m in menus" :key="m.id">
+            <b>{{ m.name }}</b>
+            <span class="inner-sub">{{ m.pricePerPerson }} ₼ / nəfər</span>
+          </li>
+        </ul>
+        <p v-else class="empty">Menyu əlavə olunmayıb.</p>
+
+        <p class="hint">
+          Zal və menyuların tərkibini dəyişmək üçün sahib panelindən istifadə edin —
+          admin bütün saraylara oradan tam çıxışa malikdir.
+        </p>
+      </div>
+      <template #footer>
+        <a class="mini-btn link" href="/panel" target="_blank">Sahib panelində aç</a>
+        <button class="mini-btn" @click="contentOpen = false">Bağla</button>
+      </template>
+    </el-dialog>
+
     <!-- Redaktə -->
-    <el-dialog v-model="editOpen" title="Sarayın məlumatları" width="540px">
+    <el-dialog v-model="editOpen" title="Sarayın məlumatları" width="540px" class="venue-dialog">
       <div class="form-grid">
         <label>Ad<input v-model="form.name" class="value-box" /></label>
         <label>Şəhər<input v-model="form.city" class="value-box" /></label>
@@ -125,7 +203,7 @@
     </el-dialog>
 
     <!-- Sahib dəyişmə -->
-    <el-dialog v-model="ownerOpen" title="Sarayın sahibini dəyiş" width="440px">
+    <el-dialog v-model="ownerOpen" title="Sarayın sahibini dəyiş" width="440px" class="venue-dialog">
       <p class="hint">
         «{{ ownerTarget?.name }}» seçdiyiniz istifadəçiyə keçəcək. Müştəri hesabı seçsəniz
         rolu avtomatik «Saray sahibi» olacaq.
@@ -152,9 +230,10 @@ import {
   setVenueApproved,
   changeVenueOwner,
   deleteVenue,
+  restoreVenue,
   getUsers,
 } from '@/services/adminService'
-import { updateVenue } from '@/services/ownerService'
+import { updateVenue, getVenueHalls, getVenueMenus } from '@/services/ownerService'
 import { getCities } from '@/services/platformService'
 
 const FALLBACK_IMAGE =
@@ -164,6 +243,7 @@ const STATUS_FILTERS = [
   { value: '', label: 'Hamısı' },
   { value: 'pending', label: 'Təsdiq gözləyən' },
   { value: 'approved', label: 'Saytda olan' },
+  { value: 'deleted', label: 'Silinmiş' },
 ]
 
 const emit = defineEmits(['changed'])
@@ -200,6 +280,46 @@ const form = reactive({
 const ownerOpen = ref(false)
 const ownerTarget = ref(null)
 const newOwnerId = ref(null)
+
+const previewOpen = ref(false)
+const previewTarget = ref(null)
+
+const contentOpen = ref(false)
+const contentTarget = ref(null)
+const contentLoading = ref(false)
+const halls = ref([])
+const menus = ref([])
+
+const formatDate = (value) => {
+  const d = new Date(value)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`
+}
+
+const openPreview = (venue) => {
+  previewTarget.value = venue
+  previewOpen.value = true
+}
+
+const openContent = async (venue) => {
+  contentTarget.value = venue
+  halls.value = []
+  menus.value = []
+  contentOpen.value = true
+  contentLoading.value = true
+  try {
+    const [hallList, menuList] = await Promise.all([
+      getVenueHalls(venue.id),
+      getVenueMenus(venue.id),
+    ])
+    halls.value = hallList
+    menus.value = menuList
+  } catch (e) {
+    ElMessage.error(e?.userMessage ?? e?.message ?? 'Məlumat yüklənmədi')
+  } finally {
+    contentLoading.value = false
+  }
+}
 
 // Müştəri də seçilə bilər — sistem onu avtomatik sahibə çevirir
 const ownerCandidates = computed(() =>
@@ -329,12 +449,21 @@ const submitOwner = async () => {
   await refresh()
 }
 
-// Silmək saray, zal, menyu və şəkilləri birdəfəlik aparır
+// Silinmiş sarayı zalları və menyuları ilə birlikdə geri qaytarır
+const restore = async (venue) => {
+  const result = await restoreVenue(venue.id)
+  if (!result.success) return ElMessage.error(result.message)
+
+  ElMessage.success(result.message)
+  await refresh()
+}
+
+// Silmək məlumatı bazadan aparmır — «Silinmiş» süzgəcindən geri qaytarmaq olar
 const remove = async (venue) => {
   try {
     await ElMessageBox.confirm(
-      `«${venue.name}» və ona bağlı ${venue.hallCount} zal, ${venue.menuCount} menyu silinəcək. ` +
-        'Bu əməliyyat geri qaytarıla bilmir — saytdan yığışdırmaq üçün təsdiqi geri almaq daha təhlükəsizdir.',
+      `«${venue.name}» və ona bağlı ${venue.hallCount} zal, ${venue.menuCount} menyu silinmiş kimi ` +
+        'işarələnəcək: saytda görünməyəcək, amma «Silinmiş» süzgəcindən geri qaytarmaq olacaq.',
       'Sarayı sil',
       { confirmButtonText: 'Sil', cancelButtonText: 'İmtina', type: 'warning' },
     )
@@ -461,77 +590,123 @@ onMounted(async () => {
   color: #fff;
 }
 
-/* Saray sətirləri */
-.venue-list {
+/* Saray kartları — şəkil əsas yeri tutur */
+.venue-grid {
   margin: 0;
   padding: 0;
   list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 18px;
+}
+
+.venue-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.venue-item {
-  display: flex;
-  gap: 14px;
   border: 1px solid #f4eff1;
-  border-radius: 12px;
-  padding: 12px 14px;
-  align-items: flex-start;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  transition: box-shadow 0.18s, transform 0.18s;
 }
 
-.venue-item.pending {
-  background: #fffaf2;
-  border-color: #f5e4c8;
+.venue-card:hover {
+  box-shadow: 0 14px 30px rgba(26, 17, 24, 0.11);
+  transform: translateY(-2px);
+}
+
+.venue-card.pending {
+  border-color: #f0d5a8;
+}
+
+/* Silinmiş saray sönük göstərilir — qarışdırmaq olmasın */
+.venue-card.removed {
+  border-color: #f0e0e4;
+  background: #fdfafb;
+}
+
+.venue-card.removed .cover {
+  filter: grayscale(1);
+  opacity: 0.65;
+}
+
+.status-badge.off {
+  background: #f8e3e8;
+  color: #a02c4a;
+}
+
+.venue-actions.single {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.cover-wrap {
+  position: relative;
+  height: 178px;
 }
 
 .cover {
-  width: 92px;
-  height: 68px;
-  flex: none;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 10px;
+  display: block;
   background: #f6f1f3;
 }
 
-.venue-main {
-  flex: 1;
-  min-width: 0;
+/* Adın oxunması üçün şəklin altına tünd keçid */
+.cover-shade {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 26px 14px 12px;
+  background: linear-gradient(to top, rgba(26, 17, 24, 0.85), transparent);
   display: flex;
   flex-direction: column;
-  gap: 5px;
-}
-
-.venue-head {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  flex-wrap: wrap;
+  gap: 2px;
 }
 
 .venue-name {
-  font-size: 0.95rem;
-  color: #1a1118;
-}
-
-.rating {
-  font-size: 0.78rem;
-  color: #b07d2b;
+  color: #fff;
+  font-size: 1rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .venue-sub {
-  font-size: 0.78rem;
-  color: #868e96;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.cover-wrap .status-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.rating {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(26, 17, 24, 0.7);
+  color: #dfb15b;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.card-body {
+  padding: 12px 14px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
 }
 
 .chips-line {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-top: 2px;
 }
 
 .mini-chip {
@@ -580,11 +755,129 @@ onMounted(async () => {
   color: #b06a2b;
 }
 
+/* Əməliyyatlar kartın altında bərabər paylanır */
 .venue-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #f4eff1;
+  border-top: 1px solid #f4eff1;
+  margin-top: 10px;
+}
+
+.act {
+  background: #fff;
+  border: none;
+  color: #6c757d;
+  padding: 9px 6px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.act:hover {
+  background: #fbf7f8;
+  color: #721438;
+}
+
+.act.ok {
+  color: #217a41;
+}
+
+.act.danger {
+  color: #a02c4a;
+}
+
+/* Pəncərələr */
+.preview-cover {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #f6f1f3;
+}
+
+.preview-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 14px 0 10px;
+  flex-wrap: wrap;
+}
+
+.preview-text {
+  margin: 0 0 14px;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: #4a3f44;
+}
+
+.preview-list {
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+}
+
+.preview-list > div {
+  display: flex;
+  gap: 12px;
+  font-size: 0.84rem;
+  border-bottom: 1px solid #faf7f8;
+  padding-bottom: 7px;
+}
+
+.preview-list dt {
+  width: 110px;
   flex: none;
+  color: #a6969c;
+  font-size: 0.76rem;
+}
+
+.preview-list dd {
+  margin: 0;
+  color: #1a1118;
+}
+
+.sub-title {
+  margin: 0 0 10px;
+  font-size: 0.88rem;
+  color: #1a1118;
+}
+
+.sub-title em {
+  font-style: normal;
+  background: #f6e9ee;
+  color: #721438;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 6px;
+}
+
+.inner-list {
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.inner-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.84rem;
+  padding: 8px 12px;
+  background: #fbf9fa;
+  border-radius: 9px;
+}
+
+.inner-sub {
+  color: #868e96;
+  font-size: 0.78rem;
 }
 
 /* Форма */
@@ -684,14 +977,8 @@ onMounted(async () => {
 }
 
 @media (max-width: 720px) {
-  .venue-item {
-    flex-wrap: wrap;
-  }
-
-  .venue-actions {
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
+  .venue-grid {
+    grid-template-columns: 1fr;
   }
 
   .form-grid {

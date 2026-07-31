@@ -54,13 +54,23 @@
       Bu şərtlərə uyğun qeyd tapılmadı.
     </div>
 
-    <div class="log-list">
-      <div v-for="log in logs" :key="log.id" class="log-row" :class="{ failed: !log.isSuccess }">
+    <div v-for="group in grouped" :key="group.key" class="day-group">
+      <div class="day-head">
+        <span class="day-name">{{ group.title }}</span>
+        <span class="day-line"></span>
+        <span class="day-count">{{ group.items.length }} qeyd</span>
+      </div>
+
+      <div class="log-list">
+      <div v-for="log in group.items" :key="log.id" class="log-row" :class="{ failed: !log.isSuccess }">
         <div class="log-main" @click="toggle(log.id)">
           <span class="log-time">
             <b>{{ timeOf(log.createdAt) }}</b>
             <em>{{ dateOf(log.createdAt) }}</em>
           </span>
+
+          <!-- Kimin etdiyi baş hərflərlə dərhal görünür -->
+          <span class="avatar" :class="(log.role ?? '').toLowerCase()">{{ initials(log.userName) }}</span>
 
           <span class="log-badge" :class="actionTone(log.action)">{{ labelOf(log.action) }}</span>
 
@@ -98,6 +108,7 @@
           <div class="detail-agent" v-if="log.userAgent">{{ log.userAgent }}</div>
         </div>
       </div>
+      </div>
     </div>
 
     <!-- Səhifələmə -->
@@ -132,6 +143,42 @@ const hasFilters = computed(
 
 const labelOf = (action) =>
   options.value.actions.find((a) => a.code === action)?.label ?? action
+
+// Adın baş hərfləri — sətirdə kimin etdiyini tez seçmək üçün
+const initials = (name) =>
+  (name ?? '?')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join('')
+
+// Qeydlər günlərə bölünür: «Bu gün», «Dünən», sonra tarix
+const grouped = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const dayTitle = (value) => {
+    const d = new Date(value)
+    d.setHours(0, 0, 0, 0)
+    const diff = Math.round((today - d) / 86400000)
+
+    if (diff === 0) return 'Bu gün'
+    if (diff === 1) return 'Dünən'
+    return formatDateFull(value.slice(0, 10))
+  }
+
+  const groups = []
+  logs.value.forEach((log) => {
+    const key = log.createdAt.slice(0, 10)
+    const last = groups[groups.length - 1]
+
+    if (last && last.key === key) last.items.push(log)
+    else groups.push({ key, title: dayTitle(log.createdAt), items: [log] })
+  })
+
+  return groups
+})
 
 const load = async () => {
   isLoading.value = true
@@ -315,11 +362,79 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .log-main {
   display: grid;
-  grid-template-columns: 74px 150px 1fr 200px 24px;
+  grid-template-columns: 62px 32px 150px 1fr 190px 24px;
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
   cursor: pointer;
+}
+
+/* Günlərə bölgü */
+.day-group {
+  margin-bottom: 20px;
+}
+
+.day-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.day-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #721438;
+  background: #f6e9ee;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.day-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, #efe6ea, transparent);
+}
+
+.day-count {
+  font-size: 0.72rem;
+  color: #b8a3ab;
+  white-space: nowrap;
+}
+
+/* Kimin etdiyi — baş hərflər */
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #fff;
+  background: #b8a3ab;
+  letter-spacing: 0.02em;
+}
+
+.avatar.superadmin {
+  background: linear-gradient(135deg, #721438, #4a0d24);
+}
+
+.avatar.support {
+  background: linear-gradient(135deg, #2f8f52, #1e7e34);
+}
+
+.avatar.owner {
+  background: linear-gradient(135deg, #c08a2e, #a8721c);
+}
+
+.avatar.venueadmin {
+  background: linear-gradient(135deg, #3f7fc0, #2b5f95);
+}
+
+.avatar.customer {
+  background: linear-gradient(135deg, #9a8f95, #7d7379);
 }
 
 .log-time {
@@ -525,6 +640,9 @@ onBeforeUnmount(() => clearTimeout(timer))
   .log-main {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+  .avatar {
+    display: none;
   }
   .log-user,
   .log-text {
