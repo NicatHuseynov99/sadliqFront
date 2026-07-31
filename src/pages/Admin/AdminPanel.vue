@@ -28,12 +28,16 @@
         <button class="section-tab" :class="{ active: section === 'audit' }" @click="section = 'audit'">
           Fəaliyyət jurnalı
         </button>
+        <button class="section-tab" :class="{ active: section === 'settings' }" @click="section = 'settings'">
+          Parametrlər
+        </button>
       </div>
 
       <AuditLogView v-if="section === 'audit'" />
       <VisitorsView v-else-if="section === 'visitors'" />
       <ReviewsView v-else-if="section === 'reviews'" />
       <ReservationsView v-else-if="section === 'bookings'" />
+      <SettingsView v-else-if="section === 'settings'" />
 
       <template v-else>
 
@@ -231,6 +235,7 @@ import AuditLogView from '@/components/AuditLogView.vue'
 import VisitorsView from '@/components/VisitorsView.vue'
 import ReviewsView from '@/components/ReviewsView.vue'
 import ReservationsView from '@/components/ReservationsView.vue'
+import SettingsView from '@/components/SettingsView.vue'
 import {
   getPlatformStats,
   getUsers,
