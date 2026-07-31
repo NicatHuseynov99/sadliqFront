@@ -16,9 +16,11 @@ export const updateSetting = async (key, value) => {
 // Şəhər və özəllik kitabçaları ayrıca cədvəllərdir — tam CRUD dəstəklənir.
 // Hər iki kitabça eyni cür işlədiyi üçün sorğular ümumi funksiyalarla qurulur.
 
-const reference = (entity) => ({
+// entity — tək hal (City), plural — siyahı endpointinin adı (Cities).
+// İngiliscə cəm həmişə «+s» olmadığı üçün ayrıca verilir.
+const reference = (entity, plural) => ({
   list: async (includeDeleted = false) => {
-    const { data } = await api.get(`/Platform/Get${entity}s`, { params: { includeDeleted } })
+    const { data } = await api.get(`/Platform/Get${plural}`, { params: { includeDeleted } })
     return data.data ?? []
   },
   create: async (payload) => {
@@ -39,8 +41,8 @@ const reference = (entity) => ({
   },
 })
 
-export const cityApi = reference('City')
-export const featureApi = reference('Feature')
+export const cityApi = reference('City', 'Cities')
+export const featureApi = reference('Feature', 'Features')
 
 // İnterfeys mətnləri: kodda yalnız açar qalır, göstərilən söz bazadan gəlir
 export const getTextCategories = async () => {

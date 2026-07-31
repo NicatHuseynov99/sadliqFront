@@ -112,16 +112,13 @@
     </div>
 
     <!-- Səhifələmə -->
-    <div class="pager" v-if="hasMore || page > 1">
-      <button class="page-btn" :disabled="page === 1" @click="changePage(page - 1)">‹ Əvvəlki</button>
-      <span class="page-info">Səhifə {{ page }}</span>
-      <button class="page-btn" :disabled="!hasMore" @click="changePage(page + 1)">Növbəti ›</button>
-    </div>
+    <Pager :page="page" :page-size="30" :total="totalCount" @change="changePage" />
   </div>
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import Pager from '@/components/Pager.vue'
 import { searchAuditLogs, getAuditFilterOptions, actionTone, ROLE_LABELS } from '@/services/auditService'
 import { formatDateFull } from '@/utils/date'
 

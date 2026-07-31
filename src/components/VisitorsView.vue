@@ -144,11 +144,7 @@
         </table>
       </div>
 
-      <div v-if="total > filters.pageSize" class="pager">
-        <button class="mini-btn" :disabled="filters.page === 1" @click="goPage(filters.page - 1)">Əvvəlki</button>
-        <span class="pager-info">{{ filters.page }} / {{ lastPage }}</span>
-        <button class="mini-btn" :disabled="filters.page >= lastPage" @click="goPage(filters.page + 1)">Sonrakı</button>
-      </div>
+      <Pager :page="filters.page" :page-size="filters.pageSize" :total="total" @change="goPage" />
     </section>
 
     <p class="privacy-note">
@@ -159,6 +155,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import Pager from '@/components/Pager.vue'
 import { getVisitStats, searchVisits, PAGE_TYPES, browserName } from '@/services/visitService'
 
 // Lokal test zamanı IP həmişə IPv6 loopback (::1) olur — bu, «eyni kompüter»

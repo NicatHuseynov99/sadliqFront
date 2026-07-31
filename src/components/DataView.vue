@@ -66,11 +66,7 @@
           </table>
         </div>
 
-        <div v-if="total > pageSize" class="pager">
-          <button class="mini-btn" :disabled="page === 1" @click="goPage(page - 1)">Əvvəlki</button>
-          <span class="pager-info">{{ page }} / {{ lastPage }}</span>
-          <button class="mini-btn" :disabled="page >= lastPage" @click="goPage(page + 1)">Sonrakı</button>
-        </div>
+        <Pager :page="page" :page-size="pageSize" :total="total" @change="goPage" />
 
         <p class="hint">
           Silinən sətir bazadan getmir — «silinmiş» kimi işarələnir, saytda görünmür və
@@ -117,6 +113,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import Pager from '@/components/Pager.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   getTables,

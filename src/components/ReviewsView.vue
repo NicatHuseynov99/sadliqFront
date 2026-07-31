@@ -126,15 +126,7 @@
       </ul>
       <p v-else class="empty">Bu şərtlərə uyğun rəy tapılmadı.</p>
 
-      <div v-if="total > filters.pageSize" class="pager">
-        <button class="mini-btn" :disabled="filters.page === 1" @click="goPage(filters.page - 1)">
-          Əvvəlki
-        </button>
-        <span class="pager-info">{{ filters.page }} / {{ lastPage }}</span>
-        <button class="mini-btn" :disabled="filters.page >= lastPage" @click="goPage(filters.page + 1)">
-          Sonrakı
-        </button>
-      </div>
+      <Pager :page="filters.page" :page-size="filters.pageSize" :total="total" @change="goPage" />
     </section>
 
     <!-- Dəyişiklik tarixçəsi — yalnız platforma sahibi görür -->
@@ -256,6 +248,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import Pager from '@/components/Pager.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   getReviewStats,
