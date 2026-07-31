@@ -154,7 +154,7 @@
                   </select>
                 </td>
                 <td class="row-actions">
-                  <button class="mini-btn" @click="openDetail(u)">Kart</button>
+                  <button class="mini-btn" @click="openDetail(u)">Ətraflı</button>
                   <button class="mini-btn" @click="openPassword(u)">Parol</button>
                   <button
                     class="mini-btn"
