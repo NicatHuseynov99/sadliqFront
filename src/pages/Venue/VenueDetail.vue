@@ -249,11 +249,46 @@
                 </template>
               </el-popconfirm>
             </div>
+
+            <!-- Başqasının rəyi uyğunsuzdursa moderatora bildirmək olar -->
+            <button v-else-if="auth.isAuth" class="report-btn" @click="openReport(r)">
+              Şikayət et
+            </button>
           </div>
         </div>
       </div>
       <el-empty v-else description="Hələ rəy yoxdur — ilk rəyi siz yazın" />
     </div>
+
+    <!-- Rəy şikayəti -->
+    <el-dialog v-model="reportOpen" title="Rəyi şikayət et" width="420px">
+      <p class="report-note">
+        Şikayət moderatora göndərilir. Rəy dərhal silinmir — qərarı moderator verir.
+      </p>
+      <div class="report-reasons">
+        <button
+          v-for="r in REPORT_REASONS"
+          :key="r.value"
+          class="reason-chip"
+          :class="{ active: reportReason === r.value }"
+          @click="reportReason = r.value"
+        >
+          {{ r.label }}
+        </button>
+      </div>
+      <el-input
+        v-model="reportNote"
+        type="textarea"
+        :rows="3"
+        maxlength="300"
+        show-word-limit
+        placeholder="Əlavə izah (məcburi deyil)"
+      />
+      <template #footer>
+        <el-button @click="reportOpen = false">İmtina</el-button>
+        <el-button type="danger" :disabled="!reportReason" @click="submitReport">Göndər</el-button>
+      </template>
+    </el-dialog>
 
     <!-- Menyu detalı dialoqu — yeməklərin şəkilləri ilə -->
     <el-dialog v-model="menuVisible" :title="selectedMenu?.name" width="620px">
@@ -357,6 +392,7 @@ import AddressLink from '@/components/AddressLink.vue'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
 import { getVenueById, toDateKey } from '@/services/venueService'
 import { getVenueReviews, createReview, updateReview, deleteReview } from '@/services/reviewService'
+import { reportReview, REPORT_REASONS } from '@/services/reviewModerationService'
 import { formatDate, formatDateFull, weekdayShort, MONTHS } from '@/utils/date'
 import { createReservation } from '@/services/reservationService'
 import { useAuthStore } from '@/store/auth'
@@ -376,6 +412,13 @@ const hallBusy = ref({})
 const openCalendars = ref(new Set())
 
 const reviews = ref([])
+
+// Rəy şikayəti dialoqu
+const reportOpen = ref(false)
+const reportReason = ref('')
+const reportNote = ref('')
+const reportTarget = ref(null)
+
 const hoverRating = ref(0)
 const isSendingReview = ref(false)
 const reviewError = ref('')
@@ -478,6 +521,33 @@ const removeReview = async (review) => {
     if (editingId.value === review.id) resetForm()
     await loadReviews()
     ElNotification({ title: 'Silindi', message, type: 'success', zIndex: 99999 })
+  } catch (e) {
+    ElNotification({
+      title: 'Xəta',
+      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
+      type: 'error',
+      zIndex: 99999,
+    })
+  }
+}
+
+// Uyğunsuz rəyi moderatorun diqqətinə çatdırır
+const openReport = (review) => {
+  reportTarget.value = review
+  reportReason.value = ''
+  reportNote.value = ''
+  reportOpen.value = true
+}
+
+const submitReport = async () => {
+  try {
+    const { message } = await reportReview({
+      reviewId: reportTarget.value.id,
+      reason: reportReason.value,
+      note: reportNote.value.trim(),
+    })
+    reportOpen.value = false
+    ElNotification({ title: 'Göndərildi', message, type: 'success', zIndex: 99999 })
   } catch (e) {
     ElNotification({
       title: 'Xəta',
@@ -1575,6 +1645,57 @@ onMounted(loadVenue)
 .review-date {
   font-size: 0.75rem;
   color: #adb5bd;
+}
+
+/* Şikayət düyməsi — gözə soxulmasın deyə sönük saxlanılır */
+.report-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.75rem;
+  color: #c0b2b7;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.report-btn:hover {
+  color: #a02c4a;
+}
+
+.report-note {
+  margin: 0 0 14px;
+  font-size: 0.83rem;
+  color: #868e96;
+  line-height: 1.5;
+}
+
+.report-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.reason-chip {
+  background: #fff;
+  border: 1px solid #f0eaec;
+  color: #6c757d;
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.reason-chip:hover {
+  border-color: #dfb15b;
+}
+
+.reason-chip.active {
+  background: #721438;
+  border-color: #721438;
+  color: #fff;
 }
 
 .field-hint {

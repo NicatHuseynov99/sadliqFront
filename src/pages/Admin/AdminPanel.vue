@@ -19,6 +19,9 @@
         <button class="section-tab" :class="{ active: section === 'visitors' }" @click="section = 'visitors'">
           Ziyarətçilər
         </button>
+        <button class="section-tab" :class="{ active: section === 'reviews' }" @click="section = 'reviews'">
+          Rəylər
+        </button>
         <button class="section-tab" :class="{ active: section === 'audit' }" @click="section = 'audit'">
           Fəaliyyət jurnalı
         </button>
@@ -26,6 +29,7 @@
 
       <AuditLogView v-if="section === 'audit'" />
       <VisitorsView v-else-if="section === 'visitors'" />
+      <ReviewsView v-else-if="section === 'reviews'" />
 
       <template v-else>
 
@@ -221,6 +225,7 @@ import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import AuditLogView from '@/components/AuditLogView.vue'
 import VisitorsView from '@/components/VisitorsView.vue'
+import ReviewsView from '@/components/ReviewsView.vue'
 import {
   getPlatformStats,
   getUsers,
