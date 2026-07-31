@@ -1,35 +1,39 @@
 <template>
   <div class="admin-page" v-loading="isLoading">
     <div class="admin-inner">
-      <header class="page-head">
-        <div>
-          <h1 class="page-title">Platforma idarəetməsi</h1>
-          <p class="page-sub">Bütün istifadəçilər, saraylar və göstəricilər</p>
+      <!-- Başlıq: kim olduğun və nəyin gözlədiyi bir baxışda görünsün -->
+      <header class="hero">
+        <div class="hero-text">
+          <span class="hero-eyebrow">{{ auth.isSupport ? 'Dəstək paneli' : 'Platforma sahibi paneli' }}</span>
+          <h1 class="page-title">Salam, {{ firstName }}</h1>
+          <p class="page-sub">
+            <template v-if="todoCount">
+              {{ todoCount }} iş sizi gözləyir — {{ todoText }}
+            </template>
+            <template v-else>Gözləyən iş yoxdur, hər şey qaydasındadır.</template>
+          </p>
         </div>
-        <span class="admin-tag" :class="{ support: auth.isSupport }">
-          {{ auth.isSupport ? '🛟 Dəstək' : '⚙️ SuperAdmin' }} · {{ auth.user?.fullName }}
-        </span>
+
+        <div class="hero-side">
+          <span class="admin-tag" :class="{ support: auth.isSupport }">
+            {{ auth.isSupport ? '🛟 Dəstək admini' : '⚙️ SuperAdmin' }}
+          </span>
+          <span class="hero-name">{{ auth.user?.fullName }}</span>
+        </div>
       </header>
 
       <!-- Bölmələr -->
       <div class="section-tabs">
-        <button class="section-tab" :class="{ active: section === 'overview' }" @click="section = 'overview'">
-          İcmal
-        </button>
-        <button class="section-tab" :class="{ active: section === 'visitors' }" @click="section = 'visitors'">
-          Ziyarətçilər
-        </button>
-        <button class="section-tab" :class="{ active: section === 'bookings' }" @click="section = 'bookings'">
-          Rezervlər
-        </button>
-        <button class="section-tab" :class="{ active: section === 'reviews' }" @click="section = 'reviews'">
-          Rəylər
-        </button>
-        <button class="section-tab" :class="{ active: section === 'audit' }" @click="section = 'audit'">
-          Fəaliyyət jurnalı
-        </button>
-        <button class="section-tab" :class="{ active: section === 'settings' }" @click="section = 'settings'">
-          Parametrlər
+        <button
+          v-for="t in tabs"
+          :key="t.value"
+          class="section-tab"
+          :class="{ active: section === t.value }"
+          @click="section = t.value"
+        >
+          <i class="tab-icon">{{ t.icon }}</i>
+          {{ t.label }}
+          <em v-if="t.badge" class="tab-badge">{{ t.badge }}</em>
         </button>
       </div>
 
@@ -38,42 +42,46 @@
       <ReviewsView v-else-if="section === 'reviews'" />
       <ReservationsView v-else-if="section === 'bookings'" />
       <SettingsView v-else-if="section === 'settings'" />
+      <VenuesView v-else-if="section === 'venues'" @changed="loadStats" />
 
       <template v-else>
 
-      <!-- Göstəricilər -->
+      <!-- Göstəricilər: hər kart öz bölməsinə aparır -->
       <div class="stat-row">
         <div class="stat-card dark">
           <span class="stat-value">{{ stats.users ?? 0 }}</span>
           <span class="stat-label">İstifadəçi</span>
           <span class="stat-sub">{{ stats.customers ?? 0 }} müştəri · {{ stats.owners ?? 0 }} sahib</span>
         </div>
-        <div class="stat-card">
+        <button class="stat-card" @click="section = 'venues'">
           <span class="stat-value">{{ stats.venues ?? 0 }}</span>
           <span class="stat-label">Saray</span>
           <span class="stat-sub" :class="{ warn: stats.pendingVenues }">
             {{ stats.pendingVenues ?? 0 }} təsdiq gözləyir
           </span>
-        </div>
-        <div class="stat-card">
+        </button>
+        <button class="stat-card" @click="section = 'bookings'">
           <span class="stat-value">{{ stats.reservations ?? 0 }}</span>
           <span class="stat-label">Rezerv</span>
           <span class="stat-sub" :class="{ warn: stats.pendingReservations }">
             {{ stats.pendingReservations ?? 0 }} cavabsız
           </span>
-        </div>
-        <div class="stat-card">
+        </button>
+        <button class="stat-card" @click="section = 'reviews'">
           <span class="stat-value">{{ stats.reviews ?? 0 }}</span>
           <span class="stat-label">Rəy</span>
           <span class="stat-sub" :class="{ warn: stats.blockedUsers }">
             {{ stats.blockedUsers ?? 0 }} bloklanmış hesab
           </span>
-        </div>
+        </button>
       </div>
 
       <!-- Təsdiq gözləyən saraylar -->
       <section class="block" v-if="pendingVenues.length">
-        <h2 class="block-title">Təsdiq gözləyən saraylar <em>{{ pendingVenues.length }}</em></h2>
+        <div class="block-head">
+          <h2 class="block-title">Təsdiq gözləyən saraylar <em>{{ pendingVenues.length }}</em></h2>
+          <button class="mini-btn" @click="section = 'venues'">Bütün saraylar</button>
+        </div>
         <div class="pending-list">
           <div v-for="v in pendingVenues" :key="v.id" class="pending-card">
             <img :src="v.coverImageUrl" :alt="v.name" @error="onImgError" />
@@ -82,7 +90,10 @@
               <span>{{ v.city }} · {{ v.address }}</span>
               <em>{{ v.phone }}</em>
             </div>
-            <button class="approve-btn" @click="approve(v)">Təsdiqlə</button>
+            <div class="pending-actions">
+              <a class="mini-btn link" :href="`/venue/${v.id}`" target="_blank">Bax</a>
+              <button class="approve-btn" @click="approve(v)">Təsdiqlə</button>
+            </div>
           </div>
         </div>
       </section>
@@ -91,13 +102,16 @@
       <section class="block">
         <div class="block-head">
           <h2 class="block-title">İstifadəçilər <em>{{ users.length }}</em></h2>
-          <input
-            v-model="search"
-            class="search-box"
-            type="search"
-            placeholder="Ad, e-poçt və ya telefon üzrə axtar…"
-            @input="onSearchInput"
-          />
+          <div class="head-tools">
+            <input
+              v-model="search"
+              class="search-box"
+              type="search"
+              placeholder="Ad, e-poçt və ya telefon üzrə axtar…"
+              @input="onSearchInput"
+            />
+            <button class="approve-btn" @click="openCreate">+ Yeni hesab</button>
+          </div>
         </div>
 
         <div class="filter-row">
@@ -167,6 +181,7 @@
                 </td>
                 <td class="row-actions">
                   <button class="mini-btn" @click="openDetail(u)">Ətraflı</button>
+                  <button class="mini-btn" @click="openEdit(u)">Redaktə</button>
                   <button class="mini-btn" @click="openPassword(u)">Parol</button>
                   <button
                     class="mini-btn"
@@ -175,6 +190,13 @@
                     @click="toggleActive(u)"
                   >
                     {{ u.isActive ? 'Blokla' : 'Bloku aç' }}
+                  </button>
+                  <button
+                    class="mini-btn danger"
+                    :disabled="u.id === auth.user?.id"
+                    @click="removeUser(u)"
+                  >
+                    Sil
                   </button>
                 </td>
               </tr>
@@ -214,6 +236,38 @@
         </div>
       </el-dialog>
 
+      <!-- Yeni hesab / redaktə -->
+      <el-dialog
+        v-model="formOpen"
+        :title="formMode === 'create' ? 'Yeni hesab' : 'Hesabın məlumatları'"
+        width="480px"
+      >
+        <div class="form-grid">
+          <label>Ad<input v-model="form.firstName" class="dialog-input" /></label>
+          <label>Soyad<input v-model="form.lastName" class="dialog-input" /></label>
+          <label class="wide">E-poçt<input v-model="form.email" class="dialog-input" type="email" /></label>
+          <label class="wide">Telefon<input v-model="form.phone" class="dialog-input" /></label>
+          <template v-if="formMode === 'create'">
+            <label class="wide">
+              Parol
+              <input v-model="form.password" class="dialog-input" placeholder="Ən azı 6 simvol" />
+            </label>
+            <label class="wide">
+              Rol
+              <select v-model="form.role" class="dialog-input">
+                <option v-for="r in roles" :key="r.value" :value="r.value">{{ r.label }}</option>
+              </select>
+            </label>
+          </template>
+        </div>
+        <template #footer>
+          <button class="mini-btn" @click="formOpen = false">İmtina</button>
+          <button class="mini-btn ok" @click="submitForm">
+            {{ formMode === 'create' ? 'Yarat' : 'Yadda saxla' }}
+          </button>
+        </template>
+      </el-dialog>
+
       <!-- Parolun sıfırlanması -->
       <el-dialog v-model="passwordOpen" title="Yeni parol təyin et" width="420px">
         <p class="dialog-sub">{{ passwordTarget?.fullName }} üçün yeni parol.</p>
@@ -228,14 +282,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { ElNotification } from 'element-plus'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { ElMessageBox, ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import AuditLogView from '@/components/AuditLogView.vue'
 import VisitorsView from '@/components/VisitorsView.vue'
 import ReviewsView from '@/components/ReviewsView.vue'
 import ReservationsView from '@/components/ReservationsView.vue'
 import SettingsView from '@/components/SettingsView.vue'
+import VenuesView from '@/components/VenuesView.vue'
 import {
   getPlatformStats,
   getUsers,
@@ -245,6 +300,9 @@ import {
   resetUserPassword,
   getPendingVenues,
   approveVenue,
+  createUser,
+  updateUser,
+  deleteUser,
 } from '@/services/adminService'
 import { formatDateFull } from '@/utils/date'
 
@@ -265,6 +323,42 @@ const passwordTarget = ref(null)
 const newPassword = ref('')
 
 const section = ref('overview')
+
+const formOpen = ref(false)
+const formMode = ref('create')
+const formTarget = ref(null)
+const form = reactive({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  password: '',
+  role: 'Customer',
+})
+
+const firstName = computed(() => auth.user?.fullName?.split(' ')[0] ?? 'admin')
+
+// Başlıqdakı «nə gözləyir» sətri — gündəlik işin xülasəsi
+const todoCount = computed(
+  () => (stats.value.pendingVenues ?? 0) + (stats.value.pendingReservations ?? 0),
+)
+
+const todoText = computed(() => {
+  const parts = []
+  if (stats.value.pendingVenues) parts.push(`${stats.value.pendingVenues} saray təsdiqi`)
+  if (stats.value.pendingReservations) parts.push(`${stats.value.pendingReservations} cavabsız rezerv`)
+  return parts.join(' və ')
+})
+
+const tabs = computed(() => [
+  { value: 'overview', label: 'İcmal', icon: '📊' },
+  { value: 'venues', label: 'Saraylar', icon: '🏛', badge: stats.value.pendingVenues || 0 },
+  { value: 'bookings', label: 'Rezervlər', icon: '📅', badge: stats.value.pendingReservations || 0 },
+  { value: 'reviews', label: 'Rəylər', icon: '⭐' },
+  { value: 'visitors', label: 'Ziyarətçilər', icon: '👣' },
+  { value: 'audit', label: 'Jurnal', icon: '📜' },
+  { value: 'settings', label: 'Parametrlər', icon: '⚙️' },
+])
 
 // Dəstək admini SuperAdmin hesablarını görmür — həm süzgəcdən, həm də
 // rol seçimindən bu variant çıxarılır
@@ -319,6 +413,12 @@ const reloadUsers = async () => {
   users.value = await getUsers(currentQuery())
 }
 
+// Saray bölməsində dəyişiklik olanda başlıqdakı saylar da yenilənməlidir
+const loadStats = async () => {
+  stats.value = await getPlatformStats()
+  pendingVenues.value = await getPendingVenues()
+}
+
 const setRoleFilter = async (value) => {
   roleFilter.value = value
   await reloadUsers()
@@ -360,6 +460,86 @@ const toggleActive = async (user) => {
   try {
     const message = await setUserActive(user.id, !user.isActive)
     ElNotification({ title: 'Hazırdır', message, type: 'success', zIndex: 99999 })
+    await load()
+  } catch (e) {
+    notifyError(e)
+  }
+}
+
+const openCreate = () => {
+  formMode.value = 'create'
+  formTarget.value = null
+  Object.assign(form, {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    role: 'Customer',
+  })
+  formOpen.value = true
+}
+
+const openEdit = (user) => {
+  formMode.value = 'edit'
+  formTarget.value = user
+  Object.assign(form, {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    phone: user.phone ?? '',
+    password: '',
+    role: user.role,
+  })
+  formOpen.value = true
+}
+
+const submitForm = async () => {
+  try {
+    const result =
+      formMode.value === 'create'
+        ? await createUser({
+            firstName: form.firstName.trim(),
+            lastName: form.lastName.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            password: form.password,
+            role: form.role,
+          })
+        : await updateUser(formTarget.value.id, {
+            firstName: form.firstName.trim(),
+            lastName: form.lastName.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+          })
+
+    if (!result.success) return notifyError({ userMessage: result.message })
+
+    formOpen.value = false
+    ElNotification({ title: 'Hazırdır', message: result.message, type: 'success', zIndex: 99999 })
+    await load()
+  } catch (e) {
+    notifyError(e)
+  }
+}
+
+// Silmək yalnız «təmiz» hesablar üçün işləyir — server sarayı və rezervi yoxlayır
+const removeUser = async (user) => {
+  try {
+    await ElMessageBox.confirm(
+      `${user.fullName} hesabı tamamilə silinəcək. Fəaliyyəti olan hesab üçün blok daha təhlükəsizdir.`,
+      'Hesabı sil',
+      { confirmButtonText: 'Sil', cancelButtonText: 'İmtina', type: 'warning' },
+    )
+  } catch {
+    return
+  }
+
+  try {
+    const result = await deleteUser(user.id)
+    if (!result.success) return notifyError({ userMessage: result.message })
+
+    ElNotification({ title: 'Silindi', message: result.message, type: 'success', zIndex: 99999 })
     await load()
   } catch (e) {
     notifyError(e)
@@ -435,39 +615,91 @@ onMounted(load)
   margin: 0 auto;
 }
 
-.page-head {
+/* Başlıq: tünd fon üzərində qızılı vurğu — panelin «rəsmi» hissəsi */
+.hero {
+  position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 22px;
+  gap: 20px;
+  flex-wrap: wrap;
+  background: linear-gradient(120deg, #2a0f1c 0%, #4a0d24 55%, #721438 100%);
+  border-radius: 18px;
+  padding: 26px 30px;
+  margin-bottom: 20px;
+}
+
+/* Fondakı zərif işıq ləkəsi */
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -80px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(223, 177, 91, 0.25), transparent 65%);
+  pointer-events: none;
+}
+
+.hero-text {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #dfb15b;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
 .page-title {
-  margin: 0 0 4px;
-  color: #1a1118;
-  font-size: 1.7rem;
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: 1.75rem;
+  letter-spacing: -0.01em;
 }
 
 .page-sub {
   margin: 0;
-  color: #6c757d;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.92rem;
 }
 
+.hero-side {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
 .admin-tag {
-  background: #1a1118;
+  background: rgba(223, 177, 91, 0.15);
+  border: 1px solid rgba(223, 177, 91, 0.4);
   color: #dfb15b;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  padding: 8px 16px;
+  padding: 7px 15px;
   border-radius: 20px;
   white-space: nowrap;
 }
 
 .admin-tag.support {
-  background: #e3f6e8;
-  color: #1e7e34;
+  background: rgba(126, 217, 158, 0.15);
+  border-color: rgba(126, 217, 158, 0.4);
+  color: #8fe0ab;
+}
+
+.hero-name {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* Bölmə seçimi */
@@ -475,28 +707,61 @@ onMounted(load)
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .section-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   background: #fff;
   border: 1px solid #f0eaec;
   color: #6c757d;
-  padding: 9px 20px;
+  padding: 9px 17px;
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
 }
 
+.tab-icon {
+  font-style: normal;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+/* Gözləyən işin sayı bölmənin üstündə görünür */
+.tab-badge {
+  font-style: normal;
+  background: #b06a2b;
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+}
+
 .section-tab:hover {
   border-color: #dfb15b;
+  transform: translateY(-1px);
 }
 
 .section-tab.active {
   background: #721438;
   border-color: #721438;
   color: #fff;
+  box-shadow: 0 6px 16px rgba(114, 20, 56, 0.25);
+}
+
+.section-tab.active .tab-badge {
+  background: #dfb15b;
+  color: #4a0d24;
 }
 
 /* Göstəricilər */
@@ -508,14 +773,29 @@ onMounted(load)
 }
 
 .stat-card {
+  position: relative;
   background: #fff;
   border: 1px solid #f2ecee;
   border-radius: 14px;
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
   gap: 3px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+/* Kartlar düymədir — uyğun bölməyə aparır */
+button.stat-card {
+  cursor: pointer;
+  font: inherit;
+}
+
+button.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(26, 17, 24, 0.09);
 }
 
 .stat-card.dark {
@@ -644,6 +924,45 @@ onMounted(load)
 
 .approve-btn:hover {
   background: #17692b;
+}
+
+.pending-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.head-tools {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Dialoq formaları */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.76rem;
+  color: #868e96;
+}
+
+.form-grid label.wide {
+  grid-column: 1 / -1;
+}
+
+.mini-btn.link {
+  color: #1c5cab;
+  border-color: #dce8f7;
+  text-decoration: none;
+  display: inline-block;
 }
 
 /* Axtarış və süzgəc sətri */

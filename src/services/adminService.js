@@ -44,6 +44,48 @@ export const resetUserPassword = async (userId, newPassword) => {
   return data.message
 }
 
+// POST /Admin/CreateUser — admin yeni hesab açır
+export const createUser = async (payload) => {
+  const { data } = await api.post('/Admin/CreateUser', payload)
+  return data
+}
+
+// PUT /Admin/UpdateUser/{userId} — ad, e-poçt, telefon
+export const updateUser = async (userId, payload) => {
+  const { data } = await api.put(`/Admin/UpdateUser/${userId}`, payload)
+  return data
+}
+
+// DELETE /Admin/DeleteUser/{userId} — yalnız sarayı və rezervi olmayan hesab silinir
+export const deleteUser = async (userId) => {
+  const { data } = await api.delete(`/Admin/DeleteUser/${userId}`)
+  return data
+}
+
+// GET /AdminVenues/Search — bütün saraylar, süzgəclərlə
+export const searchVenues = async (params) => {
+  const { data } = await api.get('/AdminVenues/Search', { params })
+  return data.data ?? { items: [], totalCount: 0, page: 1, pageSize: 20, hasMore: false }
+}
+
+// PUT /AdminVenues/SetApproved/{venueId} — təsdiqi vermək və ya geri almaq
+export const setVenueApproved = async (venueId, isApproved) => {
+  const { data } = await api.put(`/AdminVenues/SetApproved/${venueId}`, { isApproved })
+  return data
+}
+
+// PUT /AdminVenues/ChangeOwner/{venueId}
+export const changeVenueOwner = async (venueId, newOwnerId) => {
+  const { data } = await api.put(`/AdminVenues/ChangeOwner/${venueId}`, { newOwnerId })
+  return data
+}
+
+// DELETE /AdminVenues/Delete/{venueId}
+export const deleteVenue = async (venueId) => {
+  const { data } = await api.delete(`/AdminVenues/Delete/${venueId}`)
+  return data
+}
+
 // GET /Venues/GetPending — təsdiq gözləyən saraylar
 export const getPendingVenues = async () => {
   const { data } = await api.get('/Venues/GetPending')
