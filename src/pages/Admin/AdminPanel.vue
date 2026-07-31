@@ -19,6 +19,9 @@
         <button class="section-tab" :class="{ active: section === 'visitors' }" @click="section = 'visitors'">
           Ziyarətçilər
         </button>
+        <button class="section-tab" :class="{ active: section === 'bookings' }" @click="section = 'bookings'">
+          Rezervlər
+        </button>
         <button class="section-tab" :class="{ active: section === 'reviews' }" @click="section = 'reviews'">
           Rəylər
         </button>
@@ -30,6 +33,7 @@
       <AuditLogView v-if="section === 'audit'" />
       <VisitorsView v-else-if="section === 'visitors'" />
       <ReviewsView v-else-if="section === 'reviews'" />
+      <ReservationsView v-else-if="section === 'bookings'" />
 
       <template v-else>
 
@@ -226,6 +230,7 @@ import { useAuthStore } from '@/store/auth'
 import AuditLogView from '@/components/AuditLogView.vue'
 import VisitorsView from '@/components/VisitorsView.vue'
 import ReviewsView from '@/components/ReviewsView.vue'
+import ReservationsView from '@/components/ReservationsView.vue'
 import {
   getPlatformStats,
   getUsers,
