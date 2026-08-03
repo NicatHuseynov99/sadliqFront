@@ -3,21 +3,54 @@
     <div v-if="venue" class="detail-inner">
       <button class="back-btn" @click="$router.back()">← Geri qayıt</button>
 
-      <!-- Şəkil qalereyası -->
+      <!-- Şəkil və video qalereyası -->
       <div class="gallery">
         <div class="main-image">
-          <img :src="activeImage" :alt="venue.name" @error="onImgError" />
+          <!-- Video seçiləndə şəkil əvəzinə oynadıcı açılır -->
+          <template v-if="showVideo">
+            <iframe
+              v-if="embedUrl"
+              :src="embedUrl"
+              class="video-frame"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+              allowfullscreen
+            ></iframe>
+            <video v-else class="video-frame" :src="venue.videoUrl" controls autoplay></video>
+          </template>
+
+          <img v-else :src="activeImage" :alt="venue.name" @error="onImgError" />
           <span class="city-badge">{{ venue.city }}</span>
+
+          <!-- Qalereyanı çevirmək üçün oxlar. Bir slayd varsa göstərilmir. -->
+          <template v-if="slides.length > 1">
+            <button class="nav-arrow left" title="Əvvəlki" @click="prevSlide">‹</button>
+            <button class="nav-arrow right" title="Növbəti" @click="nextSlide">›</button>
+            <span class="slide-count">{{ slideIndex + 1 }} / {{ slides.length }}</span>
+          </template>
         </div>
-        <div class="thumbs" v-if="venue.images?.length > 1">
-          <img
-            v-for="(img, i) in venue.images"
-            :key="i"
-            :src="img"
-            :class="{ active: img === activeImage }"
-            @click="activeImage = img"
-            @error="onImgError"
-          />
+
+        <!-- Kiçik şəkillər əsas qalereya ilə eyni sırada gedir -->
+        <div class="thumbs" v-if="slides.length > 1">
+          <template v-for="(slide, i) in slides" :key="i">
+            <button
+              v-if="slide.type === 'video'"
+              class="thumb-video"
+              :class="{ active: slideIndex === i }"
+              @click="slideIndex = i"
+            >
+              <img :src="videoPoster" alt="" @error="onImgError" />
+              <span class="play">▶</span>
+              <span class="video-label">Video</span>
+            </button>
+
+            <img
+              v-else
+              :src="slide.url"
+              :class="{ active: slideIndex === i }"
+              @click="slideIndex = i"
+              @error="onImgError"
+            />
+          </template>
         </div>
       </div>
 
@@ -397,7 +430,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
 import AddressLink from '@/components/AddressLink.vue'
@@ -417,6 +450,58 @@ const auth = useAuthStore()
 const venue = ref(null)
 const isLoading = ref(false)
 const activeImage = ref('')
+
+// Qalereya slaydları. Sıra: əsas (fon) şəkil → video → qalan şəkillər.
+// Səhifə açılanda sarayın öz şəkli görünməlidir; video ondan sonra gəlir.
+const slides = computed(() => {
+  const cover = venue.value?.coverImageUrl
+  const images = venue.value?.images ?? []
+
+  const list = []
+  if (cover) list.push({ type: 'image', url: cover })
+  if (venue.value?.videoUrl) list.push({ type: 'video' })
+
+  images.filter((url) => url !== cover).forEach((url) => list.push({ type: 'image', url }))
+
+  return list
+})
+
+const slideIndex = ref(0)
+
+const showVideo = computed(() => slides.value[slideIndex.value]?.type === 'video')
+
+// Sona çatanda əvvələ qayıdır — istifadəçi dayanmadan baxa bilsin
+const nextSlide = () => {
+  slideIndex.value = (slideIndex.value + 1) % slides.value.length
+}
+
+const prevSlide = () => {
+  slideIndex.value = (slideIndex.value - 1 + slides.value.length) % slides.value.length
+}
+
+// Slayd dəyişəndə əsas şəkil də dəyişir
+watch(slideIndex, (index) => {
+  const slide = slides.value[index]
+  if (slide?.type === 'image') activeImage.value = slide.url
+})
+
+// Videonun altındakı kiçik şəkil — sarayın öz şəklindən istifadə edirik
+const videoPoster = computed(() => venue.value?.coverImageUrl || activeImage.value)
+
+// YouTube və Vimeo linkləri birbaşa oynadılmır, embed formasına çevrilməlidir.
+// Digər linklər (mp4 və s.) adi <video> ilə açılır.
+const embedUrl = computed(() => {
+  const url = venue.value?.videoUrl
+  if (!url) return null
+
+  const youtube = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/)
+  if (youtube) return `https://www.youtube.com/embed/${youtube[1]}?autoplay=1&rel=0`
+
+  const vimeo = url.match(/vimeo\.com\/(\d+)/)
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}?autoplay=1`
+
+  return null
+})
 
 const menuVisible = ref(false)
 const selectedMenu = ref(null)
@@ -459,6 +544,8 @@ const loadVenue = async () => {
   try {
     venue.value = await getVenueById(route.params.id)
     activeImage.value = venue.value.coverImageUrl
+    // Video varsa qalereya ondan başlayır
+    slideIndex.value = 0
     // Dolu günlər sarayla birlikdə gəlir — zallar üçün ayrıca sorğu göndərilmir
     hallBusy.value = Object.fromEntries(venue.value.halls.map((h) => [h.id, h.busyDates]))
     reviews.value = venue.value.reviews ?? []
@@ -839,6 +926,122 @@ onMounted(loadVenue)
 .thumbs img.active {
   opacity: 1;
   border-color: #721438;
+}
+
+/* Qalereya oxları — şəklin üstündə, kənarlarda */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1a1118;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.15s;
+  z-index: 3;
+}
+
+.nav-arrow:hover {
+  background: #fff;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.nav-arrow.left {
+  left: 14px;
+}
+
+.nav-arrow.right {
+  right: 14px;
+}
+
+.slide-count {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 3;
+  background: rgba(26, 17, 24, 0.7);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 20px;
+}
+
+/* Video oynadıcısı əsas şəklin yerini tutur */
+.video-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: #000;
+}
+
+/* Video kiçik şəkli — üzərində oynatma nişanı */
+.thumb-video {
+  position: relative;
+  width: 110px;
+  height: 72px;
+  flex: none;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #000;
+  transition: all 0.2s;
+}
+
+.thumb-video img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+  border-radius: 0;
+  border: none;
+}
+
+.thumb-video:hover img {
+  opacity: 0.75;
+}
+
+.thumb-video.active {
+  border-color: #721438;
+}
+
+.thumb-video.active img {
+  opacity: 0.8;
+}
+
+.thumb-video .play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 1.4rem;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.thumb-video .video-label {
+  position: absolute;
+  left: 6px;
+  bottom: 5px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(114, 20, 56, 0.85);
+  padding: 2px 8px;
+  border-radius: 20px;
+  pointer-events: none;
 }
 
 .head-row {

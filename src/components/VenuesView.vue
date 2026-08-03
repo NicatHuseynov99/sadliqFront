@@ -197,6 +197,10 @@
           <label class="wide">Ünvan<input v-model="form.address" class="value-box" /></label>
           <label>Telefon<input v-model="form.phone" class="value-box" /></label>
           <label>Şəkil linki<input v-model="form.coverImageUrl" class="value-box" /></label>
+          <label class="wide">
+            Video linki <em class="label-hint">YouTube, Vimeo və ya birbaşa fayl</em>
+            <input v-model="form.videoUrl" class="value-box" placeholder="https://youtube.com/watch?v=…" />
+          </label>
           <label>
             Parkinq <em class="label-hint">avtomobil sayı</em>
             <input v-model.number="form.parkingCapacity" class="value-box" type="number" min="0" />
@@ -345,6 +349,7 @@ const form = reactive({
   address: '',
   phone: '',
   coverImageUrl: '',
+  videoUrl: '',
   description: '',
   features: '',
   parkingCapacity: null,
@@ -524,6 +529,7 @@ const openEdit = (venue) => {
   form.address = venue.address
   form.phone = venue.phone
   form.coverImageUrl = venue.coverImageUrl ?? ''
+  form.videoUrl = venue.videoUrl ?? ''
   form.description = venue.description ?? ''
   form.features = (venue.features ?? []).join(', ')
   form.parkingCapacity = venue.parkingCapacity ?? null
@@ -546,6 +552,7 @@ const submitEdit = async () => {
       latitude: form.latitude,
       longitude: form.longitude,
       coverImageUrl: form.coverImageUrl.trim() || null,
+      videoUrl: form.videoUrl.trim() || null,
       // Boş qoyulsa mövcud özəlliklər saxlanılır
       features: form.features.trim()
         ? form.features.split(',').map((f) => f.trim()).filter(Boolean)

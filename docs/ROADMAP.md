@@ -119,8 +119,7 @@ hesabı ilə. Belə şey rəqiblərdə yoxdur və real problemi həll edir.
    `GET /Venues/Suggest?q=`. Cavab yüngül olmalıdır (id + ad + şəhər).
 4. **Axtarış tarixçəsi** — son 5 axtarış localStorage-də saxlanılır və
    axtarış qutusu fokuslananda göstərilir.
-5. **Nəticəsiz axtarış** — «Bu şərtlərə uyğun saray yoxdur» əvəzinə
-   ən yaxın alternativlər: «Büdcəni 10 ₼ artırsanız 6 saray tapılır».
+5. ~~Nəticəsiz axtarışda alternativ təklif~~ — istənilmir, edilməyəcək.
 
 ---
 
