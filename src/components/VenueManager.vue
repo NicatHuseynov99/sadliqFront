@@ -19,16 +19,28 @@
         {{ canEdit ? 'Hələ sarayınız yoxdur — "Yeni saray" düyməsi ilə əlavə edin.' : 'Sizə hələ zal təyin olunmayıb.' }}
       </div>
 
-      <div v-for="v in venues" :key="v.id" class="vm-card">
+      <div v-for="v in venues" :key="v.id" class="vm-card" :class="{ pending: !v.isApproved }">
         <img :src="v.coverImageUrl" :alt="v.name" @error="onImgError" />
 
         <div class="vm-text">
-          <b>{{ v.name }}</b>
+          <b>
+            {{ v.name }}
+            <span v-if="!v.isApproved" class="wait-badge">⏳ Təsdiq gözləyir</span>
+          </b>
           <span>📍 {{ v.city }} · {{ v.address }}</span>
           <em>{{ v.halls?.length ?? 0 }} zal · {{ v.menus?.length ?? 0 }} menyu</em>
+
+          <!-- Təsdiqə qədər saray dondurulur: sahibkar görür, amma dəyişə bilmir -->
+          <span v-if="!v.isApproved" class="wait-note">
+            Müraciətiniz yoxlanılır. Bu müddətdə məlumatlar dəyişdirilə bilmir və
+            saray müştərilərə görünmür.
+          </span>
         </div>
 
-        <div class="vm-actions">
+        <div v-if="!v.isApproved" class="vm-actions">
+          <button class="mini-btn" @click="openHalls(v)">Zallara bax</button>
+        </div>
+        <div v-else class="vm-actions">
           <button v-if="canEdit" class="mini-btn" @click="openVenueForm(v)">Redaktə</button>
           <button class="mini-btn" @click="openHalls(v)">Zallar</button>
           <button v-if="canEdit" class="mini-btn" @click="openMenus(v)">Menyular</button>
@@ -114,8 +126,13 @@
     <el-dialog v-model="hallDialog" :title="`${activeVenue?.name} — zallar`" width="760px">
       <div class="hall-head">
         <span class="hall-count">{{ halls.length }} zal</span>
-        <button v-if="canEdit" class="confirm-btn" @click="openHallForm(null)">+ Yeni zal</button>
+        <button v-if="canEdit && isActiveApproved" class="confirm-btn" @click="openHallForm(null)">+ Yeni zal</button>
       </div>
+
+      <!-- Təsdiqə qədər zallar yalnız baxış üçündür -->
+      <p v-if="!isActiveApproved" class="wait-strip">
+        ⏳ Saray təsdiq gözləyir — zalları yalnız görə bilərsiniz.
+      </p>
 
       <div class="hall-grid">
         <article v-for="h in halls" :key="h.id" class="hall-card">
@@ -129,7 +146,7 @@
             <span class="hc-capacity">👥 {{ h.capacity }} qonaq</span>
             <p class="hc-desc">{{ h.description || 'Təsvir yazılmayıb' }}</p>
 
-            <div class="hc-actions">
+            <div v-if="isActiveApproved" class="hc-actions">
               <button class="act-btn" @click="openCalendar(h)"><span>📅</span> Təqvim</button>
               <button class="act-btn" @click="openHallForm(h)"><span>✏️</span> Redaktə</button>
               <el-popconfirm
@@ -273,7 +290,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import HallCalendarEditor from '@/components/HallCalendarEditor.vue'
 import {
@@ -317,6 +334,9 @@ const menuDialog = ref(false)
 const calendarDialog = ref(false)
 const calendarHall = ref(null)
 const activeVenue = ref(null)
+
+// Açıq pəncərədəki saray təsdiqlənibmi — təsdiqsizdə heç bir düymə göstərilmir
+const isActiveApproved = computed(() => activeVenue.value?.isApproved !== false)
 
 const halls = ref([])
 const menus = ref([])
@@ -618,6 +638,65 @@ const onImgError = (e) => {
   border-radius: 12px;
   padding: 12px;
   margin-bottom: 10px;
+}
+
+/* Təsdiq gözləyən saray kölgəli görünür — baxmaq olar, toxunmaq olmaz */
+.vm-card.pending {
+  background: #fbf9fa;
+  border-color: #efe4e8;
+  position: relative;
+}
+
+.vm-card.pending::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(26, 17, 24, 0.03) 0 10px,
+    transparent 10px 20px
+  );
+  pointer-events: none;
+}
+
+.vm-card.pending img {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.vm-card.pending .vm-text b,
+.vm-card.pending .vm-text span,
+.vm-card.pending .vm-text em {
+  color: #a6969c;
+}
+
+.wait-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #b06a2b;
+  background: #fdf0e3;
+  padding: 2px 9px;
+  border-radius: 20px;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.wait-note {
+  font-size: 0.74rem !important;
+  color: #b06a2b !important;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.wait-strip {
+  margin: 0 0 14px;
+  background: #fdf0e3;
+  border-left: 3px solid #dfb15b;
+  border-radius: 0 10px 10px 0;
+  padding: 10px 14px;
+  font-size: 0.83rem;
+  color: #8a6a25;
 }
 
 .vm-card img {

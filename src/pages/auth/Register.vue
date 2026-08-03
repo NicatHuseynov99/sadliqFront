@@ -1,7 +1,41 @@
 <template>
   <div class="auth-page">
-    <div class="auth-card">
+    <!-- Əvvəlcə kim olduğunu soruşuruq: axınlar tamamilə fərqlidir.
+         Müştəri bir formada bitir, restoran isə çoxaddımlı anket doldurur. -->
+    <div v-if="!mode" class="auth-card choice-card">
       <h1 class="title">Qeydiyyat</h1>
+      <p class="subtitle">Kim kimi qeydiyyatdan keçirsiniz?</p>
+
+      <div class="choices">
+        <button class="choice" @click="mode = 'customer'">
+          <span class="choice-icon">👤</span>
+          <b>Müştəriyəm</b>
+          <span class="choice-text">
+            Saray axtarıram, rezerv etmək və rəy yazmaq istəyirəm.
+          </span>
+          <span class="choice-meta">1 dəqiqə</span>
+        </button>
+
+        <button class="choice owner" @click="goToVenueForm">
+          <span class="choice-icon">🏛</span>
+          <b>Restoran / saray sahibiyəm</b>
+          <span class="choice-text">
+            Məkanımı platformaya əlavə etmək istəyirəm. Qısa anket dolduracaqsınız:
+            saray, yer, şəkillər, zallar və menyular.
+          </span>
+          <span class="choice-meta">7 addım · yoxlanışdan sonra saytda görünür</span>
+        </button>
+      </div>
+
+      <p class="switch-link">
+        Artıq hesabınız var? <router-link to="/login">Daxil olun</router-link>
+      </p>
+    </div>
+
+    <div v-else class="auth-card">
+      <button class="back-link" @click="mode = ''">← Geri</button>
+
+      <h1 class="title">Müştəri qeydiyyatı</h1>
       <p class="subtitle">Şadlıq Sarayları-na qoşulun</p>
 
       <el-form @submit.prevent="register">
@@ -22,13 +56,6 @@
         <el-form-item>
           <el-input v-model="form.password" type="password" placeholder="Şifrə" show-password />
         </el-form-item>
-        <el-form-item>
-          <el-radio-group v-model="form.role">
-            <el-radio value="Customer">Müştəri</el-radio>
-            <el-radio value="Owner">Restoran sahibi</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
         <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
 
         <el-button
@@ -64,6 +91,12 @@ const form = reactive({
 const isLoading = ref(false)
 const errorMessage = ref('')
 
+// '' — seçim ekranı, 'customer' — adi qeydiyyat forması
+const mode = ref('')
+
+// Restoran sahibi çoxaddımlı ankete keçir: hesab elə orada açılır
+const goToVenueForm = () => router.push({ name: 'venue-register' })
+
 const register = async () => {
   if (isLoading.value) return
 
@@ -98,6 +131,87 @@ const register = async () => {
   padding: 44px 36px;
   width: 100%;
   max-width: 400px;
+}
+
+/* Seçim ekranı iki karta yer verməli olduğu üçün daha genişdir */
+.choice-card {
+  max-width: 720px;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 22px 0 18px;
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid #f0eaec;
+  border-radius: 14px;
+  padding: 20px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.choice:hover {
+  border-color: #dfb15b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(184, 134, 11, 0.14);
+}
+
+/* Sahibkar axını platformanın böyüməsi üçün əsasdır — vurğulanır */
+.choice.owner {
+  background: linear-gradient(135deg, #fffdf7, #fff);
+  border-color: #f0e0bd;
+}
+
+.choice-icon {
+  font-size: 1.7rem;
+}
+
+.choice b {
+  font-size: 1rem;
+  color: #1a1118;
+}
+
+.choice-text {
+  font-size: 0.82rem;
+  color: #6c757d;
+  line-height: 1.55;
+  flex: 1;
+}
+
+.choice-meta {
+  font-size: 0.72rem;
+  color: #b08d3a;
+  background: #fdf6e3;
+  padding: 3px 10px;
+  border-radius: 20px;
+  align-self: flex-start;
+}
+
+.back-link {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0 0 10px;
+}
+
+.back-link:hover {
+  color: #721438;
+}
+
+@media (max-width: 640px) {
+  .choices {
+    grid-template-columns: 1fr;
+  }
 }
 
 .title {

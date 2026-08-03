@@ -56,6 +56,13 @@ const routes = [
     meta: { requiresAuth: true, roles: ['Customer'], track: 'reservations' },
   },
   {
+    // Sahibkar müraciəti — giriş tələb olunmur, hesab elə burada açılır
+    path: '/saray-elave-et',
+    name: 'venue-register',
+    component: () => import('@/pages/Owner/VenueRegister.vue'),
+    meta: { track: 'venue-register' },
+  },
+  {
     path: '/panel',
     name: 'owner-panel',
     component: () => import('@/pages/Owner/OwnerPanel.vue'),

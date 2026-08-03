@@ -53,6 +53,13 @@ export const useAuthStore = defineStore('auth', {
       await api.post('/Auth/Register', payload)
     },
 
+    // Hazır token ilə sessiyanı başladır — saray müraciəti sahibkarı
+    // eyni anda həm qeydiyyatdan keçirir, həm daxil edir
+    async applyToken(token) {
+      this.setToken(token)
+      await this.fetchMe()
+    },
+
     // Cari istifadəçinin məlumatını backend-dən çəkir
     async fetchMe() {
       const { data } = await api.get('/Auth/Me')
