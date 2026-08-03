@@ -114,16 +114,33 @@
     <section class="venues-container" v-loading="isLoading">
       <div class="results-header">
         <h2>Mövcud Saraylar <span>({{ totalCount }})</span></h2>
-        <div class="sort-box">
-          <label>Sıralama:</label>
-          <select v-model="filters.sort">
-            <option value="rating-desc">Reytinq — ən yüksək</option>
-            <option value="price-asc">Qiymət — ucuzdan bahaya</option>
-            <option value="price-desc">Qiymət — bahadan ucuza</option>
-          </select>
+
+        <div class="header-tools">
+          <!-- Siyahı və xəritə eyni süzgəclərlə işləyir -->
+          <div class="view-switch">
+            <button :class="{ active: view === 'list' }" @click="view = 'list'">☰ Siyahı</button>
+            <button :class="{ active: view === 'map' }" @click="view = 'map'">🗺 Xəritə</button>
+          </div>
+
+          <div class="sort-box" v-if="view === 'list'">
+            <label>Sıralama:</label>
+            <select v-model="filters.sort">
+              <option value="rating-desc">Reytinq — ən yüksək</option>
+              <option value="price-asc">Qiymət — ucuzdan bahaya</option>
+              <option value="price-desc">Qiymət — bahadan ucuza</option>
+            </select>
+          </div>
         </div>
       </div>
 
+      <VenueMap
+        v-if="view === 'map'"
+        :filters="mapFilters"
+        @select="selectVenue"
+        @count="totalCount = $event"
+      />
+
+      <template v-else>
       <div v-if="!isLoading && venues.length === 0" class="no-result">
         <h3>Axtarışınıza uyğun heç bir saray tapılmadı.</h3>
         <p>Filtrləri dəyişərək yenidən yoxlaya bilərsiniz.</p>
@@ -151,6 +168,7 @@
           Bütün saraylar göstərildi ({{ totalCount }})
         </p>
       </div>
+      </template>
     </section>
   </div>
 </template>
@@ -160,6 +178,7 @@ import { ref, reactive, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
 import VenueCard from '@/components/VenueCard.vue'
+import VenueMap from '@/components/VenueMap.vue'
 import {
   searchVenues,
   getFilterOptions,
@@ -171,6 +190,9 @@ import { trackPage } from '@/services/visitService'
 import { useAuthStore } from '@/store/auth'
 
 const PAGE_SIZE = 12
+
+// «list» və ya «map» — seçim səhifə yenilənəndə sıfırlanır
+const view = ref('list')
 
 // Tez seçim üçün tipik qonaq sayları (bazadakı tutumlar 150-800 arasındadır)
 const capacityOptions = [150, 250, 400, 600]
@@ -245,6 +267,12 @@ const buildParams = (pageNumber) => ({
   sort: filters.sort,
   page: pageNumber,
   pageSize: PAGE_SIZE,
+})
+
+// Xəritə eyni süzgəcləri işlədir, sadəcə səhifələmə və sıralama olmadan
+const mapFilters = computed(() => {
+  const { page, pageSize, sort, ...rest } = buildParams(1)
+  return rest
 })
 
 const toggleFeature = (name) => {
@@ -778,6 +806,39 @@ const selectVenue = (venue) => {
 .results-header h2 {
   font-size: 1.6rem;
   color: #1a1118;
+}
+
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* Siyahı / Xəritə keçidi */
+.view-switch {
+  display: flex;
+  background: #f4eff1;
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.view-switch button {
+  border: none;
+  background: none;
+  padding: 7px 15px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.view-switch button.active {
+  background: #fff;
+  color: #721438;
+  box-shadow: 0 2px 6px rgba(26, 17, 24, 0.1);
 }
 
 .results-header h2 span {

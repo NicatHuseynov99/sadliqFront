@@ -168,6 +168,14 @@
         </div>
       </div>
 
+      <!-- Məkanın xəritədəki yeri -->
+      <MiniMap
+        :latitude="venue.latitude"
+        :longitude="venue.longitude"
+        :name="venue.name"
+        :address="`${venue.address}, ${venue.city}`"
+      />
+
       <!-- Rəylər -->
       <h2 class="section-title">
         Qonaq rəyləri
@@ -389,6 +397,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
 import AddressLink from '@/components/AddressLink.vue'
+import MiniMap from '@/components/MiniMap.vue'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
 import { getVenueById, toDateKey } from '@/services/venueService'
 import { getVenueReviews, createReview, updateReview, deleteReview } from '@/services/reviewService'

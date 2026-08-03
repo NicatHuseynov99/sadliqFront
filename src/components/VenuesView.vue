@@ -206,6 +206,21 @@
             <input v-model="form.features" class="value-box" />
           </label>
         </div>
+
+        <!-- Koordinat olmadan saray xəritədə görünmür -->
+        <div class="coord-block">
+          <div class="coord-title">
+            Xəritədəki yeri
+            <em v-if="!form.latitude || !form.longitude" class="warn-tag">təyin edilməyib</em>
+          </div>
+          <CoordinatePicker
+            v-if="editOpen"
+            :latitude="form.latitude"
+            :longitude="form.longitude"
+            :address="`${form.address}, ${form.city}, Azərbaycan`"
+            @update="onCoordinates"
+          />
+        </div>
       </div>
 
       <template #footer>
@@ -272,6 +287,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
 import DialogHead from '@/components/DialogHead.vue'
+import CoordinatePicker from '@/components/CoordinatePicker.vue'
 import { ElMessage } from 'element-plus'
 import {
   searchVenues,
@@ -323,7 +339,14 @@ const form = reactive({
   coverImageUrl: '',
   description: '',
   features: '',
+  latitude: null,
+  longitude: null,
 })
+
+const onCoordinates = ({ latitude, longitude }) => {
+  form.latitude = latitude
+  form.longitude = longitude
+}
 
 const ownerOpen = ref(false)
 const ownerTarget = ref(null)
@@ -493,6 +516,8 @@ const openEdit = (venue) => {
   form.coverImageUrl = venue.coverImageUrl ?? ''
   form.description = venue.description ?? ''
   form.features = (venue.features ?? []).join(', ')
+  form.latitude = venue.latitude ?? null
+  form.longitude = venue.longitude ?? null
   editOpen.value = true
 }
 
@@ -504,6 +529,8 @@ const submitEdit = async () => {
       city: form.city.trim(),
       address: form.address.trim(),
       phone: form.phone.trim(),
+      latitude: form.latitude,
+      longitude: form.longitude,
       coverImageUrl: form.coverImageUrl.trim() || null,
       // Boş qoyulsa mövcud özəlliklər saxlanılır
       features: form.features.trim()
@@ -1065,6 +1092,32 @@ onMounted(async () => {
   font-style: normal;
   color: #c9bcc1;
   margin-left: 5px;
+}
+
+/* Koordinat bloku */
+.coord-block {
+  border-top: 1px solid #f4eff1;
+  padding-top: 12px;
+}
+
+.coord-title {
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b8a3ab;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.warn-tag {
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  background: #fdf0e3;
+  color: #b06a2b;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 6px;
 }
 
 /* Sahib seçimi */
