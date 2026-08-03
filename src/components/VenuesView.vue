@@ -197,6 +197,14 @@
           <label class="wide">Ünvan<input v-model="form.address" class="value-box" /></label>
           <label>Telefon<input v-model="form.phone" class="value-box" /></label>
           <label>Şəkil linki<input v-model="form.coverImageUrl" class="value-box" /></label>
+          <label>
+            Parkinq <em class="label-hint">avtomobil sayı</em>
+            <input v-model.number="form.parkingCapacity" class="value-box" type="number" min="0" />
+          </label>
+          <label class="check-label">
+            <input v-model="form.hasValetParking" type="checkbox" />
+            Valet xidməti var
+          </label>
           <label class="wide">
             Təsvir
             <textarea v-model="form.description" class="value-box area" rows="2"></textarea>
@@ -339,6 +347,8 @@ const form = reactive({
   coverImageUrl: '',
   description: '',
   features: '',
+  parkingCapacity: null,
+  hasValetParking: false,
   latitude: null,
   longitude: null,
 })
@@ -516,6 +526,8 @@ const openEdit = (venue) => {
   form.coverImageUrl = venue.coverImageUrl ?? ''
   form.description = venue.description ?? ''
   form.features = (venue.features ?? []).join(', ')
+  form.parkingCapacity = venue.parkingCapacity ?? null
+  form.hasValetParking = venue.hasValetParking ?? false
   form.latitude = venue.latitude ?? null
   form.longitude = venue.longitude ?? null
   editOpen.value = true
@@ -529,6 +541,8 @@ const submitEdit = async () => {
       city: form.city.trim(),
       address: form.address.trim(),
       phone: form.phone.trim(),
+      parkingCapacity: form.parkingCapacity || null,
+      hasValetParking: form.hasValetParking,
       latitude: form.latitude,
       longitude: form.longitude,
       coverImageUrl: form.coverImageUrl.trim() || null,
@@ -1329,6 +1343,16 @@ onMounted(async () => {
 
 .form-grid .value-box {
   padding: 7px 11px;
+}
+
+/* Qeyd qutusu sahə kimi yox, sətir kimi düzülür */
+.check-label {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 7px !important;
+  font-size: 0.8rem !important;
+  color: #4a3f44 !important;
+  padding-top: 16px;
 }
 
 .form-grid label.wide {

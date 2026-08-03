@@ -34,6 +34,10 @@
           <p class="venue-phone">
             📞 <a :href="`tel:${venue.phone.replace(/\s/g, '')}`">{{ venue.phone }}</a>
           </p>
+          <p v-if="venue.parkingCapacity" class="venue-parking">
+            🅿️ Parkinq: <b>{{ venue.parkingCapacity }} avtomobil</b>
+            <span v-if="venue.hasValetParking" class="valet-tag">valet xidməti</span>
+          </p>
         </div>
         <div class="rating-box">
           <span class="rating-score">★ {{ venue.rating }}</span>
@@ -854,6 +858,28 @@ onMounted(loadVenue)
   margin: 4px 0 0;
   color: #6c757d;
   font-size: 0.92rem;
+}
+
+.venue-parking {
+  margin: 4px 0 0;
+  color: #6c757d;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.venue-parking b {
+  color: #1a1118;
+}
+
+.valet-tag {
+  background: #eef4fb;
+  color: #1c5cab;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 20px;
 }
 
 .venue-phone a {

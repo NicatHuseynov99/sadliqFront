@@ -41,6 +41,10 @@
           :longitude="venue.longitude"
         />
         <span class="rev-count">· {{ venue.reviewCount }} rəy</span>
+        <!-- Parkinq tutumu ünvanın yanında verilir: yer seçimində ikinci ən vacib məlumatdır -->
+        <span v-if="venue.parkingCapacity" class="parking-tag" :title="venue.hasValetParking ? 'Valet xidməti var' : ''">
+          🅿️ {{ venue.parkingCapacity }}{{ venue.hasValetParking ? ' · valet' : '' }}
+        </span>
       </div>
 
       <p class="description">{{ venue.description }}</p>
@@ -257,6 +261,17 @@ const onImgError = (e) => {
 .rev-count {
   color: #adb5bd;
   font-size: 0.8rem;
+}
+
+.parking-tag {
+  margin-left: auto;
+  background: #eef4fb;
+  color: #1c5cab;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
 }
 
 .description {

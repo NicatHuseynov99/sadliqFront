@@ -74,6 +74,7 @@ const popupHtml = (v) => `
       <span class="pin-meta">
         ${v.rating ? `★ ${v.rating}` : 'rəy yoxdur'}
         ${v.maxCapacity ? ` · ${v.maxCapacity} nəfər` : ''}
+        ${v.parkingCapacity ? ` · 🅿️ ${v.parkingCapacity}` : ''}
         ${v.distanceKm != null ? ` · ${v.distanceKm} km` : ''}
       </span>
       <button class="pin-btn" data-venue="${v.id}">Ətraflı bax</button>

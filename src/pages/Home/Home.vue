@@ -51,6 +51,8 @@
                   {{ c }}
                 </button>
               </div>
+              <!-- Qonaq sayı seçiləndə lazım olan parkinq yerini xatırladırıq -->
+              <span v-if="parkingHint" class="field-hint">{{ parkingHint }}</span>
             </div>
 
             <div class="field">
@@ -89,6 +91,17 @@
               @click="filters.minRating = filters.minRating === r ? null : r"
             >
               ★ {{ r }}+
+            </button>
+
+            <span class="chips-label divider-label">Parkinq</span>
+            <button
+              v-for="p in parkingOptions"
+              :key="p.value"
+              class="chip chip-parking"
+              :aria-pressed="filters.minParking === p.value"
+              @click="filters.minParking = filters.minParking === p.value ? null : p.value"
+            >
+              🅿️ {{ p.label }}
             </button>
 
             <span class="chips-label divider-label">Özəlliklər</span>
@@ -200,6 +213,14 @@ const capacityOptions = [150, 250, 400, 600]
 // Reytinq həddi seçimləri
 const ratingOptions = [4.5, 4]
 
+// Parkinq həddi seçimləri. «Var» — tutumu göstərilmiş bütün saraylar.
+const parkingOptions = [
+  { value: 1, label: 'var' },
+  { value: 50, label: '50+' },
+  { value: 100, label: '100+' },
+  { value: 200, label: '200+' },
+]
+
 const router = useRouter()
 const auth = useAuthStore()
 
@@ -224,6 +245,7 @@ const filters = reactive({
   capacity: null,
   budget: null,
   minRating: null,
+  minParking: null,
   priceRange: [30, 100],
   features: [],
   sort: 'rating-desc'
@@ -240,6 +262,16 @@ const budgetHint = computed(() => {
   return `≈ ${Math.floor(filters.budget / filters.capacity)} ₼ / nəfər`
 })
 
+// Ortalama 4 qonaq bir avtomobillə gəlir — bu, toy məkanlarında işlənən adi hesabdır
+const GUESTS_PER_CAR = 4
+
+const parkingHint = computed(() => {
+  if (!filters.capacity) return ''
+
+  const needed = Math.ceil(filters.capacity / GUESTS_PER_CAR)
+  return `${filters.capacity} qonaq üçün təxminən ${needed} avtomobil yeri lazımdır`
+})
+
 const activeFilterCount = computed(() => {
   let count = 0
   if (filters.searchQuery) count++
@@ -247,6 +279,7 @@ const activeFilterCount = computed(() => {
   if (filters.capacity) count++
   if (filters.budget) count++
   if (filters.minRating) count++
+  if (filters.minParking) count++
   if (!isFullPriceRange()) count++
   count += filters.features.length
   return count
@@ -261,6 +294,7 @@ const buildParams = (pageNumber) => ({
   capacity: filters.capacity || undefined,
   budget: filters.budget || undefined,
   minRating: filters.minRating || undefined,
+  minParking: filters.minParking || undefined,
   minPrice: isFullPriceRange() ? undefined : filters.priceRange[0],
   maxPrice: isFullPriceRange() ? undefined : filters.priceRange[1],
   features: filters.features.length ? filters.features : undefined,
