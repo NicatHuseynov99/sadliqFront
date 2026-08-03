@@ -2,12 +2,6 @@
   <div class="map-wrap">
     <div ref="mapEl" class="map"></div>
 
-    <!-- Xəritə tərpənəndə siyahı avtomatik yenilənmir: hər hərəkətdə sorğu
-         göndərmək həm serverə yük, həm də istifadəçiyə narahatlıqdır -->
-    <button v-if="movedSinceSearch" class="search-here" @click="searchHere">
-      🔄 Bu ərazidə axtar
-    </button>
-
     <div class="map-tools">
       <button class="tool" :class="{ busy: isLocating }" title="Mənə yaxın" @click="goToMe">
         {{ isLocating ? '…' : '📍' }}
@@ -50,20 +44,29 @@ const items = ref([])
 const withoutCoordinates = ref(0)
 const isLoading = ref(false)
 const isLocating = ref(false)
-const movedSinceSearch = ref(false)
 
 const FALLBACK_IMAGE =
   'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=400&q=60'
 
-// Marker kimi qiymət etiketi göstəririk — müştəri xəritəyə baxan kimi
-// büdcəsinə uyğun məkanı seçir
-const priceIcon = (venue) =>
+// Markerdə əsas yeri sarayın adı tutur, qiymət isə yanında kiçik yazılır —
+// müştəri əvvəlcə məkanı tanıyır, sonra qiymətə baxır
+const venueIcon = (venue) =>
   L.divIcon({
-    className: 'price-pin-wrap',
-    html: `<span class="price-pin">${venue.minPrice ? `${venue.minPrice} ₼` : '—'}</span>`,
-    iconSize: [54, 26],
-    iconAnchor: [27, 26],
+    className: 'venue-pin-wrap',
+    html: `<span class="venue-pin">
+             <b>${escapeHtml(venue.name)}</b>
+             ${venue.minPrice ? `<i>${venue.minPrice} ₼</i>` : ''}
+           </span>`,
+    // Ölçü mətnə görə dəyişir, ona görə sabit vermirik
+    iconSize: null,
+    iconAnchor: [0, 34],
   })
+
+// Saray adı bazadan gəlir — HTML kimi şərh olunmasın deyə təmizləyirik
+const escapeHtml = (text) =>
+  String(text ?? '').replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+  )
 
 const popupHtml = (v) => `
   <div class="pin-card">
@@ -81,25 +84,17 @@ const popupHtml = (v) => `
     </div>
   </div>`
 
-const bounds = () => {
-  const b = map.value.getBounds()
-  return {
-    north: b.getNorth(),
-    south: b.getSouth(),
-    east: b.getEast(),
-    west: b.getWest(),
-  }
-}
-
-const load = async (extra = {}) => {
+// Bütün saraylar bir dəfə yüklənir və xəritədə qalır. Bazada yüzlərlə deyil,
+// onlarla saray var — hamısını göndərmək xəritəni hərəkət etdirdikcə
+// təkrar sorğu göndərməkdən həm sadə, həm sürətlidir.
+const load = async () => {
   isLoading.value = true
   try {
-    const result = await searchOnMap({ ...props.filters, ...bounds(), ...extra })
+    const result = await searchOnMap({ ...props.filters, limit: 500 })
     items.value = result.items
     withoutCoordinates.value = result.withoutCoordinates
     emit('count', result.totalMatched)
     draw()
-    movedSinceSearch.value = false
   } finally {
     isLoading.value = false
   }
@@ -109,70 +104,70 @@ const draw = () => {
   markerLayer.value.clearLayers()
 
   items.value.forEach((v) => {
-    const marker = L.marker([v.latitude, v.longitude], { icon: priceIcon(v) })
+    const marker = L.marker([v.latitude, v.longitude], { icon: venueIcon(v) })
       .bindPopup(popupHtml(v), { closeButton: true, maxWidth: 260 })
 
     markerLayer.value.addLayer(marker)
   })
 }
 
-const searchHere = () => load()
+// Yüklənmiş bütün markerlər ekrana sığdırılır — yeni sorğu göndərilmir
+const fitAll = () => {
+  if (!items.value.length) return
 
-const fitAll = async () => {
-  // Süzgəcə uyğun bütün saraylar görünsün deyə əvvəlcə sahəsiz axtarırıq
-  isLoading.value = true
-  try {
-    const result = await searchOnMap({ ...props.filters })
-    items.value = result.items
-    withoutCoordinates.value = result.withoutCoordinates
-    emit('count', result.totalMatched)
-    draw()
-
-    if (result.items.length) {
-      const group = L.latLngBounds(result.items.map((v) => [v.latitude, v.longitude]))
-      map.value.fitBounds(group, { padding: [40, 40] })
-    }
-    movedSinceSearch.value = false
-  } finally {
-    isLoading.value = false
-  }
+  const group = L.latLngBounds(items.value.map((v) => [v.latitude, v.longitude]))
+  map.value.fitBounds(group, { padding: [40, 40] })
 }
 
+const showMe = (position) => {
+  map.value.setView(position, DEFAULT_ZOOM)
+
+  if (meMarker.value) map.value.removeLayer(meMarker.value)
+  meMarker.value = L.circleMarker(position, {
+    radius: 8,
+    color: '#1c5cab',
+    fillColor: '#3b82f6',
+    fillOpacity: 0.9,
+    weight: 3,
+  })
+    .addTo(map.value)
+    .bindPopup('Siz buradasınız')
+}
+
+// Yeri tapmaq bir neçə saniyə çəkə bilər, ona görə xəritə açılanda avtomatik
+// soruşulmur — istifadəçi düyməyə basanda işə düşür.
+// Markerlər onsuz da yerindədir, sadəcə xəritə istifadəçinin üstünə gətirilir.
 const goToMe = async () => {
   isLocating.value = true
   try {
     const position = await getMyLocation()
-    if (!position) {
-      movedSinceSearch.value = true
-      return
-    }
-
-    map.value.setView(position, 13)
-
-    if (meMarker.value) map.value.removeLayer(meMarker.value)
-    meMarker.value = L.circleMarker(position, {
-      radius: 8,
-      color: '#1c5cab',
-      fillColor: '#3b82f6',
-      fillOpacity: 0.9,
-      weight: 3,
-    }).addTo(map.value)
-
-    await load({ nearLat: position[0], nearLng: position[1] })
+    if (position) showMe(position)
   } finally {
     isLocating.value = false
   }
 }
 
 // Popup-dakı «Ətraflı bax» düyməsi Vue-dan kənarda qurulur, ona görə
-// kliki xəritə konteynerində tuturuq
+// kliki xəritə konteynerində tuturuq.
+// Siyahı rejimi ilə eyni olsun deyə hadisə ilə sarayın özü göndərilir —
+// rəqəm göndərsək qəbul edən tərəf `venue.id` tapmır.
 const onMapClick = (event) => {
-  const id = event.target?.dataset?.venue
-  if (id) emit('select', Number(id))
+  const id = event.target?.closest?.('[data-venue]')?.dataset?.venue
+  if (!id) return
+
+  const venue = items.value.find((v) => v.id === Number(id))
+  emit('select', venue ?? { id: Number(id) })
 }
 
 onMounted(async () => {
-  map.value = L.map(mapEl.value, { zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM)
+  // «Leaflet» yazısı kitabxananın öz reklamıdır — götürürük.
+  // «© OpenStreetMap» isə lisenziya tələbidir və qalmalıdır.
+  map.value = L.map(mapEl.value, {
+    zoomControl: false,
+    attributionControl: false,
+  }).setView(DEFAULT_CENTER, DEFAULT_ZOOM)
+
+  L.control.attribution({ prefix: false, position: 'bottomleft' }).addTo(map.value)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -183,13 +178,10 @@ onMounted(async () => {
 
   markerLayer.value = L.layerGroup().addTo(map.value)
 
-  map.value.on('moveend', () => {
-    movedSinceSearch.value = true
-  })
-
   mapEl.value.addEventListener('click', onMapClick)
 
-  await fitAll()
+  // Açılan kimi bütün saraylar yüklənir — gecikmə yaradan heç nə gözlənilmir
+  await load()
 })
 
 onBeforeUnmount(() => {
@@ -197,11 +189,12 @@ onBeforeUnmount(() => {
   map.value?.remove()
 })
 
-// Süzgəc dəyişəndə xəritə də yenilənir
+// Süzgəc dəyişəndə markerlər yenidən yüklənir; xəritənin baxış yeri dəyişmir —
+// istifadəçini baxdığı yerdən qoparmaq düzgün deyil
 watch(
   () => props.filters,
   () => {
-    if (map.value) fitAll()
+    if (map.value) load()
   },
   { deep: true },
 )
@@ -210,6 +203,10 @@ watch(
 <style scoped>
 .map-wrap {
   position: relative;
+  /* Leaflet öz laylarına 400–700 arası z-index verir. Öz yığın konteksti
+     yaradırıq ki, xəritə scroll zamanı yuxarıdakı menyunun üstünə çıxmasın. */
+  z-index: 0;
+  isolation: isolate;
   height: 620px;
   border-radius: 16px;
   overflow: hidden;
@@ -219,30 +216,6 @@ watch(
 .map {
   width: 100%;
   height: 100%;
-}
-
-/* Xəritə tərpənəndən sonra çıxan düymə */
-.search-here {
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 500;
-  background: #fff;
-  border: 1px solid #ece5e8;
-  color: #721438;
-  padding: 9px 18px;
-  border-radius: 20px;
-  font-size: 0.83rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(26, 17, 24, 0.16);
-}
-
-.search-here:hover {
-  background: #721438;
-  color: #fff;
-  border-color: #721438;
 }
 
 .map-tools {
@@ -316,22 +289,56 @@ watch(
 <!-- Marker və popup Leaflet tərəfindən body-yə əlavə olunur, ona görə
      bu stillər scoped ola bilməz -->
 <style>
-.price-pin {
-  display: inline-block;
-  background: #721438;
-  color: #fff;
-  font-size: 0.74rem;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 20px;
-  white-space: nowrap;
-  box-shadow: 0 3px 8px rgba(26, 17, 24, 0.3);
-  border: 2px solid #fff;
-  transition: transform 0.12s;
+/* Marker: sarayın adı böyük, qiymət kiçik və solğun */
+.venue-pin-wrap {
+  width: auto !important;
+  height: auto !important;
 }
 
-.price-pin-wrap:hover .price-pin {
-  transform: scale(1.12);
+.venue-pin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  color: #1a1118;
+  padding: 5px 11px;
+  border-radius: 20px;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(26, 17, 24, 0.28);
+  border: 2px solid #721438;
+  transition: all 0.12s;
+  transform: translateX(-50%);
+}
+
+.venue-pin b {
+  font-size: 0.76rem;
+  font-weight: 700;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.venue-pin i {
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #721438;
+  background: #f6e9ee;
+  padding: 1px 7px;
+  border-radius: 20px;
+}
+
+.venue-pin-wrap:hover {
+  z-index: 1000 !important;
+}
+
+.venue-pin-wrap:hover .venue-pin {
+  background: #721438;
+  color: #fff;
+  border-color: #dfb15b;
+}
+
+.venue-pin-wrap:hover .venue-pin i {
   background: #dfb15b;
   color: #4a0d24;
 }

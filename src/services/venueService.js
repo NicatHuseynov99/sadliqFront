@@ -80,6 +80,12 @@ export const searchVenues = async (params) => {
 }
 
 // GET /Venues/GetFilterOptions — filtr panelinin seçimləri (şəhərlər, özəlliklər, aralıqlar)
+// GET /Venues/Suggest — axtarış qutusunda yazdıqca çıxan təkliflər
+export const getSuggestions = async (q) => {
+  const { data } = await api.get('/Venues/Suggest', { params: { q } })
+  return data.data ?? []
+}
+
 export const getFilterOptions = async () => {
   const { data } = await api.get('/Venues/GetFilterOptions')
   return data.data ?? { cities: [], features: [], minPrice: 0, maxPrice: 0 }

@@ -8,9 +8,11 @@ export const searchOnMap = async (params) => {
   return data.data ?? { items: [], totalMatched: 0, withoutCoordinates: 0 }
 }
 
-// Bakının mərkəzi — xəritə koordinat olmayanda buradan açılır
+// Bakının mərkəzi — istifadəçinin yeri bilinmirsə xəritə buradan açılır
 export const DEFAULT_CENTER = [40.3777, 49.892]
-export const DEFAULT_ZOOM = 11
+
+// Şəhər səviyyəsi: küçələr görünür, amma ətraf da əhatə olunur
+export const DEFAULT_ZOOM = 12
 
 // Brauzerin geolokasiyası. İstifadəçi icazə verməsə və ya cihaz dəstəkləməsə
 // səssizcə null qaytarırıq — xəritə onsuz da işləməlidir.

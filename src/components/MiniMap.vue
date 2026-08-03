@@ -33,10 +33,12 @@ onMounted(() => {
 
   // Kiçik xəritədir — sürüşdürmə və təkərlə yaxınlaşdırma söndürülür ki,
   // səhifəni scroll edərkən xəritə «tutmasın»
+  // «Leaflet» reklamı götürülür, «© OpenStreetMap» lisenziya tələbi kimi qalır
   map.value = L.map(mapEl.value, {
     zoomControl: true,
     scrollWheelZoom: false,
     dragging: true,
+    attributionControl: false,
   }).setView(position, 15)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -44,10 +46,12 @@ onMounted(() => {
     attribution: '© OpenStreetMap',
   }).addTo(map.value)
 
+  L.control.attribution({ prefix: false }).addTo(map.value)
+
   L.marker(position, {
     icon: L.divIcon({
-      className: 'venue-pin-wrap',
-      html: '<span class="venue-pin">📍</span>',
+      className: 'spot-pin-wrap',
+      html: '<span class="spot-pin">📍</span>',
       iconSize: [30, 30],
       iconAnchor: [15, 30],
     }),
@@ -102,7 +106,7 @@ onBeforeUnmount(() => map.value?.remove())
 </style>
 
 <style>
-.venue-pin {
+.spot-pin {
   font-size: 1.6rem;
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
 }

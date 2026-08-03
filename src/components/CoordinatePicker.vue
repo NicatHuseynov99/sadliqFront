@@ -124,7 +124,10 @@ const findByAddress = async () => {
 onMounted(() => {
   const start = lat.value && lng.value ? [lat.value, lng.value] : DEFAULT_CENTER
 
-  map.value = L.map(mapEl.value).setView(start, lat.value ? 16 : 11)
+  map.value = L.map(mapEl.value, { attributionControl: false })
+    .setView(start, lat.value ? 16 : 11)
+
+  L.control.attribution({ prefix: false }).addTo(map.value)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,

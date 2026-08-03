@@ -15,9 +15,35 @@
               v-model="filters.searchQuery"
               type="text"
               class="search-input"
-              placeholder="Saray adı və ya ünvan yazın..."
+              placeholder="Saray, zal, menyu və ya ünvan yazın..."
+              @input="onSuggestInput"
+              @focus="suggestOpen = true"
+              @blur="closeSuggest"
             />
-            <button class="search-clear" v-if="filters.searchQuery" @click="filters.searchQuery = ''">✕</button>
+            <button class="search-clear" v-if="filters.searchQuery" @click="clearSearch">✕</button>
+
+            <!-- Yazdıqca çıxan təkliflər -->
+            <ul v-if="suggestOpen && suggestions.length" class="suggest-list">
+              <li
+                v-for="s in suggestions"
+                :key="`${s.type}-${s.venueId ?? s.text}`"
+                @mousedown.prevent="pickSuggestion(s)"
+              >
+                <template v-if="s.type === 'venue'">
+                  <img :src="s.imageUrl" alt="" @error="onImgError" />
+                  <span class="sug-text">
+                    <b>{{ s.text }}</b>
+                    <em>{{ s.city }}</em>
+                  </span>
+                  <span class="sug-type">saray</span>
+                </template>
+                <template v-else>
+                  <span class="sug-city-icon">📍</span>
+                  <span class="sug-text"><b>{{ s.text }}</b><em>{{ s.count }} saray</em></span>
+                  <span class="sug-type">şəhər</span>
+                </template>
+              </li>
+            </ul>
           </div>
 
           <div class="search-grid">
@@ -126,7 +152,11 @@
     <!-- Restoranlar Siyahısı -->
     <section class="venues-container" v-loading="isLoading">
       <div class="results-header">
-        <h2>Mövcud Saraylar <span>({{ totalCount }})</span></h2>
+        <!-- Xəritə rejimində say xəritənin öz sətrində göstərilir —
+             burada təkrarlansa, koordinatı olmayan saraylara görə iki
+             fərqli rəqəm görünür və çaşdırır -->
+        <h2 v-if="view === 'list'">Mövcud Saraylar <span>({{ totalCount }})</span></h2>
+        <span v-else></span>
 
         <div class="header-tools">
           <!-- Siyahı və xəritə eyni süzgəclərlə işləyir -->
@@ -196,6 +226,7 @@ import {
   searchVenues,
   getFilterOptions,
   getNearestFreeDate,
+  getSuggestions,
   buildBusyMap,
 } from '@/services/venueService'
 import { getMyFavoriteIds, toggleFavorite } from '@/services/favoriteService'
@@ -261,6 +292,50 @@ const budgetHint = computed(() => {
   if (!filters.capacity) return 'Qonaq sayını yazsanız daha dəqiq olar'
   return `≈ ${Math.floor(filters.budget / filters.capacity)} ₼ / nəfər`
 })
+
+// Axtarış təklifləri
+const suggestions = ref([])
+const suggestOpen = ref(false)
+
+const FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=200&q=60'
+
+const onImgError = (event) => {
+  event.target.src = FALLBACK_IMAGE
+}
+
+// Hər hərfdə sorğu getməsin deyə yazmaq bitəndən sonra soruşuruq
+let suggestTimer = null
+const onSuggestInput = () => {
+  suggestOpen.value = true
+  clearTimeout(suggestTimer)
+
+  suggestTimer = setTimeout(async () => {
+    suggestions.value = await getSuggestions(filters.searchQuery)
+  }, 250)
+}
+
+// Siyahıdakı elementə klik blur-dan sonra işləsin deyə bir az gözləyirik
+const closeSuggest = () => setTimeout(() => (suggestOpen.value = false), 150)
+
+const pickSuggestion = (item) => {
+  suggestOpen.value = false
+  suggestions.value = []
+
+  // Saray seçilibsə birbaşa səhifəsinə keçirik, şəhər seçilibsə süzgəcə salırıq
+  if (item.type === 'venue') {
+    router.push(`/venue/${item.venueId}`)
+    return
+  }
+
+  filters.searchQuery = ''
+  filters.city = item.text
+}
+
+const clearSearch = () => {
+  filters.searchQuery = ''
+  suggestions.value = []
+}
 
 // Ortalama 4 qonaq bir avtomobillə gəlir — bu, toy məkanlarında işlənən adi hesabdır
 const GUESTS_PER_CAR = 4
@@ -505,6 +580,7 @@ const selectVenue = (venue) => {
 }
 
 .search-main {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -514,6 +590,79 @@ const selectVenue = (venue) => {
   padding: 12px 16px;
   margin-bottom: 16px;
   transition: all 0.2s;
+}
+
+/* Axtarış təklifləri */
+.suggest-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #f0eaec;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(26, 17, 24, 0.16);
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.suggest-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.suggest-list li:hover {
+  background: #fbf7f8;
+}
+
+.suggest-list img {
+  width: 42px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 7px;
+  background: #f6f1f3;
+}
+
+.sug-city-icon {
+  width: 42px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.sug-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.sug-text b {
+  font-size: 0.88rem;
+  color: #1a1118;
+}
+
+.sug-text em {
+  font-style: normal;
+  font-size: 0.74rem;
+  color: #a6969c;
+}
+
+.sug-type {
+  font-size: 0.68rem;
+  color: #b8a3ab;
+  background: #f6f1f3;
+  padding: 2px 8px;
+  border-radius: 20px;
 }
 
 .search-main:focus-within {
