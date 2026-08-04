@@ -25,14 +25,29 @@
       </div>
 
       <template v-else>
-        <header class="page-head">
-          <h1>Sarayınızı platformaya əlavə edin</h1>
-          <p>
-            Yalnız <b>ulduzlu</b> sahələr məcburidir — ad, e-poçt, parol və sarayın adı.
-            Qalanını indi doldurmasanız da olar, təsdiqdən sonra panelinizdən tamamlayarsınız.
-            Addımlar arasında sərbəst keçə bilərsiniz.
-          </p>
+        <header class="hero">
+          <div class="hero-text">
+            <span class="hero-eyebrow">Sahibkarlar üçün</span>
+            <h1>Sarayınızı platformaya əlavə edin</h1>
+            <p>
+              Yalnız <b>ulduzlu</b> sahələr məcburidir — ad, e-poçt, parol və sarayın adı.
+              Qalanını indi doldurmasanız da olar. Addımlar arasında sərbəst keçin,
+              yazdıqlarınız özü saxlanılır.
+            </p>
+          </div>
+
+          <ul class="hero-points">
+            <li><b>Pulsuz</b> yerləşdirmə</li>
+            <li><b>1 gün</b> ərzində yoxlanış</li>
+            <li><b>Birbaşa</b> rezerv sorğuları</li>
+          </ul>
         </header>
+
+        <!-- Doldurulma faizi: uzun anketdə irəliləyişi görmək motivasiya verir -->
+        <div class="progress">
+          <div class="progress-bar"><span :style="{ width: `${progress}%` }"></span></div>
+          <span class="progress-text">{{ progress }}% tamamlanıb</span>
+        </div>
 
         <!-- Addım göstəricisi. İstənilən addıma keçmək olar —
              sahibkar əvvəlcə əlindəki məlumatı doldurub qalanına sonra qayıda bilsin. -->
@@ -128,7 +143,18 @@
               <em>Bu addımı keçib sonra da doldurmaq olar.</em>
             </p>
 
-            <button class="ghost-btn" :disabled="isLocating" @click="useMyLocation">
+            <!-- Yer avtomatik götürülür, amma təsdiq olmadan yazılmır:
+                 sahibkar evdən doldurursa saray başqa yerdədir -->
+            <div v-if="askLocation" class="ask-box">
+              <b>📍 Bura sarayın yeridir?</b>
+              <p>Cihazınızın göstərdiyi yeri xəritədə işarələdik. Doğrudursa təsdiqləyin.</p>
+              <div class="ask-actions">
+                <button class="primary-btn" @click="confirmLocation">Bəli, bura saraydır</button>
+                <button class="ghost-btn" @click="rejectLocation">Xeyr, başqa yerdədir</button>
+              </div>
+            </div>
+
+            <button v-else class="ghost-btn" :disabled="isLocating" @click="useMyLocation">
               {{ isLocating ? 'Tapılır…' : '📍 Hazırkı yerimi götür' }}
             </button>
 
@@ -150,23 +176,23 @@
               <em>Hamısını sonra da əlavə edə bilərsiniz.</em>
             </p>
 
-            <label class="wide">Fon şəkli (link)<input v-model="form.venue.coverImageUrl" placeholder="https://…" /></label>
+            <span class="label-text">Fon şəkli</span>
+            <MediaUpload v-model="form.venue.coverImageUrl" label="Fon şəklini seçin" />
 
-            <div v-if="form.venue.coverImageUrl" class="preview">
-              <img :src="form.venue.coverImageUrl" alt="" @error="onImgError" />
-            </div>
-
-            <label class="wide">
-              Video (link) <em>YouTube, Vimeo və ya birbaşa fayl</em>
-              <input v-model="form.venue.videoUrl" placeholder="https://youtube.com/watch?v=…" />
-            </label>
+            <span class="label-text">Video <em>məcburi deyil</em></span>
+            <MediaUpload v-model="form.venue.videoUrl" video label="Video seçin" />
 
             <span class="label-text">Əlavə şəkillər</span>
-            <div v-for="(img, i) in form.venue.imageUrls" :key="i" class="row-input">
-              <input v-model="form.venue.imageUrls[i]" placeholder="https://…" />
-              <button class="del-btn" type="button" @click="form.venue.imageUrls.splice(i, 1)">✕</button>
+            <div class="shot-grid">
+              <MediaUpload
+                v-for="(img, i) in form.venue.imageUrls"
+                :key="i"
+                v-model="form.venue.imageUrls[i]"
+                small
+                label="Şəkil seçin"
+              />
+              <MediaUpload v-model="newImage" small label="Şəkil əlavə et" />
             </div>
-            <button class="add-link" type="button" @click="form.venue.imageUrls.push('')">+ Şəkil əlavə et</button>
           </div>
 
           <!-- 5. Zallar -->
@@ -194,7 +220,10 @@
                   Təsvir <em>məcburi deyil</em>
                   <textarea v-model="hall.description" rows="2"></textarea>
                 </label>
-                <label class="wide">Zalın şəkli (link)<input v-model="hall.imageUrls[0]" placeholder="https://…" /></label>
+                <div class="wide">
+                  <span class="label-text">Zalın şəkli</span>
+                  <MediaUpload v-model="hall.imageUrls[0]" small label="Zalın şəklini seçin" />
+                </div>
               </div>
             </div>
 
@@ -218,7 +247,10 @@
               <div class="grid">
                 <label>Menyunun adı <i>*</i><input v-model="menu.name" /></label>
                 <label>Nəfərbaşı qiymət <i>*</i><input v-model.number="menu.pricePerPerson" type="number" min="0" /></label>
-                <label class="wide">Şəkil (link)<input v-model="menu.imageUrl" placeholder="https://…" /></label>
+                <div class="wide">
+                  <span class="label-text">Menyunun şəkli</span>
+                  <MediaUpload v-model="menu.imageUrl" small label="Süfrə şəklini seçin" />
+                </div>
                 <label class="wide">
                   Tərkibi <em>qısa təsvir</em>
                   <textarea v-model="menu.description" rows="2"></textarea>
@@ -256,8 +288,10 @@
           <div class="actions">
             <button v-if="stepIndex > 0" class="ghost-btn" @click="stepIndex--">← Geri</button>
             <span class="spacer"></span>
-            <button v-if="!isLast" class="primary-btn" :disabled="!canGoNext" @click="next">
-              Növbəti →
+            <!-- Addımı boş qoyub keçmək olar: məcburi sahələr yalnız göndərişdə yoxlanılır -->
+            <button v-if="!isLast" class="primary-btn" @click="next">Növbəti →</button>
+            <button v-if="!isLast" class="ghost-btn" @click="stepIndex = visibleSteps.length - 1">
+              Yekuna keç
             </button>
             <button v-else class="primary-btn" :disabled="isSending || !canSubmit" @click="submit">
               {{ isSending ? 'Göndərilir…' : 'Müraciəti göndər' }}
@@ -272,6 +306,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import CoordinatePicker from '@/components/CoordinatePicker.vue'
+import MediaUpload from '@/components/MediaUpload.vue'
 import { submitVenueApplication, STEPS } from '@/services/venueApplicationService'
 import { getFilterOptions } from '@/services/venueService'
 import { getMyLocation } from '@/services/mapService'
@@ -282,6 +317,13 @@ const auth = useAuthStore()
 const stepIndex = ref(0)
 const isSending = ref(false)
 const isLocating = ref(false)
+
+// Cihazın yeri götürülüb, sahibkarın təsdiqini gözləyirik
+const askLocation = ref(false)
+const locationAsked = ref(false)
+
+// «Şəkil əlavə et» sahəsinə fayl düşən kimi siyahıya keçir
+const newImage = ref('')
 const error = ref('')
 const submitted = ref(null)
 
@@ -322,25 +364,6 @@ const visibleSteps = computed(() => (auth.isAuth ? STEPS.filter((s) => s.key !==
 const current = computed(() => visibleSteps.value[stepIndex.value])
 const isLast = computed(() => stepIndex.value === visibleSteps.value.length - 1)
 
-// Yalnız ən zəruri sahələr keçidi bloklayır: hesab açmaq üçün lazım olanlar
-// və sarayın adı. Qalanı boş qala bilər — sonra paneldən tamamlanır.
-const canGoNext = computed(() => {
-  switch (current.value.key) {
-    case 'account': {
-      const a = form.applicant
-      return a.firstName.trim() && a.email.includes('@') && a.password.trim().length >= 6
-    }
-    case 'venue':
-      return form.venue.name.trim().length > 0
-    case 'halls':
-      // Zal əlavə edilibsə tutumu göstərilməlidir; heç biri yoxdursa problem deyil
-      return form.halls.every((h) => !h.name.trim() || h.capacity > 0)
-    case 'menus':
-      return form.menus.every((m) => !m.name.trim() || m.pricePerPerson > 0)
-    default:
-      return true
-  }
-})
 
 // Göndərmək üçün minimum: hesab + sarayın adı
 const canSubmit = computed(() => {
@@ -349,6 +372,13 @@ const canSubmit = computed(() => {
     auth.isAuth || (a.firstName.trim() && a.email.includes('@') && a.password.trim().length >= 6)
 
   return accountReady && form.venue.name.trim().length > 0
+})
+
+// Neçə addım doldurulub — yuxarıdakı zolaq üçün
+const progress = computed(() => {
+  const total = visibleSteps.value.filter((s) => s.key !== 'review').length
+  const done = visibleSteps.value.filter((s) => s.key !== 'review' && isStepFilled(s.key)).length
+  return Math.round((done / total) * 100)
 })
 
 // Addımın doldurulub-doldurulmadığını göstərir — nişanı üçün
@@ -389,13 +419,20 @@ const willMiss = computed(() => {
 
 const next = () => {
   error.value = ''
-  if (canGoNext.value) stepIndex.value++
+  if (stepIndex.value < visibleSteps.value.length - 1) stepIndex.value++
 }
 
 const toggleFeature = (name) => {
   const index = form.venue.features.indexOf(name)
   index === -1 ? form.venue.features.push(name) : form.venue.features.splice(index, 1)
 }
+
+// Yeni şəkil yüklənən kimi siyahıya əlavə olunur, sahə isə boşalır
+watch(newImage, (url) => {
+  if (!url) return
+  form.venue.imageUrls.push(url)
+  newImage.value = ''
+})
 
 const addHall = () =>
   form.halls.push({ name: '', capacity: null, minPrice: null, description: '', imageUrls: [''] })
@@ -411,12 +448,40 @@ const useMyLocation = async () => {
   isLocating.value = true
   try {
     const position = await getMyLocation()
-    if (position) onCoordinates({ latitude: position[0], longitude: position[1] })
-    else error.value = 'Yeriniz tapılmadı — nişanı xəritədə əl ilə yerləşdirin.'
+    if (position) {
+      onCoordinates({ latitude: position[0], longitude: position[1] })
+      askLocation.value = true
+    } else {
+      error.value = 'Yeriniz tapılmadı — nişanı xəritədə əl ilə yerləşdirin.'
+    }
   } finally {
     isLocating.value = false
   }
 }
+
+const confirmLocation = () => {
+  askLocation.value = false
+  locationAsked.value = true
+}
+
+// Yer düz deyilsə nişanı götürürük ki, səhv koordinat yazılmasın
+const rejectLocation = () => {
+  askLocation.value = false
+  locationAsked.value = true
+  onCoordinates({ latitude: null, longitude: null })
+  error.value = 'Nişanı xəritədə sarayın olduğu yerə qoyun və ya ünvana görə tapın.'
+}
+
+// «Yer» addımı ilk dəfə açılanda cihazın yerini özümüz soruşuruq
+watch(
+  () => current.value.key,
+  (key) => {
+    if (key === 'location' && !locationAsked.value && !form.venue.latitude) {
+      locationAsked.value = true
+      useMyLocation()
+    }
+  },
+)
 
 const submit = async () => {
   isSending.value = true
@@ -522,16 +587,120 @@ onMounted(async () => {
   margin: 0 auto;
 }
 
-.page-head h1 {
-  margin: 0 0 6px;
-  font-size: 1.7rem;
-  color: #1a1118;
+/* Başlıq: tünd fon üzərində qızılı vurğu — panelin dili ilə eyni */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  background: linear-gradient(120deg, #2a0f1c 0%, #4a0d24 55%, #721438 100%);
+  border-radius: 18px;
+  padding: 26px 30px;
+  margin-bottom: 18px;
 }
 
-.page-head p {
-  margin: 0 0 22px;
-  color: #6c757d;
-  font-size: 0.92rem;
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -70px;
+  top: -90px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(223, 177, 91, 0.25), transparent 65%);
+  pointer-events: none;
+}
+
+.hero-text {
+  position: relative;
+  z-index: 1;
+  max-width: 460px;
+}
+
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #dfb15b;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 1.65rem;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.hero p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.hero p b {
+  color: #dfb15b;
+}
+
+.hero-points {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hero-points li {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 7px 15px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.hero-points b {
+  color: #dfb15b;
+}
+
+/* İrəliləyiş zolağı */
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 7px;
+  background: #ece5e8;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #721438, #dfb15b);
+  border-radius: 20px;
+  transition: width 0.3s;
+}
+
+.progress-text {
+  font-size: 0.76rem;
+  color: #a6969c;
+  white-space: nowrap;
 }
 
 /* Addım göstəricisi */
@@ -771,6 +940,41 @@ label.check {
 
 .picker-box {
   margin-top: 14px;
+}
+
+/* Cihazın yerini təsdiqləmə qutusu */
+.ask-box {
+  background: #fffaf2;
+  border: 1px solid #f0e0bd;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 6px;
+}
+
+.ask-box b {
+  font-size: 0.92rem;
+  color: #1a1118;
+}
+
+.ask-box p {
+  margin: 6px 0 12px;
+  font-size: 0.82rem;
+  color: #6c757d;
+  line-height: 1.55;
+}
+
+.ask-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Şəkil yükləmə sahələri şəbəkə şəklində */
+.shot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
 }
 
 /* Yekun */

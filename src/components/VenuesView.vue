@@ -322,7 +322,12 @@ const STATUS_FILTERS = [
   { value: 'deleted', label: 'Silinmiş' },
 ]
 
-const emit = defineEmits(['changed'])
+const props = defineProps({
+  // İcmaldan «Redaktə et» ilə gələn saray — açılan kimi pəncərəsi açılır
+  editVenueId: { type: Number, default: null },
+})
+
+const emit = defineEmits(['changed', 'edit-opened'])
 
 const isLoading = ref(false)
 const rows = ref([])
@@ -611,11 +616,30 @@ const remove = (venue) => {
   })
 }
 
+// İcmaldan gələn saray siyahının cari səhifəsində olmaya bilər —
+// təsdiq gözləyənlərə keçib tapırıq
+const openRequestedVenue = async () => {
+  if (!props.editVenueId) return
+
+  let venue = rows.value.find((v) => v.id === props.editVenueId)
+
+  if (!venue) {
+    filters.status = 'pending'
+    filters.page = 1
+    await loadRows()
+    venue = rows.value.find((v) => v.id === props.editVenueId)
+  }
+
+  if (venue) openEdit(venue)
+  emit('edit-opened')
+}
+
 onMounted(async () => {
   isLoading.value = true
   try {
     const [, cityList] = await Promise.all([loadRows(), getCities()])
     cities.value = cityList
+    await openRequestedVenue()
   } finally {
     isLoading.value = false
   }

@@ -42,7 +42,12 @@
       <ReviewsView v-else-if="section === 'reviews'" />
       <ReservationsView v-else-if="section === 'bookings'" />
       <SettingsView v-else-if="section === 'settings'" />
-      <VenuesView v-else-if="section === 'venues'" @changed="loadStats" />
+      <VenuesView
+        v-else-if="section === 'venues'"
+        :edit-venue-id="editVenueId"
+        @changed="loadStats"
+        @edit-opened="editVenueId = null"
+      />
       <DataView v-else-if="section === 'data' && auth.isSuperAdmin" />
 
       <template v-else>
@@ -91,8 +96,10 @@
               <span>{{ v.city }} · {{ v.address }}</span>
               <em>{{ v.phone }}</em>
             </div>
+            <!-- «Bax» müraciətin tam yoxlanış ekranını açır: baxmaq da,
+                 düzəltmək də, təsdiqləmək də orada olur -->
             <div class="pending-actions">
-              <a class="mini-btn link" :href="`/venue/${v.id}`" target="_blank">Bax</a>
+              <button class="mini-btn" @click="reviewVenue = v">Bax</button>
               <button class="approve-btn" @click="approve(v)">Təsdiqlə</button>
             </div>
           </div>
@@ -246,6 +253,14 @@
         </div>
       </el-dialog>
 
+      <!-- Müraciətin yoxlanışı — sahibkarın anketi ilə eyni quruluşda -->
+      <VenueReview
+        v-if="reviewVenue"
+        :venue="reviewVenue"
+        @close="reviewVenue = null"
+        @changed="load"
+      />
+
       <!-- Yeni hesab / redaktə -->
       <el-dialog
         v-model="formOpen"
@@ -302,6 +317,7 @@ import ReservationsView from '@/components/ReservationsView.vue'
 import SettingsView from '@/components/SettingsView.vue'
 import VenuesView from '@/components/VenuesView.vue'
 import DataView from '@/components/DataView.vue'
+import VenueReview from '@/components/VenueReview.vue'
 import {
   getPlatformStats,
   getUsers,
@@ -335,6 +351,12 @@ const passwordTarget = ref(null)
 const newPassword = ref('')
 
 const section = ref('overview')
+
+// İcmaldan «Redaktə et» basılanda hansı sarayın açılacağı
+const editVenueId = ref(null)
+
+// İcmalda «Bax» basılan müraciət — yoxlanış ekranı üçün
+const reviewVenue = ref(null)
 
 const formOpen = ref(false)
 const formMode = ref('create')

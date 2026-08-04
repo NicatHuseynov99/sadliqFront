@@ -4,10 +4,20 @@
       <button class="find-btn" :disabled="isSearching || !address" @click="findByAddress">
         {{ isSearching ? 'Axtarılır…' : '🔍 Ünvana görə tap' }}
       </button>
+      <button v-if="isChanged" class="find-btn undo" title="Əvvəlki koordinatı qaytar" @click="undo">
+        ↺ Geri qaytar
+      </button>
       <span class="picker-hint">və ya xəritədə nişanı sürüşdürün</span>
     </div>
 
-    <div ref="mapEl" class="picker-map"></div>
+    <div class="map-wrap">
+      <div ref="mapEl" class="picker-map"></div>
+
+      <!-- Xəritədə gəzdikdən sonra öz yerinə bir kliklə qayıtmaq üçün -->
+      <button class="locate-btn" :title="locateTitle" :disabled="isLocating" @click="goToMyLocation">
+        {{ isLocating ? '⏳' : '📍' }}
+      </button>
+    </div>
 
     <div class="coord-row">
       <label>
@@ -26,7 +36,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { DEFAULT_CENTER } from '@/services/mapService'
@@ -47,8 +57,17 @@ const marker = shallowRef(null)
 const lat = ref(props.latitude)
 const lng = ref(props.longitude)
 const isSearching = ref(false)
+const isLocating = ref(false)
 const message = ref('')
 const isBad = ref(false)
+
+// Pəncərə açılanda hansı koordinat vardısa yadda saxlanılır ki,
+// dəyişiklikdən sonra bir kliklə əvvəlki hala qayıtmaq mümkün olsun.
+const original = { lat: props.latitude, lng: props.longitude }
+
+const isChanged = computed(() => lat.value !== original.lat || lng.value !== original.lng)
+
+const locateTitle = 'Mənim yerimə qayıt'
 
 const setMarker = (position, moveView = true) => {
   if (!map.value) return
@@ -85,6 +104,54 @@ const clear = () => {
   message.value = 'Koordinat silindi — saray xəritədə görünməyəcək.'
   isBad.value = true
   emit('update', { latitude: null, longitude: null })
+}
+
+// Səhvən yeri dəyişdikdə əvvəlki koordinata qayıtmaq
+const undo = () => {
+  lat.value = original.lat
+  lng.value = original.lng
+
+  if (!lat.value || !lng.value) {
+    if (marker.value) {
+      map.value.removeLayer(marker.value)
+      marker.value = null
+    }
+    emit('update', { latitude: null, longitude: null })
+  } else {
+    apply()
+  }
+
+  message.value = 'Əvvəlki koordinat qaytarıldı.'
+  isBad.value = false
+}
+
+// Brauzerdən cari yeri alıb nişanı ora qoyur
+const goToMyLocation = () => {
+  if (!navigator.geolocation) {
+    message.value = 'Brauzer yeri müəyyən edə bilmir.'
+    isBad.value = true
+    return
+  }
+
+  isLocating.value = true
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      isLocating.value = false
+      lat.value = Number(position.coords.latitude.toFixed(6))
+      lng.value = Number(position.coords.longitude.toFixed(6))
+      apply()
+
+      message.value = 'Nişan sizin olduğunuz yerə qoyuldu.'
+      isBad.value = false
+    },
+    () => {
+      isLocating.value = false
+      message.value = 'Yer icazəsi verilmədi — nişanı əl ilə yerləşdirin.'
+      isBad.value = true
+    },
+    { enableHighAccuracy: true, timeout: 8000 },
+  )
 }
 
 // Ünvan → koordinat. Nominatim pulsuzdur, amma saniyədə bir sorğu limiti var,
@@ -197,11 +264,45 @@ watch(
   color: #a6969c;
 }
 
+.find-btn.undo {
+  color: #b06a2b;
+}
+
+.map-wrap {
+  position: relative;
+}
+
 .picker-map {
   height: 220px;
   border-radius: 10px;
   overflow: hidden;
   z-index: 0;
+}
+
+/* Xəritənin üstündə üzən düymə */
+.locate-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 400;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ece5e8;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(26, 17, 24, 0.18);
+  transition: all 0.15s;
+}
+
+.locate-btn:hover:not(:disabled) {
+  border-color: #dfb15b;
+  background: #fffdf7;
+}
+
+.locate-btn:disabled {
+  cursor: progress;
 }
 
 .coord-row {
