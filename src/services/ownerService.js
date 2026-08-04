@@ -29,6 +29,12 @@ const mapReservation = (r) => ({
   note: r.note,
   status: r.status,
   createdAt: r.createdAt,
+  seenAt: r.seenAt,
+  hallId: r.hallId,
+  menuId: r.menuId,
+
+  // Cavabsız əks-təklif varsa panel onu göstərir
+  counterOffer: (r.counterOffers ?? []).find((o) => o.status === 0) ?? null,
 })
 
 // GET /Reservations/GetForOwner — bütün sarayların rezervləri tək sorğu ilə,
@@ -161,6 +167,17 @@ export const setStaffActive = async (id, isActive) => {
 export const resetStaffPassword = async (id, newPassword) => {
   const { data } = await api.put(`/VenueStaff/ResetPassword/${id}`, { newPassword })
   return data.message
+}
+
+// PUT /Reservations/MarkSeen/{id} — müştəri «baxıldı» görsün
+export const markReservationSeen = async (id) => {
+  await api.put(`/Reservations/MarkSeen/${id}`)
+}
+
+// POST /Reservations/CreateCounterOffer — «rədd» əvəzinə başqa şərt təklif etmək
+export const createCounterOffer = async (dto) => {
+  const { data } = await api.post('/Reservations/CreateCounterOffer', dto)
+  return data.message ?? 'Əks-təklif göndərildi.'
 }
 
 // PUT /Reservations/UpdateStatus/{id} — 1 = təsdiqlə, 2 = rədd et

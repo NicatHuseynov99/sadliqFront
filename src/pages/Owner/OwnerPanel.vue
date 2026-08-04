@@ -267,10 +267,17 @@
 
             <p class="res-note" v-if="r.note">💬 {{ r.note }}</p>
 
+            <!-- Göndərilmiş, cavab gözləyən əks-təklif -->
+            <div v-if="r.counterOffer" class="offer-box">
+              <b>Əks-təklif göndərilib — müştəri cavab verməyib</b>
+              <span>{{ offerSummary(r) }}</span>
+              <em>{{ r.counterOffer.message }}</em>
+            </div>
+
             <footer class="res-foot">
               <span class="res-date">Sorğu tarixi: {{ formatDateFull(r.createdAt.slice(0, 10)) }}</span>
 
-              <div class="res-actions" v-if="r.status === 0">
+              <div class="res-actions" v-if="r.status === 0 || r.status === 5">
                 <el-popconfirm
                   title="Bu sorğunu rədd etmək istəyirsiniz?"
                   confirm-button-text="Bəli, rədd et"
@@ -281,6 +288,7 @@
                     <button class="reject-btn">Rədd et</button>
                   </template>
                 </el-popconfirm>
+                <button class="offer-btn" @click="openOffer(r)">Başqa şərt təklif et</button>
                 <button class="confirm-btn" @click="setStatus(r, 1)">Təsdiqlə</button>
               </div>
             </footer>
@@ -380,6 +388,16 @@
       </template>
     </el-dialog>
   </div>
+
+  <!-- Əks-təklif pəncərəsi -->
+  <CounterOfferDialog
+    v-if="offerReservation"
+    :reservation="offerReservation"
+    :halls="selectedVenue?.halls ?? []"
+    :menus="selectedVenue?.menus ?? []"
+    @close="offerReservation = null"
+    @sent="onOfferSent"
+  />
 </template>
 
 <script setup>
@@ -387,10 +405,13 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import VenueManager from '@/components/VenueManager.vue'
+import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
 import {
   getMyVenues,
   getOwnerReservations,
   getVenueReservations,
+  markReservationSeen,
+  createCounterOffer,
   updateReservationStatus,
   getMyStaff,
   createStaff,
@@ -512,10 +533,54 @@ const visible = computed(() =>
 )
 
 const statusText = (s) =>
-  ({ 0: 'Gözləyir', 1: 'Təsdiqlənib', 2: 'Rədd edilib', 3: 'Müştəri ləğv edib', 4: 'Vaxtı keçib' })[s] ?? '—'
+  ({
+    0: 'Gözləyir',
+    1: 'Təsdiqlənib',
+    2: 'Rədd edilib',
+    3: 'Müştəri ləğv edib',
+    4: 'Vaxtı keçib',
+    5: 'Təklif göndərilib',
+  })[s] ?? '—'
 
 const statusClass = (s) =>
-  ({ 0: 'pending', 1: 'confirmed', 2: 'rejected', 3: 'cancelled', 4: 'expired' })[s] ?? ''
+  ({ 0: 'pending', 1: 'confirmed', 2: 'rejected', 3: 'cancelled', 4: 'expired', 5: 'offered' })[s] ?? ''
+
+// ————— əks-təklif —————
+
+const offerReservation = ref(null)
+
+const openOffer = async (reservation) => {
+  offerReservation.value = reservation
+
+  // Sahib sorğunu açdı — müştəri «baxıldı» görsün
+  if (!reservation.seenAt) {
+    try {
+      await markReservationSeen(reservation.id)
+      reservation.seenAt = new Date().toISOString()
+    } catch {
+      // «baxıldı» qeydi kritik deyil, xəta axını dayandırmasın
+    }
+  }
+}
+
+// Göndərilmiş təklifin nəyi dəyişdiyini bir sətirdə yazır
+const offerSummary = (reservation) => {
+  const offer = reservation.counterOffer
+  if (!offer) return ''
+
+  const parts = []
+  if (offer.eventDate) parts.push(`tarix → ${formatDateFull(offer.eventDate)}`)
+  if (offer.hall?.name) parts.push(`zal → ${offer.hall.name}`)
+  if (offer.menu?.name) parts.push(`menyu → ${offer.menu.name}`)
+  if (offer.pricePerPerson) parts.push(`qiymət → ${offer.pricePerPerson} ₼`)
+
+  return parts.join(' · ')
+}
+
+const onOfferSent = async () => {
+  allReservations.value[selectedVenueId.value] = await getVenueReservations(selectedVenueId.value)
+  reservations.value = allReservations.value[selectedVenueId.value]
+}
 
 // Sorğunu təsdiqləyir və ya rədd edir, sonra siyahını yeniləyir
 const setStatus = async (reservation, status) => {
@@ -1427,6 +1492,7 @@ onMounted(load)
 .res-card.rejected { border-left-color: #c0392b; }
 .res-card.cancelled { border-left-color: #ced4da; }
 .res-card.expired { border-left-color: #d8c39a; }
+.res-card.offered { border-left-color: #7ba1d0; }
 
 .res-top {
   display: flex;
@@ -1460,6 +1526,7 @@ onMounted(load)
 .status-tag.rejected { background: #fdeaea; color: #c0392b; }
 .status-tag.cancelled { background: #f1f3f5; color: #868e96; }
 .status-tag.expired { background: #f4efe6; color: #8a6d3b; }
+.status-tag.offered { background: #eaf1fa; color: #2d5f9a; }
 
 .res-facts {
   display: grid;
@@ -1525,6 +1592,55 @@ onMounted(load)
 .res-actions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* «Rədd» ilə «Təsdiq» arasındakı üçüncü yol */
+.offer-btn {
+  background: #fff;
+  color: #2d5f9a;
+  border: 1px solid #cfdcec;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.87rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.offer-btn:hover {
+  background: #f4f8fd;
+  border-color: #2d5f9a;
+}
+
+/* Göndərilmiş, cavab gözləyən təklif */
+.offer-box {
+  background: #f4f8fd;
+  border: 1px solid #dde8f4;
+  border-radius: 10px;
+  padding: 10px 13px;
+  margin-bottom: 12px;
+}
+
+.offer-box b {
+  display: block;
+  font-size: 0.8rem;
+  color: #2d5f9a;
+  margin-bottom: 3px;
+}
+
+.offer-box span {
+  display: block;
+  font-size: 0.78rem;
+  color: #4a5b70;
+}
+
+.offer-box em {
+  display: block;
+  font-style: normal;
+  font-size: 0.76rem;
+  color: #6c757d;
+  margin-top: 4px;
 }
 
 .confirm-btn {

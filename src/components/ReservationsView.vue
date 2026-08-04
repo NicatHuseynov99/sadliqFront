@@ -110,6 +110,17 @@
               <span class="val">{{ formatDate(r.createdAt) }}</span>
               <span class="sub" v-if="r.customerEmail">{{ r.customerEmail }}</span>
             </div>
+
+            <!-- Saray tərəfdən kim açıb. Bizim baxışımız buraya düşmür. -->
+            <div class="res-col">
+              <span class="key">Saray tərəfdən baxan</span>
+              <span class="val" :class="{ dim: !r.seenByName }">
+                {{ r.seenByName ?? 'Hələ baxılmayıb' }}
+              </span>
+              <span class="sub" v-if="r.seenAt">
+                {{ r.seenByRole }} · {{ formatDate(r.seenAt) }}
+              </span>
+            </div>
           </div>
 
           <p v-if="r.note" class="note">“{{ r.note }}”</p>
@@ -672,6 +683,11 @@ onMounted(refresh)
   color: #8a6d3b;
 }
 
+.status-badge.offered {
+  background: #eaf1fa;
+  color: #2d5f9a;
+}
+
 .res-body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -695,6 +711,11 @@ onMounted(refresh)
   font-size: 0.85rem;
   color: #1a1118;
   font-weight: 600;
+}
+
+.val.dim {
+  color: #b0a2a8;
+  font-weight: 500;
 }
 
 .sub {

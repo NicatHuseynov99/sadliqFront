@@ -71,8 +71,49 @@
 
             <p class="res-note" v-if="r.note">💬 {{ r.note }}</p>
 
+            <!-- Sahibin göndərdiyi əks-təklif -->
+            <div v-if="r.counterOffer" class="offer-box">
+              <b>Saray başqa şərt təklif edir</b>
+              <ul class="offer-list">
+                <li v-if="r.counterOffer.eventDate">
+                  Tarix: <s>{{ formatDateFull(r.eventDate) }}</s>
+                  → <b>{{ formatDateFull(r.counterOffer.eventDate) }}</b>
+                </li>
+                <li v-if="r.counterOffer.hall?.name">
+                  Zal: <s>{{ r.hallName }}</s> → <b>{{ r.counterOffer.hall.name }}</b>
+                </li>
+                <li v-if="r.counterOffer.menu?.name">
+                  Menyu: <s>{{ r.menuName }}</s> → <b>{{ r.counterOffer.menu.name }}</b>
+                </li>
+                <li v-if="r.counterOffer.pricePerPerson">
+                  Razılaşdırılmış qiymət: <b>{{ r.counterOffer.pricePerPerson }} ₼ / nəfər</b>
+                </li>
+              </ul>
+
+              <p class="offer-message">{{ r.counterOffer.message }}</p>
+
+              <div class="offer-actions">
+                <el-popconfirm
+                  title="Təklif rədd edilsin? Sorğu bağlanacaq."
+                  confirm-button-text="Bəli, rədd et"
+                  cancel-button-text="Xeyr"
+                  @confirm="declineOffer(r)"
+                >
+                  <template #reference>
+                    <button class="cancel-btn">Rədd et</button>
+                  </template>
+                </el-popconfirm>
+                <button class="accept-btn" @click="acceptOffer(r)">Qəbul edirəm</button>
+              </div>
+            </div>
+
             <footer class="res-foot">
               <span class="res-contact">📞 {{ r.contactPhone }}</span>
+
+              <!-- Şəffaflıq: sorğunun sahib tərəfindən açılıb-açılmadığı -->
+              <span v-if="r.status === 0" class="seen-tag" :class="{ seen: r.seenAt }">
+                {{ r.seenAt ? '👁 Saray baxıb' : '⏳ Hələ baxılmayıb' }}
+              </span>
 
               <el-popconfirm
                 v-if="r.status === 0 || r.status === 1"
@@ -96,7 +137,12 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { ElNotification } from 'element-plus'
-import { getMyReservations, cancelReservation } from '@/services/reservationService'
+import {
+  acceptCounterOffer,
+  cancelReservation,
+  declineCounterOffer,
+  getMyReservations,
+} from '@/services/reservationService'
 import { formatDateFull } from '@/utils/date'
 
 const reservations = ref([])
@@ -108,6 +154,7 @@ const tabs = [
   { value: 0, label: 'Gözləyir', key: 'pending' },
   { value: 1, label: 'Təsdiqlənib', key: 'confirmed' },
   { value: 2, label: 'Rədd edilib', key: 'rejected' },
+  { value: 5, label: 'Təklif gəldi', key: 'offered' },
   { value: 3, label: 'Ləğv edilib', key: 'cancelled' },
 ]
 
@@ -136,12 +183,19 @@ const visible = computed(() =>
 
 // Backend ReservationStatus enum-una uyğun status mətnləri
 const statusText = (s) =>
-  ({ 0: 'Gözləyir', 1: 'Təsdiqlənib', 2: 'Rədd edilib', 3: 'Ləğv edilib', 4: 'Vaxtı keçib' })[s] ?? '—'
+  ({
+    0: 'Gözləyir',
+    1: 'Təsdiqlənib',
+    2: 'Rədd edilib',
+    3: 'Ləğv edilib',
+    4: 'Vaxtı keçib',
+    5: 'Təklif gəldi',
+  })[s] ?? '—'
 
 const statusClass = (s) =>
-  ({ 0: 'pending', 1: 'confirmed', 2: 'rejected', 3: 'cancelled', 4: 'expired' })[s] ?? ''
+  ({ 0: 'pending', 1: 'confirmed', 2: 'rejected', 3: 'cancelled', 4: 'expired', 5: 'offered' })[s] ?? ''
 
-const statusIcon = (s) => ({ 0: '⏳', 1: '✅', 2: '✕', 3: '🚫', 4: '⌛' })[s] ?? ''
+const statusIcon = (s) => ({ 0: '⏳', 1: '✅', 2: '✕', 3: '🚫', 4: '⌛', 5: '🔁' })[s] ?? ''
 
 // Tədbirə neçə gün qaldığını hesablayır (keçmiş tarixlərdə null qaytarır)
 const daysLeft = (r) => {
@@ -173,6 +227,25 @@ const cancel = async (r) => {
     })
   }
 }
+
+// Sahibin təklifini qəbul etmək və ya rədd etmək
+const respondToOffer = async (reservation, action) => {
+  try {
+    const message = await action(reservation.counterOffer.id)
+    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    await load()
+  } catch (e) {
+    ElNotification({
+      title: 'Xəta',
+      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
+      type: 'error',
+      zIndex: 99999,
+    })
+  }
+}
+
+const acceptOffer = (r) => respondToOffer(r, acceptCounterOffer)
+const declineOffer = (r) => respondToOffer(r, declineCounterOffer)
 
 const onImgError = (e) => {
   e.target.src = 'https://picsum.photos/seed/sadliq/600/400'
@@ -307,6 +380,80 @@ onMounted(load)
 .res-card.rejected { border-left-color: #c0392b; }
 .res-card.cancelled { border-left-color: #ced4da; }
 .res-card.expired { border-left-color: #d8c39a; }
+.res-card.offered { border-left-color: #7ba1d0; }
+
+/* Sahibin əks-təklifi */
+.offer-box {
+  background: #f4f8fd;
+  border: 1px solid #dde8f4;
+  border-radius: 11px;
+  padding: 12px 15px;
+  margin: 10px 0 4px;
+}
+
+.offer-box > b {
+  display: block;
+  font-size: 0.86rem;
+  color: #2d5f9a;
+  margin-bottom: 7px;
+}
+
+.offer-list {
+  margin: 0 0 8px;
+  padding-left: 17px;
+  font-size: 0.8rem;
+  color: #4a5b70;
+  line-height: 1.75;
+}
+
+.offer-list s {
+  color: #a6969c;
+}
+
+.offer-message {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  color: #6c757d;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.offer-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.accept-btn {
+  background: #1e7e34;
+  color: #fff;
+  border: none;
+  padding: 7px 18px;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.accept-btn:hover {
+  background: #17692b;
+}
+
+/* «Baxıldı» nişanı */
+.seen-tag {
+  font-size: 0.74rem;
+  color: #b06a2b;
+  background: #fdf6ec;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-right: auto;
+  margin-left: 10px;
+}
+
+.seen-tag.seen {
+  color: #217a41;
+  background: #f0f8f3;
+}
 
 .res-card.cancelled .res-thumb img,
 .res-card.rejected .res-thumb img {
@@ -361,6 +508,7 @@ onMounted(load)
 .status-tag.confirmed { background: #e3f6e8; color: #1e7e34; }
 .status-tag.rejected { background: #fdeaea; color: #c0392b; }
 .status-tag.cancelled { background: #f1f3f5; color: #868e96; }
+.status-tag.offered { background: #eaf1fa; color: #2d5f9a; }
 .status-tag.expired { background: #f4efe6; color: #8a6d3b; }
 
 /* Detal sətirləri */

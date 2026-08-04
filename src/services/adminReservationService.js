@@ -28,6 +28,7 @@ export const RESERVATION_STATUS = {
   rejected: 2,
   cancelled: 3,
   expired: 4,
+  counterOffered: 5,
 }
 
 // PUT /AdminReservations/Restore/{id} — silinmiş rezervi geri qaytarır
@@ -43,9 +44,10 @@ export const STATUS_FILTERS = [
   { value: 'Rejected', label: 'Rədd edilib' },
   { value: 'Cancelled', label: 'Ləğv edilib' },
   { value: 'Expired', label: 'Vaxtı keçib' },
+  { value: 'CounterOffered', label: 'Təklif göndərilib' },
   { value: 'Deleted', label: 'Silinmiş' },
 ]
 
 // Status kodunu rəng sinfinə çevirir
 export const statusClass = (status) =>
-  ({ 0: 'pending', 1: 'confirmed', 2: 'rejected', 3: 'cancelled', 4: 'expired' })[status] ?? 'pending'
+  ({ 0: 'pending', 1: 'confirmed', 2: 'rejected', 3: 'cancelled', 4: 'expired', 5: 'offered' })[status] ?? 'pending'

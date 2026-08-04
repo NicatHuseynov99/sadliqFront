@@ -22,6 +22,10 @@ const mapReservation = (r) => ({
   note: r.note,
   status: r.status,
   createdAt: r.createdAt,
+  seenAt: r.seenAt,
+
+  // Sahibin göndərdiyi, cavab gözləyən əks-təklif
+  counterOffer: (r.counterOffers ?? []).find((o) => o.status === 0) ?? null,
 })
 
 // POST /Reservations/Create — yeni rezerv sorğusu göndərir
@@ -48,4 +52,16 @@ export const getMyReservations = async () => {
 export const cancelReservation = async (id) => {
   const { data } = await api.put(`/Reservations/Cancel/${id}`)
   return { message: data.message ?? 'Rezerv ləğv edildi.' }
+}
+
+// PUT /Reservations/AcceptCounterOffer/{id} — sahibin təklifini qəbul edir
+export const acceptCounterOffer = async (offerId) => {
+  const { data } = await api.put(`/Reservations/AcceptCounterOffer/${offerId}`)
+  return data.message ?? 'Təklif qəbul edildi.'
+}
+
+// PUT /Reservations/DeclineCounterOffer/{id}
+export const declineCounterOffer = async (offerId) => {
+  const { data } = await api.put(`/Reservations/DeclineCounterOffer/${offerId}`)
+  return data.message ?? 'Təklif rədd edildi.'
 }
