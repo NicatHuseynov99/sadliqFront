@@ -149,6 +149,39 @@
       </div>
     </section>
 
+    <!-- Tərs axtarış: axtarmaq əvəzinə elan qoymaq.
+         Qonağa da, giriş etmiş müştəriyə də göstərilir — sahibkara yox. -->
+    <section v-if="!auth.isAuth || auth.isCustomer" class="reverse-banner">
+      <div class="rb-inner">
+        <div class="rb-text">
+          <span class="rb-badge">Yeni</span>
+          <h2>Axtarmaq əvəzinə elan qoyun</h2>
+          <p>
+            «Oktyabrda toy edirəm, 250 nəfər, nəfər başına 70 ₼» — bir dəfə yazın.
+            Uyğun saraylar <b>sizə təklif göndərsin</b>: tarix, zal, menyu və qiymətlə.
+            Təklifi təsdiqləyəndən sonra sarayla <b>birbaşa yazışırsınız</b> —
+            10 yerə zəng etmək lazım deyil.
+          </p>
+
+          <ol class="rb-steps">
+            <li><span>1</span> Şərtlərinizi yazın</li>
+            <li><span>2</span> Saraylar təklif göndərir</li>
+            <li><span>3</span> Təsdiqləyib yazışırsınız</li>
+            <li><span>4</span> Bəyəndiyinizi seçirsiniz</li>
+          </ol>
+        </div>
+
+        <div class="rb-action">
+          <router-link :to="auth.isAuth ? '/sorgularim' : '/login'">
+            <button class="rb-btn">
+              {{ auth.isAuth ? 'Sorğu paylaş' : 'Daxil ol və sorğu paylaş' }}
+            </button>
+          </router-link>
+          <span class="rb-note">Pulsuzdur · sorğu 7 gün açıq qalır</span>
+        </div>
+      </div>
+    </section>
+
     <!-- Restoranlar Siyahısı -->
     <section class="venues-container" v-loading="isLoading">
       <div class="results-header">
@@ -526,6 +559,132 @@ const selectVenue = (venue) => {
 </script>
 
 <style scoped>
+
+/* Tərs axtarış banneri */
+.reverse-banner {
+  max-width: 1240px;
+  margin: 26px auto 0;
+  padding: 0 20px;
+}
+
+.rb-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  background: linear-gradient(135deg, #1a1118 0%, #4a1026 55%, #721438 100%);
+  border-radius: 20px;
+  padding: 26px 32px;
+  color: #fff;
+  flex-wrap: wrap;
+}
+
+.rb-badge {
+  display: inline-block;
+  background: #dfb15b;
+  color: #1a1118;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 9px;
+}
+
+.rb-text h2 {
+  margin: 0 0 8px;
+  font-size: 1.42rem;
+  color: #fff;
+}
+
+.rb-text p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #e6d8dd;
+  max-width: 620px;
+}
+
+.rb-text p b {
+  color: #f3dfa8;
+  font-weight: 600;
+}
+
+.rb-steps {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.rb-steps li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.79rem;
+  color: #d8c6cc;
+}
+
+.rb-steps span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(223, 177, 91, 0.2);
+  color: #dfb15b;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rb-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rb-btn {
+  background: #dfb15b;
+  color: #1a1118;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s;
+}
+
+.rb-btn:hover {
+  background: #ecc272;
+  transform: translateY(-1px);
+}
+
+.rb-note {
+  font-size: 0.72rem;
+  color: #bda9b1;
+}
+
+@media (max-width: 820px) {
+  .rb-inner {
+    padding: 22px;
+  }
+
+  .rb-action {
+    width: 100%;
+  }
+
+  .rb-btn {
+    width: 100%;
+  }
+}
 .site-wrapper {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #2c3e50;

@@ -56,6 +56,12 @@ const routes = [
     meta: { requiresAuth: true, roles: ['Customer'], track: 'reservations' },
   },
   {
+    path: '/sorgularim',
+    name: 'my-requests',
+    component: () => import('@/pages/Requests/MyRequests.vue'),
+    meta: { requiresAuth: true, roles: ['Customer'], track: 'requests' },
+  },
+  {
     // Sahibkar müraciəti — giriş tələb olunmur, hesab elə burada açılır
     path: '/saray-elave-et',
     name: 'venue-register',

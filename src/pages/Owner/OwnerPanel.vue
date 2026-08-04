@@ -35,6 +35,12 @@
         <button class="section-tab" :class="{ active: section === 'reservations' }" @click="section = 'reservations'">
           Rezerv sorğuları
         </button>
+        <button class="section-tab" :class="{ active: section === 'requests' }" @click="section = 'requests'">
+          Açıq sorğular
+        </button>
+        <button class="section-tab" :class="{ active: section === 'offers' }" @click="section = 'offers'">
+          Təkliflərim
+        </button>
         <button class="section-tab" :class="{ active: section === 'venues' }" @click="section = 'venues'">
           {{ auth.canEditVenues ? 'Saraylarım' : 'Zallarım' }} <em>{{ venues.length }}</em>
         </button>
@@ -53,6 +59,12 @@
         <h3>Hələ sarayınız yoxdur.</h3>
         <p>Saray əlavə olunduqdan sonra rezerv sorğuları burada görünəcək.</p>
       </div>
+
+      <!-- Müştəri sorğuları: təklif göndərmək imkanı -->
+      <OpenRequests v-else-if="section === 'requests'" />
+
+      <!-- Göndərilmiş təkliflər və yazışmalar -->
+      <MyOffers v-else-if="section === 'offers'" />
 
       <!-- Saraylarım bölməsi -->
       <VenueManager
@@ -406,6 +418,8 @@ import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import VenueManager from '@/components/VenueManager.vue'
 import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
+import OpenRequests from '@/components/OpenRequests.vue'
+import MyOffers from '@/components/MyOffers.vue'
 import {
   getMyVenues,
   getOwnerReservations,

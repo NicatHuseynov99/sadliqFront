@@ -9,6 +9,7 @@
       <router-link v-if="auth.canManageVenues" to="/panel" class="panel-link">🏛 Saraylar</router-link>
       <router-link v-if="auth.isCustomer" to="/favorites">♥ Seçilmişlər</router-link>
       <router-link v-if="auth.isCustomer" to="/my-reservations">Rezervlərim</router-link>
+      <router-link v-if="auth.isCustomer" to="/sorgularim">Sorğularım</router-link>
     </nav>
 
     <div class="user-box" v-if="auth.isAuth">
