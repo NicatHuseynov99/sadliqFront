@@ -136,12 +136,12 @@ const visible = computed(() =>
 
 // Backend ReservationStatus enum-una uyğun status mətnləri
 const statusText = (s) =>
-  ({ 0: 'Gözləyir', 1: 'Təsdiqlənib', 2: 'Rədd edilib', 3: 'Ləğv edilib' })[s] ?? '—'
+  ({ 0: 'Gözləyir', 1: 'Təsdiqlənib', 2: 'Rədd edilib', 3: 'Ləğv edilib', 4: 'Vaxtı keçib' })[s] ?? '—'
 
 const statusClass = (s) =>
-  ({ 0: 'pending', 1: 'confirmed', 2: 'rejected', 3: 'cancelled' })[s] ?? ''
+  ({ 0: 'pending', 1: 'confirmed', 2: 'rejected', 3: 'cancelled', 4: 'expired' })[s] ?? ''
 
-const statusIcon = (s) => ({ 0: '⏳', 1: '✅', 2: '✕', 3: '🚫' })[s] ?? ''
+const statusIcon = (s) => ({ 0: '⏳', 1: '✅', 2: '✕', 3: '🚫', 4: '⌛' })[s] ?? ''
 
 // Tədbirə neçə gün qaldığını hesablayır (keçmiş tarixlərdə null qaytarır)
 const daysLeft = (r) => {
@@ -306,6 +306,7 @@ onMounted(load)
 .res-card.confirmed { border-left-color: #1e7e34; }
 .res-card.rejected { border-left-color: #c0392b; }
 .res-card.cancelled { border-left-color: #ced4da; }
+.res-card.expired { border-left-color: #d8c39a; }
 
 .res-card.cancelled .res-thumb img,
 .res-card.rejected .res-thumb img {
@@ -360,6 +361,7 @@ onMounted(load)
 .status-tag.confirmed { background: #e3f6e8; color: #1e7e34; }
 .status-tag.rejected { background: #fdeaea; color: #c0392b; }
 .status-tag.cancelled { background: #f1f3f5; color: #868e96; }
+.status-tag.expired { background: #f4efe6; color: #8a6d3b; }
 
 /* Detal sətirləri */
 .res-facts {

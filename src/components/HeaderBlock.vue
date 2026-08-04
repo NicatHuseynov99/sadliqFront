@@ -12,6 +12,7 @@
     </nav>
 
     <div class="user-box" v-if="auth.isAuth">
+      <NotificationBell />
       <router-link to="/profile" class="user-name">👤 {{ auth.user?.fullName }}</router-link>
       <button class="ghost-btn" @click="auth.logout()">Çıxış</button>
     </div>
@@ -27,7 +28,8 @@
 </template>
 
 <script setup>
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore } from "@/store/auth"
+import NotificationBell from "@/components/NotificationBell.vue"
 
 const auth = useAuthStore()
 </script>

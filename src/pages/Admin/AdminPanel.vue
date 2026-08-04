@@ -42,6 +42,7 @@
       <ReviewsView v-else-if="section === 'reviews'" />
       <ReservationsView v-else-if="section === 'bookings'" />
       <SettingsView v-else-if="section === 'settings'" />
+      <NotificationSender v-else-if="section === 'notify'" />
       <VenuesView
         v-else-if="section === 'venues'"
         :edit-venue-id="editVenueId"
@@ -315,6 +316,7 @@ import VisitorsView from '@/components/VisitorsView.vue'
 import ReviewsView from '@/components/ReviewsView.vue'
 import ReservationsView from '@/components/ReservationsView.vue'
 import SettingsView from '@/components/SettingsView.vue'
+import NotificationSender from '@/components/NotificationSender.vue'
 import VenuesView from '@/components/VenuesView.vue'
 import DataView from '@/components/DataView.vue'
 import VenueReview from '@/components/VenueReview.vue'
@@ -390,6 +392,7 @@ const tabs = computed(() => [
   { value: 'bookings', label: 'Rezervlər', icon: '📅', badge: stats.value.pendingReservations || 0 },
   { value: 'reviews', label: 'Rəylər', icon: '⭐' },
   { value: 'visitors', label: 'Ziyarətçilər', icon: '👣' },
+  { value: 'notify', label: 'Bildiriş göndər', icon: '📣' },
   { value: 'audit', label: 'Jurnal', icon: '📜' },
   { value: 'settings', label: 'Parametrlər', icon: '⚙️' },
 

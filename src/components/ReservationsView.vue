@@ -667,6 +667,11 @@ onMounted(refresh)
   color: #6c757d;
 }
 
+.status-badge.expired {
+  background: #f4efe6;
+  color: #8a6d3b;
+}
+
 .res-body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
