@@ -110,10 +110,13 @@
             <footer class="res-foot">
               <span class="res-contact">📞 {{ r.contactPhone }}</span>
 
-              <!-- Şəffaflıq: sorğunun sahib tərəfindən açılıb-açılmadığı -->
+              <!-- Şəffaflıq: sorğunun sahib tərəfindən açılıb-açılmadığı
+                   və cavaba nə qədər vaxt qaldığı -->
               <span v-if="r.status === 0" class="seen-tag" :class="{ seen: r.seenAt }">
                 {{ r.seenAt ? '👁 Saray baxıb' : '⏳ Hələ baxılmayıb' }}
               </span>
+
+              <span v-if="holdLeft(r)" class="hold-tag">⏱ Cavaba {{ holdLeft(r) }} qalıb</span>
 
               <el-popconfirm
                 v-if="r.status === 0 || r.status === 1"
@@ -204,6 +207,16 @@ const daysLeft = (r) => {
   today.setHours(0, 0, 0, 0)
   const diff = Math.round((new Date(r.eventDate) - today) / 86400000)
   return diff < 0 ? null : diff
+}
+
+// Tarix nə vaxta qədər tutulub: cavab gəlməsə həmin an boşalır
+const holdLeft = (r) => {
+  if (!r.holdExpiresAt || (r.status !== 0 && r.status !== 5)) return ''
+
+  const hours = Math.round((new Date(r.holdExpiresAt) - Date.now()) / 3600000)
+  if (hours <= 0) return ''
+
+  return hours < 24 ? `${hours} saat` : `${Math.round(hours / 24)} gün`
 }
 
 const daysLeftText = (r) => {
@@ -448,6 +461,15 @@ onMounted(load)
   border-radius: 20px;
   margin-right: auto;
   margin-left: 10px;
+}
+
+.hold-tag {
+  font-size: 0.74rem;
+  color: #2d5f9a;
+  background: #eef4fb;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-right: 10px;
 }
 
 .seen-tag.seen {

@@ -23,6 +23,7 @@ const mapReservation = (r) => ({
   status: r.status,
   createdAt: r.createdAt,
   seenAt: r.seenAt,
+  holdExpiresAt: r.holdExpiresAt,
 
   // Sahibin göndərdiyi, cavab gözləyən əks-təklif
   counterOffer: (r.counterOffers ?? []).find((o) => o.status === 0) ?? null,

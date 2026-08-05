@@ -86,6 +86,28 @@
               </div>
             </el-form>
           </section>
+
+          <!-- Bildiriş seçimləri -->
+          <section class="form-card">
+            <h2 class="card-title">Bildirişlər</h2>
+            <p class="card-sub">
+              Rezervinizlə bağlı bildirişlər həmişə gəlir — onlar xidmətin bir hissəsidir.
+              Söndürə biləcəyiniz yalnız elanlardır.
+            </p>
+
+            <label class="switch-row">
+              <div>
+                <b>Elanlar və kampaniyalar</b>
+                <span>Endirimlər, yeni imkanlar, mövsümi təkliflər</span>
+              </div>
+              <el-switch v-model="prefs.allowAnnouncements" @change="savePrefs" />
+            </label>
+
+            <div class="prefs-note">
+              <b>Həmişə gələnlər:</b> rezervin təsdiqi və rəddi, sarayın əks-təklifi,
+              tarixin bağlanması, sorğunuza gələn təkliflər və yazışma mesajları.
+            </div>
+          </section>
         </div>
       </div>
     </div>
@@ -93,10 +115,11 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import { formatDateFull } from '@/utils/date'
+import { getPreferences, updatePreferences } from '@/services/notificationService'
 
 const auth = useAuthStore()
 
@@ -190,6 +213,28 @@ const savePassword = async () => {
     isSavingPassword.value = false
   }
 }
+
+// ————— bildiriş seçimləri —————
+
+const prefs = reactive({ allowAnnouncements: true, allowEmail: true, allowSms: true })
+
+const savePrefs = async () => {
+  try {
+    const result = await updatePreferences({ ...prefs })
+    ElNotification({ title: 'Uğurlu', message: result.message, type: 'success', zIndex: 99999 })
+  } catch (e) {
+    ElNotification({
+      title: 'Xəta',
+      message: e?.userMessage ?? e?.message ?? 'Seçim saxlanmadı',
+      type: 'error',
+      zIndex: 99999,
+    })
+  }
+}
+
+onMounted(async () => {
+  Object.assign(prefs, await getPreferences())
+})
 </script>
 
 <style scoped>
@@ -345,6 +390,42 @@ const savePassword = async () => {
   margin: 0 0 4px;
   font-size: 1.15rem;
   color: #1a1118;
+}
+
+/* Bildiriş seçimi sətri */
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #f4eef0;
+  cursor: pointer;
+}
+
+.switch-row b {
+  display: block;
+  font-size: 0.87rem;
+  color: #1a1118;
+}
+
+.switch-row span {
+  font-size: 0.78rem;
+  color: #868e96;
+}
+
+.prefs-note {
+  margin-top: 8px;
+  background: #fbf8f9;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 0.78rem;
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+.prefs-note b {
+  color: #4a3f44;
 }
 
 .card-sub {
