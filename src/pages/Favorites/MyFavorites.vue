@@ -11,6 +11,26 @@
         <router-link to="/" class="new-link">Saraylara bax</router-link>
       </header>
 
+      <!-- Seçilmişlərin xülasəsi: qərar vermək üçün lazım olan üç rəqəm -->
+      <div v-if="venues.length" class="fav-summary">
+        <div class="fs-item">
+          <span class="fs-value">{{ priceRange }}</span>
+          <span class="fs-label">qiymət aralığı, nəfər başına</span>
+        </div>
+        <div class="fs-item">
+          <span class="fs-value">{{ capacityRange }}</span>
+          <span class="fs-label">tutum aralığı</span>
+        </div>
+        <div class="fs-item" :class="{ warn: withoutFreeDate > 0 }">
+          <span class="fs-value">{{ withoutFreeDate }}</span>
+          <span class="fs-label">sarayda yaxın 4 ayda boş tarix yoxdur</span>
+        </div>
+
+        <button class="fs-btn" :disabled="venues.length < 2" @click="compareAll">
+          Hamısını müqayisə et
+        </button>
+      </div>
+
       <div v-if="!isLoading && venues.length === 0" class="no-result">
         <div class="empty-icon">🤍</div>
         <h3>Hələ seçilmiş sarayınız yoxdur.</h3>
@@ -24,20 +44,31 @@
           :key="venue.id"
           :venue="venue"
           :is-favorite="true"
+          :is-compared="compareMap.has(venue.id)"
           :nearest-date="nearestDates[venue.id]"
           @select="selectVenue"
           @toggle-favorite="onRemove"
+          @toggle-compare="toggleCompare"
         />
       </div>
     </div>
+
+    <VenueCompare
+      v-if="compareOpen && compareVenues.length > 1"
+      :venues="compareVenues"
+      @close="compareOpen = false"
+      @remove="toggleCompare"
+      @open="selectVenue"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
 import VenueCard from '@/components/VenueCard.vue'
+import VenueCompare from '@/components/VenueCompare.vue'
 import { getMyFavorites, toggleFavorite } from '@/services/favoriteService'
 import { getNearestFreeDate } from '@/services/venueService'
 
@@ -46,6 +77,76 @@ const router = useRouter()
 const venues = ref([])
 const nearestDates = ref({})
 const isLoading = ref(false)
+
+// ————— müqayisə —————
+
+const compareMap = reactive(new Map())
+const compareOpen = ref(false)
+
+const compareVenues = computed(() => [...compareMap.values()])
+
+const toggleCompare = (venue) => {
+  if (compareMap.has(venue.id)) {
+    compareMap.delete(venue.id)
+    if (compareMap.size < 2) compareOpen.value = false
+    return
+  }
+
+  if (compareMap.size >= 3) {
+    ElNotification({
+      title: 'Diqqət',
+      message: 'Eyni anda ən çox 3 sarayı müqayisə etmək olar.',
+      type: 'warning',
+      zIndex: 99999,
+    })
+    return
+  }
+
+  compareMap.set(venue.id, venue)
+  if (compareMap.size >= 2) compareOpen.value = true
+}
+
+// Seçilmişlərin hamısını (ilk üçünü) bir kliklə müqayisə edir
+const compareAll = () => {
+  compareMap.clear()
+  venues.value.slice(0, 3).forEach((v) => compareMap.set(v.id, v))
+  compareOpen.value = true
+}
+
+// ————— xülasə —————
+
+const minPriceOf = (v) => {
+  const menus = v.menus ?? []
+  return menus.length ? Math.min(...menus.map((m) => m.pricePerPerson)) : 0
+}
+
+const maxCapacityOf = (v) => {
+  const halls = v.halls ?? []
+  return halls.length ? Math.max(...halls.map((h) => h.capacity)) : 0
+}
+
+const priceRange = computed(() => {
+  const prices = venues.value.map(minPriceOf).filter(Boolean)
+  if (!prices.length) return '—'
+
+  const min = Math.min(...prices)
+  const max = Math.max(...prices)
+  return min === max ? `${min} ₼` : `${min}–${max} ₼`
+})
+
+const capacityRange = computed(() => {
+  const sizes = venues.value.map(maxCapacityOf).filter(Boolean)
+  if (!sizes.length) return '—'
+
+  const min = Math.min(...sizes)
+  const max = Math.max(...sizes)
+  return min === max ? `${min} nəfər` : `${min}–${max} nəfər`
+})
+
+// Boş tarixi olmayanlar: seçilmişlərdə qalmağın mənası azdır
+const withoutFreeDate = computed(
+  () => venues.value.filter((v) => !nearestDates.value[v.id]).length,
+)
 
 // Seçilmiş sarayları yükləyir və hər biri üçün ən yaxın boş tarixi hesablayır
 const load = async () => {
@@ -65,6 +166,7 @@ const onRemove = async (venue) => {
   try {
     await toggleFavorite(venue.id)
     venues.value = venues.value.filter((v) => v.id !== venue.id)
+    compareMap.delete(venue.id)
     ElNotification({
       title: 'Silindi',
       message: `${venue.name} seçilmişlərdən çıxarıldı.`,
@@ -135,6 +237,61 @@ onMounted(load)
 
 .new-link:hover {
   background: #590f2b;
+}
+
+/* Seçilmişlərin xülasə sətri */
+.fav-summary {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap;
+}
+
+.fs-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.fs-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #721438;
+  line-height: 1.2;
+}
+
+.fs-label {
+  font-size: 0.74rem;
+  color: #868e96;
+}
+
+.fs-item.warn .fs-value {
+  color: #a02c4a;
+}
+
+.fs-btn {
+  margin-left: auto;
+  background: #2d5f9a;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fs-btn:hover:not(:disabled) {
+  background: #24507f;
+}
+
+.fs-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .venues-grid {
