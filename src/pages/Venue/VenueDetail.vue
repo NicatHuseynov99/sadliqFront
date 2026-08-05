@@ -223,7 +223,7 @@
 
       <!-- Rəy yazma / redaktə formu -->
       <div class="review-form" ref="reviewFormRef">
-        <template v-if="auth.isAuth">
+        <template v-if="auth.isAuth && (canReview.canReview || editingId)">
           <h4>{{ editingId ? 'Rəyi redaktə edin' : 'Rəyinizi yazın' }}</h4>
 
           <div class="star-picker">
@@ -260,6 +260,15 @@
           </div>
         </template>
 
+        <!-- Rəy yalnız tədbiri keçmiş qonaqdan qəbul olunur — səbəbi burada yazılır -->
+        <div v-else-if="auth.isAuth" class="review-locked">
+          <span class="lock-icon">🔒</span>
+          <div>
+            <b>{{ canReview.reason || 'Bu saraya rəy yaza bilmirsiniz.' }}</b>
+            <span>Reytinqin dəyəri budur: yalnız orada tədbir keçirmiş qonaqlar yaza bilir.</span>
+          </div>
+        </div>
+
         <div v-else class="review-login">
           <span>Rəy yazmaq üçün hesabınıza daxil olun.</span>
           <router-link to="/login"><button class="reserve-btn">Daxil ol</button></router-link>
@@ -272,6 +281,9 @@
             <span class="review-author">
               {{ r.author }}
               <em v-if="isMine(r)" class="mine-tag">siz</em>
+              <em v-if="r.isVerifiedGuest" class="verified-tag" title="Bu saraydakı tədbiri keçmiş qonaq">
+                ✓ təsdiqlənmiş qonaq
+              </em>
             </span>
             <span class="review-stars">{{ '★'.repeat(r.rating) }}{{ '☆'.repeat(5 - r.rating) }}</span>
           </div>
@@ -437,7 +449,13 @@ import AddressLink from '@/components/AddressLink.vue'
 import MiniMap from '@/components/MiniMap.vue'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
 import { getVenueById, toDateKey } from '@/services/venueService'
-import { getVenueReviews, createReview, updateReview, deleteReview } from '@/services/reviewService'
+import {
+  getVenueReviews,
+  createReview,
+  updateReview,
+  deleteReview,
+  canReviewVenue,
+} from '@/services/reviewService'
 import { reportReview, REPORT_REASONS } from '@/services/reviewModerationService'
 import { formatDate, formatDateFull, weekdayShort, MONTHS } from '@/utils/date'
 import { createReservation } from '@/services/reservationService'
@@ -523,6 +541,20 @@ const reviewError = ref('')
 const editingId = ref(null)
 const reviewFormRef = ref(null)
 const reviewForm = reactive({ rating: 5, comment: '' })
+
+// Rəy yaza bilirmi və yaza bilmirsə səbəbi
+const canReview = ref({ canReview: false, reason: '' })
+
+const loadEligibility = async () => {
+  if (!auth.isAuth || !venue.value?.id) return
+
+  try {
+    canReview.value = await canReviewVenue(venue.value.id)
+  } catch {
+    // Yoxlama alınmasa forma bağlı qalır — yazmağa cəhd onsuz da serverdə yoxlanılır
+    canReview.value = { canReview: false, reason: '' }
+  }
+}
 
 const reserveVisible = ref(false)
 const selectedHall = ref(null)
@@ -846,7 +878,10 @@ const onImgError = (e) => {
   e.target.src = 'https://picsum.photos/seed/sadliq/900/600'
 }
 
-onMounted(loadVenue)
+onMounted(async () => {
+  await loadVenue()
+  await loadEligibility()
+})
 </script>
 
 <style scoped>
@@ -1772,6 +1807,30 @@ onMounted(loadVenue)
   text-decoration: underline;
 }
 
+/* Rəy yaza bilməyənə səbəb izah olunur */
+.review-locked {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.review-locked .lock-icon {
+  font-size: 1.1rem;
+}
+
+.review-locked b {
+  display: block;
+  font-size: 0.88rem;
+  color: #1a1118;
+  margin-bottom: 3px;
+}
+
+.review-locked span {
+  font-size: 0.8rem;
+  color: #868e96;
+  line-height: 1.55;
+}
+
 .review-login {
   display: flex;
   align-items: center;
@@ -1783,6 +1842,19 @@ onMounted(loadVenue)
 
 .review-login a {
   text-decoration: none;
+}
+
+/* Tədbiri keçmiş qonaq nişanı — reytinqin dəyəri buna söykənir */
+.verified-tag {
+  background: #e9f6ee;
+  color: #217a41;
+  font-style: normal;
+  font-size: 0.67rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 6px;
+  white-space: nowrap;
 }
 
 .mine-tag {

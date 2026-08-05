@@ -36,3 +36,9 @@ export const deleteReview = async (id) => {
   const { data } = await api.delete(`/Reviews/Delete/${id}`)
   return { message: data.message ?? 'Rəy silindi.' }
 }
+
+// GET /Reviews/CanReview/{venueId} — forma göstərilməzdən əvvəl yoxlanılır
+export const canReviewVenue = async (venueId) => {
+  const { data } = await api.get(`/Reviews/CanReview/${venueId}`)
+  return data.data ?? { canReview: false, reason: '' }
+}

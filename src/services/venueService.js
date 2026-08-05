@@ -25,6 +25,7 @@ export const mapVenue = (v) => {
     rating: r.rating,
     text: r.comment,
     date: (r.createdAt ?? '').slice(0, 10),
+    isVerifiedGuest: r.isVerifiedGuest ?? false,
   }))
 
   const rating = reviews.length
