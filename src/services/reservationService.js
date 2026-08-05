@@ -11,6 +11,7 @@ const mapReservation = (r) => ({
   venueName: r.venue?.name ?? '',
   venueCity: r.venue?.city ?? '',
   venueImage: r.venue?.coverImageUrl ?? '',
+  venuePhone: r.venue?.phone ?? '',
   hallId: r.hallId,
   hallName: r.hall?.name ?? '',
   menuId: r.menuId,

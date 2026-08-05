@@ -9,6 +9,9 @@
         <router-link to="/" class="new-link">+ Yeni rezerv</router-link>
       </header>
 
+      <!-- Yaxınlaşan təsdiqlənmiş tədbir: kabinet -->
+      <WeddingBoard v-if="upcoming" :reservation="upcoming" />
+
       <!-- Statuslara görə xülasə -->
       <div class="summary" v-if="reservations.length">
         <button
@@ -147,6 +150,7 @@ import {
   getMyReservations,
 } from '@/services/reservationService'
 import { formatDateFull } from '@/utils/date'
+import WeddingBoard from '@/components/WeddingBoard.vue'
 
 const reservations = ref([])
 const isLoading = ref(false)
@@ -170,6 +174,18 @@ const load = async () => {
     isLoading.value = false
   }
 }
+
+// Ən yaxın təsdiqlənmiş tədbir — kabinetdə göstərilir
+const upcoming = computed(() => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  return (
+    reservations.value
+      .filter((r) => r.status === 1 && new Date(r.eventDate) >= today)
+      .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate))[0] ?? null
+  )
+})
 
 // Hər status üçün rezerv sayı (xülasə kartlarında göstərilir)
 const counts = computed(() => {
