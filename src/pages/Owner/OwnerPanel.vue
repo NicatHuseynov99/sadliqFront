@@ -35,6 +35,9 @@
         <button class="section-tab" :class="{ active: section === 'reservations' }" @click="section = 'reservations'">
           Rezerv sorğuları
         </button>
+        <button class="section-tab" :class="{ active: section === 'stats' }" @click="section = 'stats'">
+          Statistika
+        </button>
         <button class="section-tab" :class="{ active: section === 'requests' }" @click="section = 'requests'">
           Açıq sorğular
         </button>
@@ -59,6 +62,9 @@
         <h3>Hələ sarayınız yoxdur.</h3>
         <p>Saray əlavə olunduqdan sonra rezerv sorğuları burada görünəcək.</p>
       </div>
+
+      <!-- Sahibkarın hesabatı -->
+      <OwnerStats v-else-if="section === 'stats'" />
 
       <!-- Müştəri sorğuları: təklif göndərmək imkanı -->
       <OpenRequests v-else-if="section === 'requests'" />
@@ -420,6 +426,7 @@ import VenueManager from '@/components/VenueManager.vue'
 import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
 import OpenRequests from '@/components/OpenRequests.vue'
 import MyOffers from '@/components/MyOffers.vue'
+import OwnerStats from '@/components/OwnerStats.vue'
 import {
   getMyVenues,
   getOwnerReservations,

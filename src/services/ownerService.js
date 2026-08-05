@@ -185,3 +185,9 @@ export const updateReservationStatus = async (id, status) => {
   const { data } = await api.put(`/Reservations/UpdateStatus/${id}`, { status })
   return data.message ?? 'Status yeniləndi.'
 }
+
+// GET /OwnerStats/Get — sahibkarın hesabatı
+export const getOwnerStats = async (days = 30, venueId = null) => {
+  const { data } = await api.get('/OwnerStats/Get', { params: { days, venueId } })
+  return data.data ?? []
+}

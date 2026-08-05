@@ -4,6 +4,16 @@
       <img :src="venue.coverImageUrl" :alt="venue.name" class="venue-img" @error="onImgError" />
       <span class="badge">{{ venue.city }}</span>
 
+      <!-- Müqayisə seçimi: müştəri 2-3 sarayı yan-yana qoya bilir -->
+      <button
+        class="cmp-btn"
+        :class="{ on: isCompared }"
+        :title="isCompared ? 'Müqayisədən çıxar' : 'Müqayisəyə əlavə et'"
+        @click.stop="$emit('toggle-compare', venue)"
+      >
+        ⇄
+      </button>
+
       <button
         class="fav-btn"
         :aria-pressed="isFavorite"
@@ -86,10 +96,11 @@ import { formatDate } from '@/utils/date'
 const props = defineProps({
   venue: { type: Object, required: true },
   isFavorite: { type: Boolean, default: false },
+  isCompared: { type: Boolean, default: false },
   nearestDate: { type: [String, null], default: undefined },
 })
 
-defineEmits(['select', 'toggle-favorite'])
+defineEmits(["select", "toggle-favorite", "toggle-compare"])
 
 // Kartda göstərilən minimum menyu qiyməti
 const minPrice = computed(() => {
@@ -143,6 +154,36 @@ const onImgError = (e) => {
   border-radius: 4px;
   font-weight: 600;
   letter-spacing: 0.03em;
+}
+
+/* Müqayisə düyməsi ürəyin altında durur */
+.cmp-btn {
+  position: absolute;
+  top: 52px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  color: #adb5bd;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s;
+  z-index: 2;
+}
+
+.cmp-btn:hover {
+  color: #2d5f9a;
+  transform: scale(1.08);
+}
+
+.cmp-btn.on {
+  background: #2d5f9a;
+  color: #fff;
 }
 
 .fav-btn {

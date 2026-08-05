@@ -229,9 +229,11 @@
           :key="venue.id"
           :venue="venue"
           :is-favorite="favoriteIds.has(venue.id)"
+          :is-compared="isCompared(venue.id)"
           :nearest-date="nearestDates[venue.id]"
           @select="selectVenue"
           @toggle-favorite="onToggleFavorite"
+          @toggle-compare="toggleCompare"
         />
       </div>
 
@@ -246,13 +248,37 @@
       </div>
       </template>
     </section>
+    <!-- Müqayisə üçün seçilənlər: səhifənin altında üzən sətir -->
+    <div v-if="compareMap.size" class="cmp-bar">
+      <span class="cmp-count">{{ compareMap.size }} saray seçildi</span>
+
+      <div class="cmp-names">
+        <span v-for="v in compareVenues" :key="v.id" class="cmp-name">
+          {{ v.name }}
+          <button @click="toggleCompare(v)">✕</button>
+        </span>
+      </div>
+
+      <button class="cmp-clear" @click="clearCompare">Təmizlə</button>
+      <button class="cmp-open" :disabled="compareMap.size < 2" @click="compareOpen = true">
+        Müqayisə et
+      </button>
+    </div>
+
+    <VenueCompare
+      v-if="compareOpen && compareVenues.length"
+      :venues="compareVenues"
+      @close="compareOpen = false"
+      @remove="toggleCompare"
+      @open="selectVenue"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElNotification } from 'element-plus'
+import { ElMessage, ElNotification } from 'element-plus'
 import VenueCard from '@/components/VenueCard.vue'
 import VenueMap from '@/components/VenueMap.vue'
 import {
@@ -265,8 +291,39 @@ import {
 import { getMyFavoriteIds, toggleFavorite } from '@/services/favoriteService'
 import { trackPage } from '@/services/visitService'
 import { useAuthStore } from '@/store/auth'
+import VenueCompare from '@/components/VenueCompare.vue'
 
 const PAGE_SIZE = 12
+
+// Müqayisəyə seçilənlər. Sarayın özü saxlanılır, təkcə nömrəsi yox:
+// süzgəc dəyişib saray siyahıdan çıxsa da, seçim yerində qalır.
+const compareMap = reactive(new Map())
+const compareOpen = ref(false)
+
+const compareVenues = computed(() => [...compareMap.values()])
+
+const isCompared = (id) => compareMap.has(id)
+
+const toggleCompare = (venue) => {
+  if (compareMap.has(venue.id)) {
+    compareMap.delete(venue.id)
+    if (compareMap.size < 2) compareOpen.value = false
+    return
+  }
+
+  // Üçdən çox saray yan-yana oxunmur
+  if (compareMap.size >= 3) {
+    ElMessage.warning('Eyni anda ən çox 3 sarayı müqayisə etmək olar.')
+    return
+  }
+
+  compareMap.set(venue.id, venue)
+}
+
+const clearCompare = () => {
+  compareMap.clear()
+  compareOpen.value = false
+}
 
 // «list» və ya «map» — seçim səhifə yenilənəndə sıfırlanır
 const view = ref('list')
@@ -559,6 +616,89 @@ const selectVenue = (venue) => {
 </script>
 
 <style scoped>
+
+/* Müqayisə sətri — səhifənin altında üzür */
+.cmp-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1a1118;
+  color: #fff;
+  border-radius: 14px;
+  padding: 11px 16px;
+  box-shadow: 0 14px 36px rgba(26, 17, 24, 0.35);
+  max-width: calc(100vw - 32px);
+  flex-wrap: wrap;
+}
+
+.cmp-count {
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cmp-names {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cmp-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.76rem;
+}
+
+.cmp-name button {
+  background: none;
+  border: none;
+  color: #d8c6cc;
+  cursor: pointer;
+  font-size: 0.68rem;
+  padding: 0;
+}
+
+.cmp-name button:hover {
+  color: #fff;
+}
+
+.cmp-clear {
+  background: none;
+  border: none;
+  color: #bda9b1;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.cmp-clear:hover {
+  color: #fff;
+}
+
+.cmp-open {
+  background: #dfb15b;
+  color: #1a1118;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cmp-open:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 
 /* Tərs axtarış banneri */
 .reverse-banner {
