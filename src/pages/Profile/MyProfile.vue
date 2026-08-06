@@ -21,7 +21,7 @@
             <li v-if="memberSince"><span>Qeydiyyat</span><b>{{ memberSince }}</b></li>
           </ul>
 
-          <button class="logout-btn" @click="auth.logout()">Hesabdan çıx</button>
+          <UiButton variant="danger" block @click="auth.logout()">Hesabdan çıx</UiButton>
         </aside>
 
         <div class="forms">
@@ -51,9 +51,9 @@
               <p v-if="profileError" class="form-error">{{ profileError }}</p>
 
               <div class="form-foot">
-                <button class="primary-btn" :disabled="isSavingProfile || !profileChanged" @click="saveProfile">
-                  {{ isSavingProfile ? 'Saxlanılır...' : 'Yadda saxla' }}
-                </button>
+                <UiButton :disabled="!profileChanged" :is-loading="isSavingProfile" @click="saveProfile">
+                  Yadda saxla
+                </UiButton>
                 <button v-if="profileChanged" class="link-btn" @click="resetProfileForm">İmtina</button>
               </div>
             </el-form>
@@ -80,9 +80,7 @@
               <p v-if="passwordError" class="form-error">{{ passwordError }}</p>
 
               <div class="form-foot">
-                <button class="primary-btn" :disabled="isSavingPassword" @click="savePassword">
-                  {{ isSavingPassword ? 'Dəyişdirilir...' : 'Parolu dəyiş' }}
-                </button>
+                <UiButton :is-loading="isSavingPassword" @click="savePassword">Parolu dəyiş</UiButton>
               </div>
             </el-form>
           </section>
@@ -120,6 +118,7 @@ import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import { formatDateFull } from '@/utils/date'
 import { getPreferences, updatePreferences } from '@/services/notificationService'
+import UiButton from '@/components/ui/UiButton.vue'
 
 const auth = useAuthStore()
 
@@ -352,25 +351,6 @@ onMounted(async () => {
   word-break: break-all;
 }
 
-.logout-btn {
-  width: 100%;
-  background: #fff;
-  color: #c0392b;
-  border: 1px solid #eed4d0;
-  padding: 9px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.logout-btn:hover {
-  background: #c0392b;
-  border-color: #c0392b;
-  color: #fff;
-}
-
 /* Sağ formalar */
 .forms {
   display: flex;
@@ -439,27 +419,6 @@ onMounted(async () => {
   align-items: center;
   gap: 14px;
   margin-top: 6px;
-}
-
-.primary-btn {
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.primary-btn:hover:not(:disabled) {
-  background: var(--brand-dark);
-}
-
-.primary-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .link-btn {
