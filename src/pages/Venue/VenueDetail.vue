@@ -18,7 +18,14 @@
             <video v-else class="video-frame" :src="venue.videoUrl" controls autoplay></video>
           </template>
 
-          <img v-else :src="activeImage" :alt="venue.name" @error="onImgError" />
+          <img
+            v-else
+            :src="activeImage"
+            :alt="venue.name"
+            class="zoomable"
+            @error="onImgError"
+            @click="openLightbox"
+          />
           <span class="city-badge">{{ venue.city }}</span>
 
           <!-- Qalereyanı çevirmək üçün oxlar. Bir slayd varsa göstərilmir. -->
@@ -27,6 +34,8 @@
             <button class="nav-arrow right" title="Növbəti" @click="nextSlide">›</button>
             <span class="slide-count">{{ slideIndex + 1 }} / {{ slides.length }}</span>
           </template>
+
+          <button v-if="!showVideo" class="zoom-hint" title="Böyüt" @click="openLightbox">⤢</button>
         </div>
 
         <!-- Kiçik şəkillər əsas qalereya ilə eyni sırada gedir -->
@@ -53,6 +62,21 @@
           </template>
         </div>
       </div>
+
+      <!-- Şəkli tam ekranda böyütmək: klik, ← → oxları, Esc ilə bağlanır -->
+      <Teleport to="body">
+        <div v-if="isLightboxOpen" class="lightbox" @click.self="closeLightbox">
+          <button class="lb-close" title="Bağla (Esc)" @click="closeLightbox">✕</button>
+
+          <button v-if="slides.length > 1" class="lb-arrow left" title="Əvvəlki (←)" @click="prevSlide">‹</button>
+
+          <img :src="activeImage" :alt="venue.name" class="lb-image" />
+
+          <button v-if="slides.length > 1" class="lb-arrow right" title="Növbəti (→)" @click="nextSlide">›</button>
+
+          <span v-if="slides.length > 1" class="lb-count">{{ slideIndex + 1 }} / {{ slides.length }}</span>
+        </div>
+      </Teleport>
 
       <!-- Başlıq və əsas məlumat -->
       <div class="head-row">
@@ -460,7 +484,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
 import AddressLink from '@/components/AddressLink.vue'
@@ -523,6 +547,27 @@ const nextSlide = () => {
 
 const prevSlide = () => {
   slideIndex.value = (slideIndex.value - 1 + slides.value.length) % slides.value.length
+}
+
+// ————— tam ekranda böyütmə —————
+
+const isLightboxOpen = ref(false)
+
+const openLightbox = () => {
+  isLightboxOpen.value = true
+}
+
+const closeLightbox = () => {
+  isLightboxOpen.value = false
+}
+
+// Açıq ikən ← → ilə gəzmək, Esc ilə bağlamaq
+const onLightboxKeydown = (event) => {
+  if (!isLightboxOpen.value) return
+
+  if (event.key === 'Escape') closeLightbox()
+  else if (event.key === 'ArrowRight') nextSlide()
+  else if (event.key === 'ArrowLeft') prevSlide()
 }
 
 // Slayd dəyişəndə əsas şəkil də dəyişir
@@ -909,6 +954,12 @@ const onImgError = (e) => {
 onMounted(async () => {
   await loadVenue()
   await loadEligibility()
+
+  document.addEventListener('keydown', onLightboxKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', onLightboxKeydown)
 })
 </script>
 
@@ -945,6 +996,116 @@ onMounted(async () => {
   height: 440px;
   border-radius: 14px;
   overflow: hidden;
+}
+
+.zoomable {
+  cursor: zoom-in;
+}
+
+.zoom-hint {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(26, 17, 24, 0.55);
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.zoom-hint:hover {
+  background: rgba(26, 17, 24, 0.8);
+}
+
+/* Tam ekran şəkil */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 6, 9, 0.94);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.lb-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.lb-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.lb-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.lb-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+.lb-arrow:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.lb-arrow.left {
+  left: 18px;
+}
+
+.lb-arrow.right {
+  right: 18px;
+}
+
+.lb-count {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #e6d8dd;
+  font-size: 0.82rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+@media (max-width: 600px) {
+  .lightbox {
+    padding: 16px;
+  }
+
+  .lb-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 1.3rem;
+  }
 }
 
 .main-image img {
