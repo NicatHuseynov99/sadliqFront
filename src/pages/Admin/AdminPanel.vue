@@ -308,18 +308,21 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, reactive, ref } from 'vue'
 import { ElMessageBox, ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
-import AuditLogView from '@/components/AuditLogView.vue'
-import VisitorsView from '@/components/VisitorsView.vue'
-import ReviewsView from '@/components/ReviewsView.vue'
-import ReservationsView from '@/components/ReservationsView.vue'
-import SettingsView from '@/components/SettingsView.vue'
-import NotificationSender from '@/components/NotificationSender.vue'
-import VenuesView from '@/components/VenuesView.vue'
-import DataView from '@/components/DataView.vue'
-import VenueReview from '@/components/VenueReview.vue'
+
+// Bölmələr tənbəl yüklənir: admin bir anda tək bölməyə baxır, qalan 8-i
+// ilkin yükləmədə lazım deyil. Bu, AdminPanel-in bundle ölçüsünü kəskin azaldır.
+const AuditLogView = defineAsyncComponent(() => import('@/components/AuditLogView.vue'))
+const VisitorsView = defineAsyncComponent(() => import('@/components/VisitorsView.vue'))
+const ReviewsView = defineAsyncComponent(() => import('@/components/ReviewsView.vue'))
+const ReservationsView = defineAsyncComponent(() => import('@/components/ReservationsView.vue'))
+const SettingsView = defineAsyncComponent(() => import('@/components/SettingsView.vue'))
+const NotificationSender = defineAsyncComponent(() => import('@/components/NotificationSender.vue'))
+const VenuesView = defineAsyncComponent(() => import('@/components/VenuesView.vue'))
+const DataView = defineAsyncComponent(() => import('@/components/DataView.vue'))
+const VenueReview = defineAsyncComponent(() => import('@/components/VenueReview.vue'))
 import {
   getPlatformStats,
   getUsers,

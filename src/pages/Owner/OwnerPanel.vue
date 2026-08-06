@@ -419,14 +419,16 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, reactive, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
-import VenueManager from '@/components/VenueManager.vue'
 import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
-import OpenRequests from '@/components/OpenRequests.vue'
-import MyOffers from '@/components/MyOffers.vue'
-import OwnerStats from '@/components/OwnerStats.vue'
+
+// Bölmələr tənbəl yüklənir: sahib bir anda tək bölməyə baxır
+const VenueManager = defineAsyncComponent(() => import('@/components/VenueManager.vue'))
+const OpenRequests = defineAsyncComponent(() => import('@/components/OpenRequests.vue'))
+const MyOffers = defineAsyncComponent(() => import('@/components/MyOffers.vue'))
+const OwnerStats = defineAsyncComponent(() => import('@/components/OwnerStats.vue'))
 import {
   getMyVenues,
   getOwnerReservations,

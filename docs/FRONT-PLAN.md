@@ -1,128 +1,138 @@
-# Frontend gediş planı
+# Frontend gediş planı — yenilənmə (2-ci mərhələ)
 
-Bu sənəd kodun ölçülməsi əsasında yazılıb. Məqsəd: görünüşü səliqəyə salmaq,
-uzun scroll-ları qırmaq və müştəri axınını (xüsusən elan paylaşmağı) rahatlaşdırmaq.
+Bu sənəd birinci planın (Sprint A/B1/B2/C1/C2) icrasından sonra yazılıb.
+Mobil tətbiq mövzusu kənara qoyulub — bütün güc **web** üzərinədir.
 
 ---
 
-## 1. İndiki vəziyyət — ölçülmüş faktlar
+## 1. İndiyə qədər bitənlər (yoxlanılıb, push edilib)
 
-| Ölçü | Rəqəm | Nə deməkdir |
+| Sprint | Nə edildi |
+|---|---|
+| A | `tokens.css`, `UiButton/UiCard/UiTag/UiSkeleton/UiEmpty/UiCardSkeleton`, header burger + alt naviqasiya, ana səhifədə skeleton |
+| B1 | Ana səhifədə süzgəc çekmecəsi («Ətraflı axtarış») |
+| B2 | Saray səhifəsi 4 sekməyə bölündü (Zallar/Menyular/Rəylər/Yer) |
+| C1 | Təkliflər sıralana bilir, yığcam sətir görünüşü |
+| C2 | Elan yazma qutusu + canlı önizləmə |
+| — | Bütün səhifələrdə responsivlik (bu sessiyada) |
+
+---
+
+## 2. Təzə audit — konkret rəqəmlər
+
+Kod yenidən ölçüldü:
+
+| Ölçü | Rəqəm | Nəticə |
 |---|---|---|
-| `#721438` rəngi kodda | **202 dəfə** | Vahid rəng sistemi yoxdur |
-| `#dfb15b` / `#1a1118` / `#a02c4a` | 112 / 141 / 44 | Rəngi dəyişmək = 500 yerdə əl gəzdirmək |
-| «Segoe UI» yazısı | 10 faylda təkrar | Şrift bir yerdən idarə olunmur |
-| `VenueDetail.vue` | **2051 sətir** | Bir faylda şablon + kod + ~900 sətir CSS |
-| `OwnerPanel.vue` / `Home.vue` | 1733 / 1682 | Eyni problem |
-| Skeleton yükləmə | **0** | Yalnız fırlanan spinner var |
-| Səhifə başına media query | əsasən **1** | Mobil görünüş zəif |
+| `tokens.css` dəyişənini işlədən fayl | **10 / 50** | Yeni yazılan yerlərdə var, köhnə 40 faylda yoxdur |
+| `UiButton` / `UiCard` istifadəsi | **0** | Sprint A-da qurulan komponentlər hələ heç yerdə işlədilmir |
+| Hələ `#721438` və s. sabit rəng yazan fayl | **40 / 50** | Əsas iş qalıb |
+| Boş hal (`empty-box`/`no-result`) olan yer | 10 | Format hələ hər yerdə fərqlidir |
+| `AdminPanel.vue` | 1320 sətir | Bölünməyib |
+| `OwnerPanel.vue` | 1740 sətir | Bölünməyib |
+| `VenueDetail.vue` | 2146 sətir | Sekmələnib, amma fayl özü hələ bir bloklu |
+| Toast sistemi | `ElMessage` 12 fayl, `ElNotification` 11 fayl | Qarışıqlıq davam edir |
 
-**Ən görünən nəticə:** hər yeni komponent öz düyməsini yenidən yazır —
-`gold-btn`, `ghost-btn`, `primary-btn`, `confirm-btn`, `rb-btn`, `fs-btn`,
-`open-btn`, `detail-btn`, `accept-btn`… Hamısı oxşardır, amma heç biri eyni deyil.
-
-**Scroll problemi olan üç səhifə:**
-1. **Ana səhifə** — nəhəng hero + həmişə açıq süzgəc paneli; saraylar ekranın çox aşağısında başlayır.
-2. **Saray səhifəsi** — qalereya, zallar (hər birinin təqvimi ilə), menyular, rəylər — hamısı alt-alta, 3-4 ekran scroll.
-3. **Sorğularım** — forma həmişə açıq, altında sorğular, onların altında bütün təkliflər açıq halda.
+**Əsas nəticə:** təməl (tokens, UI dəsti) quruldu, amma **köhnə səhifələrə köçürülmədi**.
+İkinci mərhələnin böyük hissəsi elə bunun üzərinədir — yeni komponentlərin
+qurulması deyil, mövcud olanın hər yerdə işlədilməsidir.
 
 ---
 
-## 2. Sprint A — Təməl (2–3 gün)
+## 3. Sprint E — UI dəstinin köçürülməsi (3–4 gün)
 
-Bunsuz qalan işlər yenə dağınıq olacaq.
+Ən çox görünən, ən az riskli iş. Hər dəyişiklik ayrı-ayrı commit olunur.
 
-**A1. Dizayn nişanları (`src/assets/tokens.css`)**
-Rəng, kölgə, künc radiusu, boşluq və şrift bir faylda dəyişən kimi:
-`--brand`, `--brand-dark`, `--gold`, `--ink`, `--muted`, `--bg`, `--radius`, `--shadow-1`…
-Sonra rənglər tədricən dəyişənlərə köçürülür (bir dəfəyə yox — səhifə-səhifə).
+**E1. Düymələr → `UiButton`**
+40 fayldakı `.gold-btn`, `.ghost-btn`, `.primary-btn`, `.confirm-btn`, `.reserve-btn`,
+`.accept-btn`, `.cancel-btn` və s. bir-bir `UiButton`-a keçir. Səhifə-səhifə:
+əvvəl ən çox işlədilən üç səhifə (Ana səhifə, Saray səhifəsi, Sorğularım — artıq
+qismən toxunulub), sonra panellər.
 
-**A2. Ortaq UI dəsti (`src/components/ui/`)**
-`UiButton` (primary / ghost / danger / small), `UiCard`, `UiTag`, `UiEmpty`, `UiSkeleton`.
-Yeni yazılan hər şey bunlardan istifadə edir; köhnələr yavaş-yavaş keçirilir.
+**E2. Rənglər → `tokens.css`**
+`sed`/qrep ilə tapılıb bir-bir dəyişənə keçir: `#721438` → `var(--brand)` və s.
+Riskli deyil — vizual nəticə eynidir, sadəcə bir yerdən idarə olunur.
 
-**A3. Skeleton yükləmə**
-Spinner örtüyü əvəzinə kartın öz formasında boz bloklar. Səhifə «donmuş» görünmür.
+**E3. Boş hallar → `UiEmpty`**
+10 yerdəki fərqli görünüşlü boş hal mesajı bir komponentə keçir.
 
-**A4. Header və mobil**
-Müştəridə 6 link + zəng + ad var — daralır. 900 px-dən aşağıda burger menyu,
-telefonda isə aşağıda 4 ikonlu sabit sətir (Ana səhifə · Seçilmişlər · Sorğularım · Profil).
-
----
-
-## 3. Sprint B — Müştəri axını, scroll qırılması (3–4 gün)
-
-**B1. Ana səhifə: süzgəc çekmecəsi**
-Hero kiçilir (yarı hündürlük), süzgəcdən yalnız **axtarış + şəhər + qonaq sayı**
-görünən sətirdə qalır, qalanı **«Ətraflı süzgəc»** düyməsi ilə yandan açılan panelə keçir.
-Səhifə açılan kimi saraylar görünür — indi isə əvvəlcə süzgəc divarını keçmək lazımdır.
-Scroll edəndə süzgəc sətri yuxarıda yapışıq qalır.
-
-**B2. Saray səhifəsi: sekmələr + yapışıq rezerv paneli**
-Məzmun dörd sekmeyə bölünür: **Zallar · Menyular · Rəylər · Yer**.
-Sağda ekranla birgə hərəkət edən panel: zal seçimi, menyu seçimi, qonaq sayı və
-**canlı yekun məbləğ** — «250 × 70 ₼ = 17 500 ₼». Rezerv düyməsi həmişə əldə olur.
-2000 px scroll → bir ekran.
-
-**B3. Qalereya**
-Şəkillər lightbox-da açılır, klaviatura oxları ilə gəzilir.
+**E4. Kartlar → `UiCard`**
+`.form-card`, `.staff-card`, `.venue-block` kimi ağ bloklar `UiCard`-a keçir.
 
 ---
 
-## 4. Sprint C — «Elan paylaş» hissəsi (2–3 gün)
+## 4. Sprint F — Böyük səhifələrin bölünməsi (1 həftə)
 
-Bu bölmə platformanın ən yeni və ən dəyərli hissəsidir, amma görünüşcə ən sadədir.
+Fayllar öz mənasında düzgün işləyir, amma ölçüləri saxlanmanı çətinləşdirir.
 
-**C1. Elan yazma qutusu**
-Sosial şəbəkədəki paylaşım qutusu kimi: bir sətir —
-**«Toyunuz üçün nə axtarırsınız?»**. Klikləyəndə açılır və 3 addımlı,
-lakin **eyni ekranda** doldurulan formaya çevrilir:
-`Şəhər + qonaq` → `Tarix (və ya çevik)` → `Büdcə + istəklər`.
-Yuxarıda canlı önizləmə: *«Bakı · 250 qonaq · oktyabr · 70 ₼»*.
-Formanın hazırkı halı 7 xanadır və hamısı birdən görünür — yeni halda ekran boş qalmır.
+**F1. `AdminPanel.vue` (1320 sətir)**
+Bölmələr artıq ayrı komponentlərdir (`ReservationsView`, `ReviewsView` və s.),
+amma `AdminPanel.vue`-nun özü hələ göstərici kartları, bölmə keçidi və
+inline stilləri özündə saxlayır. `AdminStatCards.vue` və ümumi `PanelTabs.vue`
+ayrılır.
 
-**C2. Sorğu + təkliflər: iki sütun**
-Solda sorğunun kartı (yapışıq): şərtlər, qalan vaxt, «Bağla» düyməsi.
-Sağda təkliflər. Uzun siyahı əvəzinə **sıralama**: ən ucuz · ən yüksək reytinq · ən yaxın tarix.
-Ən sərfəlisinə **«ən uyğun»** nişanı.
+**F2. `OwnerPanel.vue` (1740 sətir)**
+Eyni məntiq: rezerv siyahısı bölməsi öz komponentinə çıxarılır
+(`OwnerReservationList.vue`), administrator idarəetməsi ayrı fayla keçir
+(`StaffManager.vue`).
 
-**C3. Təklif kartı yığcamlaşır**
-İndi hər kartda şəkil + 4 sətir cədvəl + mesaj + 3 düymə var — 3 təklif ekranı doldurur.
-Yeni halda: şəkil + ad + qiymət + reytinq görünür, qalan detallar **«Ətraflı»** ilə açılır.
-Beləliklə 6 təklif bir ekranda müqayisə olunur.
-
-**C4. Boş hal**
-«Təkliflər gözlənilir» quru yazısı əvəzinə: neçə saraya göndərildiyi, orta cavab
-vaxtı və nə vaxta qədər açıq qalacağı.
+**F3. `VenueDetail.vue` (2146 sətir)**
+Hər sekmə (`Halls`, `Menus`, `Reviews`, `Map`) öz komponentinə çıxarılır.
+Səhifə özü yalnız qalereya, başlıq və sekmə keçidini saxlayır. Faylın 4-5 hissəyə
+bölünməsi həm oxunmanı, həm gələcək dəyişiklikləri asanlaşdırır.
 
 ---
 
-## 5. Sprint D — Cila (2 gün)
+## 5. Sprint G — Qalan interfeys işləri (3–4 gün)
 
-- **Boş hallar**: hər səhifədə eyni quruluş — işarə, bir cümlə izah, bir düymə.
-- **Mikro-hərəkət**: kart üzərinə gələndə yumşaq qalxma, rəqəmlərin sayılaraq artması,
-  yeni bildiriş gələndə zəngin yüngül titrəməsi.
-- **Toast vahidliyi**: hazırda `ElMessage` və `ElNotification` qarışıq işlənir — biri seçilir.
-- **Fokus halqaları və aria**: ikon düymələrində (♥, ⇄, ✕) klaviatura ilə gəzmək.
-- **Şəkil yükləmə**: `loading="lazy"` və ölçü nisbəti — səhifə sıçramır.
+**G1. Qalereya lightbox** (əvvəlki planda B3 idi, hələ edilməyib)
+Saray şəkilləri böyüdülüb tam ekranda açılsın, ← → düymələri və klaviatura
+oxları ilə gəzilsin.
+
+**G2. Boş hal — «Təkliflər gözlənilir»** (əvvəlki C4)
+Quru cümlə əvəzinə: neçə saraya göndərildiyi, orta cavab müddəti, nə vaxta
+qədər açıq qalacağı.
+
+**G3. Toast vahidliyi**
+`ElMessage` və `ElNotification` qarışıq işlənir (12 və 11 fayl). Biri seçilib
+(`ElNotification` — mövqe və başlıq dəstəklədiyi üçün) və hamısı ona keçir.
+
+**G4. Mikro-hərəkətlər**
+Kart üzərinə gələndə yüngül qalxma, rəqəmlərin (statistika) sayılaraq
+dəyişməsi, yeni bildiriş gələndə zəngin titrəməsi.
+
+**G5. Klaviatura və fokus**
+İkon düymələrində (♥, ⇄, ✕, 🔔) `aria-label`, tab sırası yoxlanışı.
 
 ---
 
-## 6. Təklif olunan sıra
+## 6. Sprint H — Performans (2 gün)
+
+- Böyük səhifələrin (Admin, Owner) tənbəl yüklənməsi (`defineAsyncComponent`
+  və ya router-level lazy import) — indi hamısı ilkin bundle-a düşür
+- Şəkillərdə ölçü nisbəti (`aspect-ratio`) — səhifə yüklənərkən sıçrayış olmasın
+- Uzun siyahılarda (jurnal, ziyarətçilər) səhifələmə/virtual sürüşmə yoxlanışı
+
+---
+
+## 7. Təklif olunan sıra
 
 ```
-A (təməl) → B (müştəri axını) → C (elan bölməsi) → D (cila)
+E (köçürmə) → F (bölmə) → G (qalan iş) → H (performans)
 ```
 
-A-sız B və C yenə köhnə üsulla yazılacaq. Amma **C tək başına da edilə bilər** —
-əgər elan bölməsini tez görmək istəyirsinizsə, C-dən başlayıb sonra A-ya qayıtmaq olar.
+**Səbəb:** E ən az riskli və ən çox görünən təsiri verir — bütün sayt bir gündə
+vizual cəhətdən vahidləşir. F sonra gəlməlidir, çünki bölünmüş fayllarda E-ni
+təkrar aparmaq lazım gəlməsin. G və H son ciladır.
 
 ---
 
-## 7. Ölçü meyarları
+## 8. Ölçü meyarları (yenilənmiş)
 
-- Ana səhifədə ilk sarayın göründüyü nöqtə: **1 ekrandan aşağı olmasın**
-- Saray səhifəsində rezervə qədər scroll: **0** (yapışıq panel)
-- Sorğularım səhifəsində bir ekranda görünən təklif sayı: **2 → 6**
-- Rənglərin `tokens.css`-dən gəlmə faizi: **0% → 80%+**
-- Telefonda naviqasiyanın işləkliyi: burger + alt sətir
+| Meyar | İndi | Hədəf |
+|---|---|---|
+| `tokens.css` istifadə edən fayl | 10 / 50 | 45+ / 50 |
+| `UiButton`/`UiCard` istifadə edən yer | 0 | əsas düymələrin 80%-i |
+| Toast sistemi | 2 qarışıq | 1 vahid |
+| `AdminPanel.vue` / `OwnerPanel.vue` sətir sayı | 1320 / 1740 | 400–500 aralığında |
+| Qalereya | sadə ox | lightbox + klaviatura |
