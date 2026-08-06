@@ -101,59 +101,89 @@
             : 'Bu sorğuya təklif gəlməyib.' }}
         </p>
 
-        <div v-else class="offer-grid">
-          <article
-            v-for="o in r.offers"
-            :key="o.id"
-            class="offer"
-            :class="{ accepted: o.status === 1, declined: o.status === 2 }"
-          >
-            <img :src="o.venueImageUrl" :alt="o.venueName" @error="onImgError" />
+        <template v-else>
+          <!-- Sıralama: qərar müqayisə ilə verilir, ona görə açar rəqəmlər üzrə -->
+          <div class="sort-row">
+            <span>Sırala:</span>
+            <button
+              v-for="s in sortOptions"
+              :key="s.value"
+              class="sort-chip"
+              :class="{ on: sortBy === s.value }"
+              @click="sortBy = s.value"
+            >
+              {{ s.label }}
+            </button>
+            <em class="sort-count">{{ r.offers.length }} təklif</em>
+          </div>
 
-            <div class="offer-body">
-              <div class="offer-top">
-                <b>{{ o.venueName }}</b>
-                <span v-if="o.rating" class="rating">★ {{ o.rating }} <em>({{ o.reviewCount }})</em></span>
+          <!-- Yığcam sətirlər: bir ekranda 6 təklif görünür, detallar açılır -->
+          <div class="offer-list">
+            <article
+              v-for="(o, i) in sortedOffers(r)"
+              :key="o.id"
+              class="offer-row"
+              :class="{ accepted: o.status === 1, declined: o.status === 2, open: openOfferId === o.id }"
+            >
+              <img :src="o.venueImageUrl" :alt="o.venueName" loading="lazy" @error="onImgError" />
+
+              <div class="row-main" @click="toggleOffer(o.id)">
+                <div class="row-top">
+                  <b>{{ o.venueName }}</b>
+                  <span v-if="i === 0 && sortBy === 'price' && o.status === 0" class="best-tag">
+                    ən sərfəli
+                  </span>
+                  <span v-if="o.rating" class="rating">★ {{ o.rating }}</span>
+                  <span v-if="o.isChatOpen" class="chat-dot" title="Yazışma açıqdır">💬</span>
+                </div>
+
+                <span class="row-meta">
+                  {{ formatDate(o.eventDate) }} · {{ o.hallName }} · {{ o.menuName }}
+                </span>
               </div>
 
-              <span class="offer-city">📍 {{ o.city }}</span>
-
-              <dl class="offer-facts">
-                <div><dt>Tarix</dt><dd>{{ formatDate(o.eventDate) }}</dd></div>
-                <div><dt>Zal</dt><dd>{{ o.hallName }} · {{ o.hallCapacity }} nəfər</dd></div>
-                <div><dt>Menyu</dt><dd>{{ o.menuName }}</dd></div>
-                <div v-if="o.parkingCapacity"><dt>Parkinq</dt><dd>{{ o.parkingCapacity }} avtomobil</dd></div>
-              </dl>
-
-              <p class="offer-message">{{ o.message }}</p>
-
-              <div class="offer-price">
-                <b>{{ o.pricePerPerson }} ₼</b> <span>/ nəfər</span>
-                <em>cəmi {{ o.totalPrice.toLocaleString() }} ₼</em>
+              <div class="row-price">
+                <b>{{ o.pricePerPerson }} ₼</b>
+                <span>{{ o.totalPrice.toLocaleString() }} ₼ cəmi</span>
               </div>
 
-              <div v-if="o.status === 0 && r.status === REQUEST_STATUS.open" class="offer-actions">
-                <template v-if="o.isChatOpen">
-                  <button class="ghost-btn small" @click="openChat(o, r)">
-                    Yazış<em v-if="o.unreadCount" class="badge">{{ o.unreadCount }}</em>
-                  </button>
-                  <button class="gold-btn small" @click="accept(o)">Bunu seçirəm</button>
-                </template>
+              <button class="row-toggle" @click="toggleOffer(o.id)">
+                {{ openOfferId === o.id ? '▲' : '▼' }}
+              </button>
 
-                <template v-else>
-                  <button class="ghost-btn small" @click="decline(o)">Uyğun deyil</button>
-                  <button class="ghost-btn small" @click="approve(o)">Təsdiqlə və yazış</button>
-                  <button class="gold-btn small" @click="accept(o)">Bunu seçirəm</button>
-                </template>
+              <!-- Detallar yalnız istəyəndə açılır -->
+              <div v-if="openOfferId === o.id" class="row-detail">
+                <dl class="offer-facts">
+                  <div><dt>Şəhər</dt><dd>{{ o.city }}</dd></div>
+                  <div><dt>Zal tutumu</dt><dd>{{ o.hallCapacity }} nəfər</dd></div>
+                  <div v-if="o.parkingCapacity"><dt>Parkinq</dt><dd>{{ o.parkingCapacity }} avtomobil</dd></div>
+                  <div v-if="o.reviewCount"><dt>Rəy sayı</dt><dd>{{ o.reviewCount }}</dd></div>
+                </dl>
+
+                <p class="offer-message">{{ o.message }}</p>
+                <p v-if="o.lastMessage" class="last-msg">💬 {{ o.lastMessage }}</p>
+
+                <div v-if="o.status === 0 && r.status === REQUEST_STATUS.open" class="offer-actions">
+                  <template v-if="o.isChatOpen">
+                    <button class="ghost-btn small" @click="openChat(o, r)">
+                      Yazış<em v-if="o.unreadCount" class="badge">{{ o.unreadCount }}</em>
+                    </button>
+                    <button class="gold-btn small" @click="accept(o)">Bunu seçirəm</button>
+                  </template>
+
+                  <template v-else>
+                    <button class="ghost-btn small" @click="decline(o)">Uyğun deyil</button>
+                    <button class="ghost-btn small" @click="approve(o)">Təsdiqlə və yazış</button>
+                    <button class="gold-btn small" @click="accept(o)">Bunu seçirəm</button>
+                  </template>
+                </div>
+
+                <span v-else-if="o.status === 1" class="offer-tag ok">✓ Seçdiniz</span>
+                <span v-else-if="o.status === 2" class="offer-tag">Siyahıdan çıxarıldı</span>
               </div>
-
-              <span v-else-if="o.status === 1" class="offer-tag ok">✓ Seçdiniz</span>
-              <span v-else-if="o.status === 2" class="offer-tag">Siyahıdan çıxarıldı</span>
-
-              <p v-if="o.lastMessage" class="last-msg">💬 {{ o.lastMessage }}</p>
-            </div>
-          </article>
-        </div>
+            </article>
+          </div>
+        </template>
       </section>
 
       <div v-if="!isLoading && !requests.length && hasOpenRequest === false" class="empty-box">
@@ -288,6 +318,35 @@ const accept = async (offer) => {
   } catch (e) {
     ElMessage.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
+}
+
+// ————— təkliflərin sıralanması və açılışı —————
+
+const sortOptions = [
+  { value: 'price', label: 'Ən ucuz' },
+  { value: 'rating', label: 'Ən yüksək reytinq' },
+  { value: 'date', label: 'Ən yaxın tarix' },
+]
+
+const sortBy = ref('price')
+const openOfferId = ref(null)
+
+const toggleOffer = (id) => {
+  openOfferId.value = openOfferId.value === id ? null : id
+}
+
+// Cavab verilmiş təkliflər aşağı düşür — qərar açıq olanlar arasında verilir
+const sortedOffers = (request) => {
+  const list = [...request.offers]
+
+  return list.sort((a, b) => {
+    if (a.status !== b.status) return a.status - b.status
+
+    if (sortBy.value === 'rating') return (b.rating ?? 0) - (a.rating ?? 0)
+    if (sortBy.value === 'date') return new Date(a.eventDate) - new Date(b.eventDate)
+
+    return a.pricePerPerson - b.pricePerPerson
+  })
 }
 
 // Təsdiq rezerv yaratmır — yalnız yazışmanı açır.
@@ -540,11 +599,169 @@ textarea:focus {
 }
 
 /* Təkliflər */
-.offer-grid {
+/* Sıralama sətri */
+.sort-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 14px 0 10px;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+.sort-chip {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  color: var(--muted);
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+
+.sort-chip:hover {
+  border-color: var(--gold);
+}
+
+.sort-chip.on {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.sort-count {
+  margin-left: auto;
+  font-style: normal;
+  color: var(--faint);
+}
+
+/* Yığcam təklif sətirləri */
+.offer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.offer-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: 64px 1fr auto auto;
+  align-items: center;
   gap: 12px;
-  margin-top: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 9px 12px;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.offer-row:hover {
+  border-color: #e4d5db;
+  box-shadow: var(--shadow-1);
+}
+
+.offer-row.open {
+  border-color: var(--gold);
+}
+
+.offer-row.accepted {
+  border-color: #b6ddc4;
+  background: #fbfefc;
+}
+
+.offer-row.declined {
+  opacity: 0.55;
+}
+
+.offer-row > img {
+  width: 64px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: var(--r-sm);
+}
+
+.row-main {
+  min-width: 0;
+  cursor: pointer;
+}
+
+.row-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.row-top b {
+  font-size: var(--fs-md);
+  color: var(--ink);
+}
+
+.best-tag {
+  background: var(--ok-soft);
+  color: var(--ok);
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+}
+
+.chat-dot {
+  font-size: 0.8rem;
+}
+
+.row-meta {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-price {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.row-price b {
+  display: block;
+  font-size: var(--fs-lg);
+  color: var(--brand);
+  line-height: 1.15;
+}
+
+.row-price span {
+  font-size: 0.7rem;
+  color: var(--muted-2);
+}
+
+.row-toggle {
+  background: none;
+  border: none;
+  color: var(--faint);
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 6px;
+}
+
+.row-detail {
+  grid-column: 1 / -1;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+@media (max-width: 640px) {
+  .offer-row {
+    grid-template-columns: 52px 1fr auto;
+  }
+
+  .row-toggle {
+    display: none;
+  }
 }
 
 .offer {
