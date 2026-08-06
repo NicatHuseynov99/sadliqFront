@@ -22,3 +22,14 @@ body {
     padding-bottom: 58px;
   }
 }
+
+/* Yandan açılan çekmecədə üfüqi zolaq yaranmasın:
+   el-drawer body-si səhifədən kənarda (teleport ilə) qurulur,
+   ona görə qayda qlobal verilir */
+.el-drawer__body {
+  overflow-x: hidden;
+}
+
+.el-drawer__body .el-slider {
+  padding: 0 6px;
+}

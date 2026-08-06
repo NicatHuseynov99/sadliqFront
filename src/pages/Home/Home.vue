@@ -82,7 +82,7 @@
             </div>
 
             <button class="filter-btn" @click="isFilterOpen = true">
-              🔍 Axtarış
+              🔍 Ətraflı axtarış
               <em v-if="activeFilterCount">{{ activeFilterCount }}</em>
             </button>
 
@@ -97,7 +97,7 @@
     </section>
 
     <!-- Axtarış çekmecəsi: büdcə, qiymət aralığı, reytinq, parkinq və özəlliklər -->
-    <el-drawer v-model="isFilterOpen" title="Axtarış" size="390px" class="filter-drawer">
+    <el-drawer v-model="isFilterOpen" title="Ətraflı axtarış" size="390px" class="filter-drawer">
       <div class="drawer-body">
         <div class="field">
           <label>Ümumi büdcəniz</label>
@@ -1092,6 +1092,22 @@ const selectVenue = (venue) => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-x: hidden;
+}
+
+/* Çekmecənin içindəki sahələr kənara çıxmasın */
+.drawer-body :deep(.el-slider) {
+  padding: 0 6px;
+}
+
+.drawer-body .field,
+.drawer-body input,
+.drawer-body .input-suffix {
+  max-width: 100%;
+}
+
+:deep(.filter-drawer .el-drawer__body) {
+  overflow-x: hidden;
 }
 
 .drawer-group .chips-label {
