@@ -165,7 +165,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { toast } from '@/utils/toast'
 import CoordinatePicker from '@/components/CoordinatePicker.vue'
 import MediaUpload from '@/components/MediaUpload.vue'
 import { getVenueById } from '@/services/venueService'
@@ -296,7 +296,7 @@ const load = async () => {
 
     featureOptions.value = await getFeatures()
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Məlumat yüklənmədi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Məlumat yüklənmədi')
   } finally {
     isLoading.value = false
   }
@@ -320,11 +320,11 @@ const save = async () => {
       features: form.features,
     })
 
-    ElMessage.success(message)
+    toast.success(message)
     snapshot.value = JSON.stringify(form)
     emit('changed')
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Yadda saxlanmadı')
+    toast.error(e?.userMessage ?? e?.message ?? 'Yadda saxlanmadı')
   } finally {
     isSaving.value = false
   }
@@ -343,9 +343,9 @@ const approve = async () => {
     await save()
 
     const result = await setVenueApproved(props.venue.id, true)
-    if (!result.success) return ElMessage.error(result.message)
+    if (!result.success) return toast.error(result.message)
 
-    ElMessage.success(result.message)
+    toast.success(result.message)
     emit('changed')
     emit('close')
   } finally {

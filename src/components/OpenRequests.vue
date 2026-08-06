@@ -123,7 +123,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { toast } from '@/utils/toast'
 import { getOpenRequests, sendOffer } from '@/services/venueRequestService'
 
 const isLoading = ref(false)
@@ -223,11 +223,11 @@ const send = async () => {
       message: offer.message.trim(),
     })
 
-    ElMessage.success(message)
+    toast.success(message)
     isDialogOpen.value = false
     await load()
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Təklif göndərilmədi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Təklif göndərilmədi')
   } finally {
     isSending.value = false
   }

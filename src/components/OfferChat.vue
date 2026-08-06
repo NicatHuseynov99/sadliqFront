@@ -49,7 +49,7 @@
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { toast } from '@/utils/toast'
 import { getMessages, sendMessage } from '@/services/venueRequestService'
 
 const props = defineProps({
@@ -89,7 +89,7 @@ const load = async (silent = false) => {
       messages.value = data
     }
   } catch (e) {
-    if (!silent) ElMessage.error(e?.userMessage ?? e?.message ?? 'Yazışma açılmadı')
+    if (!silent) toast.error(e?.userMessage ?? e?.message ?? 'Yazışma açılmadı')
   } finally {
     isLoading.value = false
   }
@@ -107,7 +107,7 @@ const send = async () => {
     draft.value = ''
     await scrollDown()
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Mesaj göndərilmədi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Mesaj göndərilmədi')
   } finally {
     isSending.value = false
   }

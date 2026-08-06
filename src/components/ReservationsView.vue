@@ -171,7 +171,8 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { toast } from '@/utils/toast'
 import {
   getReservationStats,
   searchReservations,
@@ -289,9 +290,9 @@ const onSearchInput = () => {
 // Silinmiş rezervi geri qaytarır
 const restore = async (reservation) => {
   const result = await restoreReservation(reservation.id)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
@@ -311,9 +312,9 @@ const changeStatus = async (reservation, status) => {
   }
 
   const result = await updateReservationStatus(reservation.id, status)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 

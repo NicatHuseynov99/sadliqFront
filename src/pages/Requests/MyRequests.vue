@@ -220,7 +220,8 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { toast } from '@/utils/toast'
 import {
   REQUEST_STATUS,
   acceptOffer,
@@ -294,12 +295,12 @@ const submit = async () => {
       note: form.note.trim() || null,
     })
 
-    ElMessage.success(result.message)
+    toast.success(result.message)
     form.note = ''
     isComposerOpen.value = false
     await load()
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Sorğu göndərilmədi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Sorğu göndərilmədi')
   } finally {
     isSending.value = false
   }
@@ -308,10 +309,10 @@ const submit = async () => {
 const close = async (request) => {
   try {
     const message = await closeRequest(request.id)
-    ElMessage.success(message)
+    toast.success(message)
     await load()
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
@@ -330,10 +331,10 @@ const accept = async (offer) => {
 
   try {
     const message = await acceptOffer(offer.id)
-    ElMessage.success(message)
+    toast.success(message)
     await load()
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
@@ -389,14 +390,14 @@ const sortedOffers = (request) => {
 const approve = async (offer) => {
   try {
     const message = await approveContact(offer.id)
-    ElMessage.success(message)
+    toast.success(message)
     await load()
 
     const request = requests.value.find((r) => r.offers.some((o) => o.id === offer.id))
     const fresh = request?.offers.find((o) => o.id === offer.id)
     if (fresh) openChat(fresh, request)
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
@@ -419,10 +420,10 @@ const closeChat = async () => {
 const decline = async (offer) => {
   try {
     const message = await declineOffer(offer.id)
-    ElMessage.success(message)
+    toast.success(message)
     await load()
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 

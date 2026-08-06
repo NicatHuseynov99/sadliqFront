@@ -114,7 +114,8 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { toast } from '@/utils/toast'
 import {
   getTables,
   getRows,
@@ -280,10 +281,10 @@ const submitForm = async () => {
       ? await createRow(table.value, values)
       : await updateRow(table.value, formTarget.value[keyColumn.value], values)
 
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
   formOpen.value = false
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
@@ -299,17 +300,17 @@ const remove = async (row) => {
   }
 
   const result = await deleteRow(table.value, row[keyColumn.value])
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
 const restore = async (row) => {
   const result = await restoreRow(table.value, row[keyColumn.value])
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 

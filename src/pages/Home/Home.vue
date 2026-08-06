@@ -313,7 +313,8 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElNotification } from 'element-plus'
+import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import VenueCard from '@/components/VenueCard.vue'
 import VenueMap from '@/components/VenueMap.vue'
 import {
@@ -352,7 +353,7 @@ const toggleCompare = (venue) => {
 
   // Üçdən çox saray yan-yana oxunmur
   if (compareMap.size >= 3) {
-    ElMessage.warning('Eyni anda ən çox 3 sarayı müqayisə etmək olar.')
+    toast.warning('Eyni anda ən çox 3 sarayı müqayisə etmək olar.')
     return
   }
 

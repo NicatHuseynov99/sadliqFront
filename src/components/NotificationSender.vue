@@ -155,7 +155,8 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { toast } from '@/utils/toast'
 import {
   BEHAVIORS,
   CAMPAIGN_STATUSES,
@@ -226,7 +227,7 @@ const check = async () => {
   try {
     preview.value = await previewAudience({ ...form.audience, userIds: [] })
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Auditoriya hesablanmadı')
+    toast.error(e?.userMessage ?? e?.message ?? 'Auditoriya hesablanmadı')
   } finally {
     isChecking.value = false
   }
@@ -250,7 +251,7 @@ const send = async () => {
 
   try {
     const result = await sendCampaign(payload())
-    ElMessage.success(result.message)
+    toast.success(result.message)
 
     form.title = ''
     form.body = ''
@@ -260,7 +261,7 @@ const send = async () => {
 
     await loadHistory()
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Göndərilmədi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Göndərilmədi')
   } finally {
     isSending.value = false
   }
@@ -271,9 +272,9 @@ const test = async () => {
 
   try {
     const result = await sendTestCampaign(payload())
-    ElMessage.success(result.message)
+    toast.success(result.message)
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Sınaq göndərilmədi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Sınaq göndərilmədi')
   } finally {
     isSending.value = false
   }
@@ -281,7 +282,7 @@ const test = async () => {
 
 const cancel = async (campaign) => {
   const result = await cancelCampaign(campaign.id)
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await loadHistory()
 }
 

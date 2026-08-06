@@ -249,7 +249,8 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { toast } from '@/utils/toast'
 import {
   getReviewStats,
   searchReviews,
@@ -314,7 +315,7 @@ const openEdits = async (review) => {
     edits.value = await getReviewEdits(review.id)
   } catch (e) {
     editsOpen.value = false
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Tarixçə yüklənmədi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Tarixçə yüklənmədi')
   }
 }
 
@@ -335,10 +336,10 @@ const submitEdit = async () => {
     rating: editRating.value,
     comment: editComment.value.trim(),
   })
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
   editOpen.value = false
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
@@ -420,35 +421,35 @@ const openHide = (review) => {
 
 const confirmHide = async () => {
   const result = await setReviewHidden(hideTarget.value.id, true, hideReason.value.trim())
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
   hideOpen.value = false
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
 const unhide = async (review) => {
   const result = await setReviewHidden(review.id, false)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
 const resolve = async (review) => {
   const result = await resolveReviewReports(review.id)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
 // Silinmiş rəyi geri qaytarır
 const restore = async (review) => {
   const result = await restoreReview(review.id)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
@@ -465,9 +466,9 @@ const remove = async (review) => {
   }
 
   const result = await deleteReview(review.id)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 

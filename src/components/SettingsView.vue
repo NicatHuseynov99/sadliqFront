@@ -147,7 +147,8 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { toast } from '@/utils/toast'
 import { useAuthStore } from '@/store/auth'
 import {
   getSettings,
@@ -244,9 +245,9 @@ const loadAll = async () => {
 
 const save = async (setting) => {
   const result = await updateSetting(setting.key, drafts[setting.key])
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   settings.value = await getSettings()
 }
 
@@ -281,10 +282,10 @@ const submitForm = async () => {
       ? await api.create(payload)
       : await api.update(formTarget.value.id, payload)
 
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
   formOpen.value = false
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await loadAll()
 }
 
@@ -306,17 +307,17 @@ const remove = async (kind, item) => {
   }
 
   const result = await apiOf(kind).remove(item.id)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await loadAll()
 }
 
 const restore = async (kind, item) => {
   const result = await apiOf(kind).restore(item.id)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await loadAll()
 }
 

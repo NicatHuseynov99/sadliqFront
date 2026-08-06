@@ -300,7 +300,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
 import DialogHead from '@/components/DialogHead.vue'
 import CoordinatePicker from '@/components/CoordinatePicker.vue'
-import { ElMessage } from 'element-plus'
+import { toast } from '@/utils/toast'
 import {
   searchVenues,
   setVenueApproved,
@@ -430,7 +430,7 @@ const openContent = async (venue) => {
     halls.value = hallList
     menus.value = menuList
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Məlumat yüklənmədi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Məlumat yüklənmədi')
   } finally {
     contentLoading.value = false
   }
@@ -506,9 +506,9 @@ const onSearchInput = () => {
 const toggleApproved = async (venue) => {
   if (!venue.isApproved) {
     const result = await setVenueApproved(venue.id, true)
-    if (!result.success) return ElMessage.error(result.message)
+    if (!result.success) return toast.error(result.message)
 
-    ElMessage.success(result.message)
+    toast.success(result.message)
     return refresh()
   }
 
@@ -519,9 +519,9 @@ const toggleApproved = async (venue) => {
     tone: 'warn',
     run: async () => {
       const result = await setVenueApproved(venue.id, false)
-      if (!result.success) return ElMessage.error(result.message)
+      if (!result.success) return toast.error(result.message)
 
-      ElMessage.success(result.message)
+      toast.success(result.message)
       await refresh()
     },
   })
@@ -564,10 +564,10 @@ const submitEdit = async () => {
         : null,
     })
     editOpen.value = false
-    ElMessage.success(message)
+    toast.success(message)
     await refresh()
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
@@ -581,19 +581,19 @@ const openOwner = async (venue) => {
 
 const submitOwner = async () => {
   const result = await changeVenueOwner(ownerTarget.value.id, newOwnerId.value)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
   ownerOpen.value = false
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
 // Silinmiş sarayı zalları və menyuları ilə birlikdə geri qaytarır
 const restore = async (venue) => {
   const result = await restoreVenue(venue.id)
-  if (!result.success) return ElMessage.error(result.message)
+  if (!result.success) return toast.error(result.message)
 
-  ElMessage.success(result.message)
+  toast.success(result.message)
   await refresh()
 }
 
@@ -608,9 +608,9 @@ const remove = (venue) => {
     tone: 'danger',
     run: async () => {
       const result = await deleteVenue(venue.id)
-      if (!result.success) return ElMessage.error(result.message)
+      if (!result.success) return toast.error(result.message)
 
-      ElMessage.success(result.message)
+      toast.success(result.message)
       await refresh()
     },
   })

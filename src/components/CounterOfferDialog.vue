@@ -73,7 +73,7 @@
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { toast } from '@/utils/toast'
 import { createCounterOffer } from '@/services/ownerService'
 
 const props = defineProps({
@@ -126,7 +126,7 @@ const changeSummary = computed(() => {
 
 const send = async () => {
   if (form.message.trim().length < 5) {
-    ElMessage.warning('Müştəriyə qısa izah yazın.')
+    toast.warning('Müştəriyə qısa izah yazın.')
     return
   }
 
@@ -142,11 +142,11 @@ const send = async () => {
       message: form.message.trim(),
     })
 
-    ElMessage.success(message)
+    toast.success(message)
     emit('sent')
     emit('close')
   } catch (e) {
-    ElMessage.error(e?.userMessage ?? e?.message ?? 'Təklif göndərilmədi')
+    toast.error(e?.userMessage ?? e?.message ?? 'Təklif göndərilmədi')
   } finally {
     isSending.value = false
   }
