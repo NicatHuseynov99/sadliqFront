@@ -111,11 +111,16 @@
         <p v-if="r.note" class="req-note">💬 {{ r.note }}</p>
 
         <!-- Təkliflər -->
-        <p v-if="!r.offers.length" class="waiting">
-          {{ r.status === REQUEST_STATUS.open
-            ? 'Təkliflər gözlənilir — gələn kimi bildiriş alacaqsınız.'
-            : 'Bu sorğuya təklif gəlməyib.' }}
-        </p>
+        <div v-if="!r.offers.length && r.status === REQUEST_STATUS.open" class="waiting-box">
+          <span class="waiting-icon">⏳</span>
+          <div>
+            <b>Təkliflər gözlənilir</b>
+            <span>Uyğun saraylara göndərildi — gələn kimi bildiriş alacaqsınız.</span>
+            <span class="waiting-time">{{ postedAgo(r) }} · {{ timeLeftText(r) }}</span>
+          </div>
+        </div>
+
+        <p v-else-if="!r.offers.length" class="waiting">Bu sorğuya təklif gəlməyib.</p>
 
         <template v-else>
           <!-- Sıralama: qərar müqayisə ilə verilir, ona görə açar rəqəmlər üzrə -->
@@ -270,6 +275,25 @@ const formatDate = (value) => {
   const d = new Date(value)
   const pad = (n) => String(n).padStart(2, '0')
   return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`
+}
+
+// Sorğu nə vaxt paylaşılıb — quru «gözlənilir» yazısı əvəzinə nə baş verdiyini göstərir
+const postedAgo = (r) => {
+  const hours = Math.round((Date.now() - new Date(r.createdAt)) / 3600000)
+
+  if (hours < 1) return 'bir az əvvəl paylaşıldı'
+  if (hours < 24) return `${hours} saat əvvəl paylaşıldı`
+  return `${Math.round(hours / 24)} gün əvvəl paylaşıldı`
+}
+
+// Sorğu nə vaxta qədər açıqdır — müştəri gözləməyin mənasını bilsin
+const timeLeftText = (r) => {
+  if (!r.expiresAt) return ''
+
+  const hours = Math.round((new Date(r.expiresAt) - Date.now()) / 3600000)
+  if (hours <= 0) return 'bağlanır'
+  if (hours < 24) return `${hours} saat sonra bağlanacaq`
+  return `${Math.round(hours / 24)} gün sonra bağlanacaq`
 }
 
 const load = async () => {
@@ -715,6 +739,52 @@ textarea:focus {
   margin: 14px 0 0;
   font-size: 0.82rem;
   color: #a6969c;
+}
+
+/* Cavab gözlənilən sorğu — nə baş verdiyi görünür, quru cümlə deyil */
+.waiting-box {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--info-soft, #eef4fb);
+  border-radius: var(--r, 11px);
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+
+.waiting-icon {
+  font-size: 1.3rem;
+  animation: waiting-pulse 2s ease-in-out infinite;
+}
+
+@keyframes waiting-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.waiting-box b {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--ink, #1a1118);
+  margin-bottom: 3px;
+}
+
+.waiting-box span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted, #6c757d);
+  line-height: 1.5;
+}
+
+.waiting-time {
+  margin-top: 4px;
+  color: var(--info, #2d5f9a) !important;
+  font-weight: 600;
 }
 
 /* Təkliflər */
