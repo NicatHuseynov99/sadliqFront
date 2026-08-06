@@ -282,7 +282,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 .field select {
   width: 100%;
   padding: 8px 11px;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 8px;
   font-size: 0.85rem;
   background: #fff;
@@ -291,7 +291,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .field input:focus,
 .field select:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   outline: none;
   box-shadow: 0 0 0 3px rgba(223, 177, 91, 0.15);
 }
@@ -381,8 +381,8 @@ onBeforeUnmount(() => clearTimeout(timer))
 .day-name {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #721438;
-  background: #f6e9ee;
+  color: var(--brand);
+  background: var(--brand-soft);
   padding: 4px 12px;
   border-radius: 20px;
   white-space: nowrap;
@@ -415,7 +415,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 }
 
 .avatar.superadmin {
-  background: linear-gradient(135deg, #721438, #4a0d24);
+  background: linear-gradient(135deg, var(--brand), #4a0d24);
 }
 
 .avatar.support {
@@ -442,7 +442,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .log-time b {
   font-size: 0.85rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .log-time em {
@@ -458,7 +458,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   border-radius: 20px;
   text-align: center;
   background: #f1f3f5;
-  color: #868e96;
+  color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -466,12 +466,12 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .log-badge.success { background: #e3f6e8; color: #1e7e34; }
 .log-badge.warning { background: #fff6e0; color: #b07d2b; }
-.log-badge.danger { background: #fdeaea; color: #c0392b; }
+.log-badge.danger { background: var(--danger-soft); color: #c0392b; }
 .log-badge.info { background: #eef2f7; color: #4a6fa5; }
 
 .log-text {
   font-size: 0.87rem;
-  color: #1a1118;
+  color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -493,7 +493,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .log-user b {
   font-size: 0.8rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .role-tag {
@@ -502,9 +502,9 @@ onBeforeUnmount(() => clearTimeout(timer))
   color: #b8a3ab;
 }
 
-.role-tag.superadmin { color: #1a1118; font-weight: 700; }
+.role-tag.superadmin { color: var(--ink); font-weight: 700; }
 .role-tag.support { color: #1e7e34; }
-.role-tag.owner { color: #721438; }
+.role-tag.owner { color: var(--brand); }
 .role-tag.venueadmin { color: #8a6220; }
 
 .log-toggle {
@@ -515,7 +515,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 /* Detallar */
 .log-details {
-  background: #faf7f8;
+  background: var(--bg);
   border-top: 1px solid #f2ecee;
   padding: 14px 16px;
 }
@@ -542,13 +542,13 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .detail-grid b {
   font-size: 0.82rem;
-  color: #1a1118;
+  color: var(--ink);
   word-break: break-all;
 }
 
 .detail-error {
   margin-top: 12px;
-  background: #fdeaea;
+  background: var(--danger-soft);
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 0.82rem;
@@ -597,7 +597,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .page-btn {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 7px 16px;
   border-radius: 8px;
@@ -607,8 +607,8 @@ onBeforeUnmount(() => clearTimeout(timer))
 }
 
 .page-btn:hover:not(:disabled) {
-  border-color: #721438;
-  color: #721438;
+  border-color: var(--brand);
+  color: var(--brand);
 }
 
 .page-btn:disabled {
@@ -618,7 +618,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .page-info {
   font-size: 0.82rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .empty-box {
@@ -626,7 +626,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   border-radius: 12px;
   padding: 34px 20px;
   text-align: center;
-  color: #868e96;
+  color: var(--muted);
   font-size: 0.88rem;
 }
 

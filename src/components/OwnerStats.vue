@@ -151,13 +151,13 @@ onMounted(load)
 
 .period-label {
   font-size: 0.78rem;
-  color: #868e96;
+  color: var(--muted);
   margin-right: 4px;
 }
 
 .period-btn {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 6px 14px;
   border-radius: 20px;
@@ -167,18 +167,18 @@ onMounted(load)
 }
 
 .period-btn:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .period-btn.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
 .venue-block {
   background: #fff;
-  border: 1px solid #f2ebee;
+  border: 1px solid var(--line);
   border-radius: 15px;
   padding: 18px 22px 20px;
 }
@@ -193,12 +193,12 @@ onMounted(load)
 
 .vb-head b {
   font-size: 1.02rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .rating {
   font-size: 0.8rem;
-  color: #b06a2b;
+  color: var(--warn);
 }
 
 /* Baxış → sorğu → təsdiq */
@@ -221,7 +221,7 @@ onMounted(load)
 .step-value {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #721438;
+  color: var(--brand);
   line-height: 1.1;
 }
 
@@ -232,16 +232,16 @@ onMounted(load)
 
 .step-extra {
   font-size: 0.72rem;
-  color: #a6969c;
+  color: var(--muted-2);
   margin-top: 2px;
 }
 
 .step-extra.up {
-  color: #217a41;
+  color: var(--ok);
 }
 
 .step-extra.down {
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .arrow {
@@ -275,20 +275,20 @@ onMounted(load)
   display: block;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .tile.good .tile-value {
-  color: #217a41;
+  color: var(--ok);
 }
 
 .tile.bad .tile-value {
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .tile-label {
   font-size: 0.73rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .offers-line {
@@ -298,7 +298,7 @@ onMounted(load)
 }
 
 .offers-line b {
-  color: #2d5f9a;
+  color: var(--info);
 }
 
 /* Məsləhətlər */
@@ -314,7 +314,7 @@ onMounted(load)
   display: block;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #b06a2b;
+  color: var(--warn);
   margin-bottom: 7px;
 }
 
@@ -336,6 +336,6 @@ onMounted(load)
   padding: 30px;
   text-align: center;
   font-size: 0.85rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 </style>

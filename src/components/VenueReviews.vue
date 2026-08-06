@@ -296,8 +296,8 @@ onMounted(() => {
 .section-title {
   margin: 34px 0 16px;
   font-size: 1.35rem;
-  color: #1a1118;
-  border-left: 4px solid #721438;
+  color: var(--ink);
+  border-left: 4px solid var(--brand);
   padding-left: 12px;
 }
 
@@ -321,7 +321,7 @@ onMounted(() => {
 .review-form h4 {
   margin: 0 0 12px;
   font-size: 1rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .star-picker {
@@ -347,13 +347,13 @@ onMounted(() => {
 }
 
 .star-btn.filled {
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 .star-hint {
   margin-left: 10px;
   font-size: 0.83rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .review-form-foot {
@@ -391,13 +391,13 @@ onMounted(() => {
 .review-locked b {
   display: block;
   font-size: 0.88rem;
-  color: #1a1118;
+  color: var(--ink);
   margin-bottom: 3px;
 }
 
 .review-locked span {
   font-size: 0.8rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.55;
 }
 
@@ -416,8 +416,8 @@ onMounted(() => {
 
 /* Tədbiri keçmiş qonaq nişanı — reytinqin dəyəri buna söykənir */
 .verified-tag {
-  background: #e9f6ee;
-  color: #217a41;
+  background: var(--ok-soft);
+  color: var(--ok);
   font-style: normal;
   font-size: 0.67rem;
   font-weight: 600;
@@ -439,12 +439,12 @@ onMounted(() => {
 }
 
 .review-card.mine {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   background: #fffdf7;
 }
 
 .review-card.editing {
-  border-color: #721438;
+  border-color: var(--brand);
   box-shadow: 0 0 0 3px rgba(114, 20, 56, 0.1);
 }
 
@@ -475,13 +475,13 @@ onMounted(() => {
 
 .icon-btn:hover {
   background: #fff;
-  border-color: #dfb15b;
+  border-color: var(--gold);
   transform: translateY(-1px);
 }
 
 .icon-btn.danger:hover {
   border-color: #c0392b;
-  background: #fdeaea;
+  background: var(--danger-soft);
 }
 
 .review-list {
@@ -506,12 +506,12 @@ onMounted(() => {
 
 .review-author {
   font-weight: 700;
-  color: #1a1118;
+  color: var(--ink);
   font-size: 0.92rem;
 }
 
 .review-stars {
-  color: #dfb15b;
+  color: var(--gold);
   letter-spacing: 2px;
 }
 
@@ -539,13 +539,13 @@ onMounted(() => {
 }
 
 .report-btn:hover {
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .report-note {
   margin: 0 0 14px;
   font-size: 0.83rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.5;
 }
 
@@ -558,7 +558,7 @@ onMounted(() => {
 
 .reason-chip {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 5px 13px;
   border-radius: 20px;
@@ -569,12 +569,12 @@ onMounted(() => {
 }
 
 .reason-chip:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .reason-chip.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -586,7 +586,7 @@ onMounted(() => {
 }
 
 .reserve-btn {
-  background: #721438;
+  background: var(--brand);
   color: white;
   border: none;
   padding: 8px 18px;
@@ -598,7 +598,7 @@ onMounted(() => {
 }
 
 .reserve-btn:hover {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 
 .reserve-btn:disabled {

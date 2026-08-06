@@ -667,7 +667,7 @@ const selectVenue = (venue) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #1a1118;
+  background: var(--ink);
   color: #fff;
   border-radius: 14px;
   padding: 11px 16px;
@@ -724,8 +724,8 @@ const selectVenue = (venue) => {
 }
 
 .cmp-open {
-  background: #dfb15b;
-  color: #1a1118;
+  background: var(--gold);
+  color: var(--ink);
   border: none;
   padding: 9px 20px;
   border-radius: 10px;
@@ -752,7 +752,7 @@ const selectVenue = (venue) => {
   align-items: center;
   justify-content: space-between;
   gap: 28px;
-  background: linear-gradient(135deg, #1a1118 0%, #4a1026 55%, #721438 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, #4a1026 55%, var(--brand) 100%);
   border-radius: 20px;
   padding: 26px 32px;
   color: #fff;
@@ -761,8 +761,8 @@ const selectVenue = (venue) => {
 
 .rb-badge {
   display: inline-block;
-  background: #dfb15b;
-  color: #1a1118;
+  background: var(--gold);
+  color: var(--ink);
   font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -813,7 +813,7 @@ const selectVenue = (venue) => {
   height: 20px;
   border-radius: 50%;
   background: rgba(223, 177, 91, 0.2);
-  color: #dfb15b;
+  color: var(--gold);
   font-size: 0.7rem;
   font-weight: 700;
   display: flex;
@@ -830,8 +830,8 @@ const selectVenue = (venue) => {
 }
 
 .rb-btn {
-  background: #dfb15b;
-  color: #1a1118;
+  background: var(--gold);
+  color: var(--ink);
   border: none;
   padding: 14px 30px;
   border-radius: 12px;
@@ -883,7 +883,7 @@ const selectVenue = (venue) => {
 .badge-top {
   display: inline-block;
   background: rgba(197, 155, 71, 0.2);
-  color: #dfb15b;
+  color: var(--gold);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -942,7 +942,7 @@ const selectVenue = (venue) => {
   padding: 6px;
   list-style: none;
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 12px;
   box-shadow: 0 12px 30px rgba(26, 17, 24, 0.16);
   max-height: 340px;
@@ -987,13 +987,13 @@ const selectVenue = (venue) => {
 
 .sug-text b {
   font-size: 0.88rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .sug-text em {
   font-style: normal;
   font-size: 0.74rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .sug-type {
@@ -1005,7 +1005,7 @@ const selectVenue = (venue) => {
 }
 
 .search-main:focus-within {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   background: #fff;
   box-shadow: 0 0 0 3px rgba(223, 177, 91, 0.15);
 }
@@ -1195,13 +1195,13 @@ const selectVenue = (venue) => {
 }
 
 .mini-chip:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   color: #212529;
 }
 
 .mini-chip[aria-pressed="true"] {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -1258,7 +1258,7 @@ const selectVenue = (venue) => {
 
 .range-val {
   float: right;
-  color: #721438;
+  color: var(--brand);
   font-weight: 700;
   text-transform: none;
   letter-spacing: 0;
@@ -1269,11 +1269,11 @@ const selectVenue = (venue) => {
 }
 
 .price-slider :deep(.el-slider__bar) {
-  background-color: #721438;
+  background-color: var(--brand);
 }
 
 .price-slider :deep(.el-slider__button) {
-  border-color: #721438;
+  border-color: var(--brand);
 }
 
 .chip em {
@@ -1318,7 +1318,7 @@ const selectVenue = (venue) => {
 }
 
 .field input:focus, .field select:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   outline: none;
   box-shadow: 0 0 0 3px rgba(223, 177, 91, 0.15);
 }
@@ -1336,13 +1336,13 @@ const selectVenue = (venue) => {
 .budget-row input[type=range] {
   flex: 1;
   padding: 0;
-  accent-color: #721438;
+  accent-color: var(--brand);
 }
 
 .budget-val {
   font-weight: 600;
   font-size: 0.85rem;
-  color: #721438;
+  color: var(--brand);
   white-space: nowrap;
 }
 
@@ -1392,13 +1392,13 @@ const selectVenue = (venue) => {
 }
 
 .chip:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   color: #212529;
 }
 
 .chip[aria-pressed="true"] {
-  background: #1a1118;
-  border-color: #1a1118;
+  background: var(--ink);
+  border-color: var(--ink);
   color: #fff;
 }
 
@@ -1421,7 +1421,7 @@ const selectVenue = (venue) => {
   width: 18px;
   height: 18px;
   border: 2px solid #e9ecef;
-  border-top-color: #721438;
+  border-top-color: var(--brand);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -1454,7 +1454,7 @@ const selectVenue = (venue) => {
 
 .results-header h2 {
   font-size: 1.6rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .header-tools {
@@ -1486,12 +1486,12 @@ const selectVenue = (venue) => {
 
 .view-switch button.active {
   background: #fff;
-  color: #721438;
+  color: var(--brand);
   box-shadow: 0 2px 6px rgba(26, 17, 24, 0.1);
 }
 
 .results-header h2 span {
-  color: #721438;
+  color: var(--brand);
 }
 
 .sort-box {
@@ -1530,7 +1530,7 @@ const selectVenue = (venue) => {
 }
 
 .btn-reset-empty {
-  background: #1a1118;
+  background: var(--ink);
   color: white;
   border: none;
   padding: 8px 20px;
@@ -1597,7 +1597,7 @@ const selectVenue = (venue) => {
   display: grid;
   place-items: center;
   font-size: 1.1rem;
-  color: #721438;
+  color: var(--brand);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   transition: transform 0.2s;
@@ -1608,7 +1608,7 @@ const selectVenue = (venue) => {
 }
 
 .fav-btn[aria-pressed="true"] {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
 }
 
@@ -1654,7 +1654,7 @@ const selectVenue = (venue) => {
 .title-row h3 {
   margin: 0;
   font-size: 1.25rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .rating-pill {
@@ -1690,7 +1690,7 @@ const selectVenue = (venue) => {
 }
 
 .avail-badge.busy {
-  background: #fdeaea;
+  background: var(--danger-soft);
   color: #c0392b;
 }
 
@@ -1737,7 +1737,7 @@ const selectVenue = (venue) => {
 }
 
 .menu-chip:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   background: #fffaf0;
 }
 
@@ -1756,12 +1756,12 @@ const selectVenue = (venue) => {
 
 .menu-chip-text strong {
   font-size: 0.8rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .menu-chip-text span {
   font-size: 0.72rem;
-  color: #721438;
+  color: var(--brand);
   font-weight: 600;
 }
 
@@ -1813,7 +1813,7 @@ const selectVenue = (venue) => {
 }
 
 .detail-btn {
-  background: #721438;
+  background: var(--brand);
   color: white;
   border: none;
   padding: 7px 16px;
@@ -1826,7 +1826,7 @@ const selectVenue = (venue) => {
 }
 
 .detail-btn:hover {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 
 @media (max-width: 900px) {

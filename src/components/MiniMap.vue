@@ -83,12 +83,12 @@ onBeforeUnmount(() => map.value?.remove())
 .mini-head h3 {
   margin: 0;
   font-size: 1.15rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .mini-sub {
   font-size: 0.83rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .mini-map {

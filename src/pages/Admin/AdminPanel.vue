@@ -254,7 +254,7 @@ onMounted(load)
   align-items: flex-start;
   gap: 20px;
   flex-wrap: wrap;
-  background: linear-gradient(120deg, #2a0f1c 0%, #4a0d24 55%, #721438 100%);
+  background: linear-gradient(120deg, #2a0f1c 0%, #4a0d24 55%, var(--brand) 100%);
   border-radius: 18px;
   padding: 26px 30px;
   margin-bottom: 20px;
@@ -283,7 +283,7 @@ onMounted(load)
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #dfb15b;
+  color: var(--gold);
   font-weight: 700;
   margin-bottom: 6px;
 }
@@ -313,7 +313,7 @@ onMounted(load)
 .admin-tag {
   background: rgba(223, 177, 91, 0.15);
   border: 1px solid rgba(223, 177, 91, 0.4);
-  color: #dfb15b;
+  color: var(--gold);
   font-size: 0.8rem;
   font-weight: 700;
   padding: 7px 15px;
@@ -346,7 +346,7 @@ onMounted(load)
   align-items: center;
   gap: 7px;
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 9px 17px;
   border-radius: 10px;
@@ -365,7 +365,7 @@ onMounted(load)
 /* Gözləyən işin sayı bölmənin üstündə görünür */
 .tab-badge {
   font-style: normal;
-  background: #b06a2b;
+  background: var(--warn);
   color: #fff;
   font-size: 0.66rem;
   font-weight: 700;
@@ -378,19 +378,19 @@ onMounted(load)
 }
 
 .section-tab:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   transform: translateY(-1px);
 }
 
 .section-tab.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
   box-shadow: 0 6px 16px rgba(114, 20, 56, 0.25);
 }
 
 .section-tab.active .tab-badge {
-  background: #dfb15b;
+  background: var(--gold);
   color: #4a0d24;
 }
 
@@ -429,18 +429,18 @@ button.stat-card:hover {
 }
 
 .stat-card.dark {
-  background: linear-gradient(135deg, #1a1118, #3a2430);
+  background: linear-gradient(135deg, var(--ink), #3a2430);
   border-color: transparent;
 }
 
-.stat-card.dark .stat-value { color: #dfb15b; }
+.stat-card.dark .stat-value { color: var(--gold); }
 .stat-card.dark .stat-label,
 .stat-card.dark .stat-sub { color: rgba(255, 255, 255, 0.75); }
 
 .stat-value {
   font-size: 1.7rem;
   font-weight: 800;
-  color: #1a1118;
+  color: var(--ink);
   line-height: 1.1;
 }
 
@@ -484,13 +484,13 @@ button.stat-card:hover {
 .block-title {
   margin: 0;
   font-size: 1.15rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .block-title em {
   font-style: normal;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.8rem;
   padding: 2px 10px;
   border-radius: 20px;
@@ -530,7 +530,7 @@ button.stat-card:hover {
 
 .pending-text b {
   font-size: 0.92rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .pending-text span,
@@ -565,7 +565,7 @@ button.stat-card:hover {
 .mini-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #4a3f44;
+  color: var(--ink-2);
   padding: 5px 11px;
   border-radius: 8px;
   font-size: 0.75rem;
@@ -575,8 +575,8 @@ button.stat-card:hover {
 }
 
 .mini-btn:hover {
-  border-color: #dfb15b;
-  color: #1a1118;
+  border-color: var(--gold);
+  color: var(--ink);
 }
 
 @media (max-width: 980px) {

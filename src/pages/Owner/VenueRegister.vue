@@ -596,7 +596,7 @@ onMounted(async () => {
   align-items: center;
   gap: 24px;
   flex-wrap: wrap;
-  background: linear-gradient(120deg, #2a0f1c 0%, #4a0d24 55%, #721438 100%);
+  background: linear-gradient(120deg, #2a0f1c 0%, #4a0d24 55%, var(--brand) 100%);
   border-radius: 18px;
   padding: 26px 30px;
   margin-bottom: 18px;
@@ -625,7 +625,7 @@ onMounted(async () => {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #dfb15b;
+  color: var(--gold);
   font-weight: 700;
   margin-bottom: 6px;
 }
@@ -645,7 +645,7 @@ onMounted(async () => {
 }
 
 .hero p b {
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 .hero-points {
@@ -670,7 +670,7 @@ onMounted(async () => {
 }
 
 .hero-points b {
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 /* İrəliləyiş zolağı */
@@ -692,14 +692,14 @@ onMounted(async () => {
 .progress-bar span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #721438, #dfb15b);
+  background: linear-gradient(90deg, var(--brand), var(--gold));
   border-radius: 20px;
   transition: width 0.3s;
 }
 
 .progress-text {
   font-size: 0.76rem;
-  color: #a6969c;
+  color: var(--muted-2);
   white-space: nowrap;
 }
 
@@ -718,11 +718,11 @@ onMounted(async () => {
   align-items: center;
   gap: 6px;
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   padding: 7px 13px;
   border-radius: 20px;
   font-size: 0.78rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .steps li {
@@ -730,18 +730,18 @@ onMounted(async () => {
 }
 
 .steps li:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 /* Doldurulmuş addım yaşıl nişan alır */
 .steps li.filled {
-  color: #217a41;
+  color: var(--ok);
   border-color: #d7ecdf;
 }
 
 .steps li.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
   font-weight: 600;
 }
@@ -753,7 +753,7 @@ onMounted(async () => {
 .saved-note {
   margin: -8px 0 16px;
   font-size: 0.76rem;
-  color: #a6969c;
+  color: var(--muted-2);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -763,7 +763,7 @@ onMounted(async () => {
 .reset-link {
   background: none;
   border: none;
-  color: #a02c4a;
+  color: var(--accent);
   font-size: 0.76rem;
   cursor: pointer;
   text-decoration: underline;
@@ -781,13 +781,13 @@ onMounted(async () => {
 .card h2 {
   margin: 0 0 6px;
   font-size: 1.2rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .hint {
   margin: 0 0 18px;
   font-size: 0.84rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.6;
 }
 
@@ -820,18 +820,18 @@ label.wide,
 /* Məcburi sahə nişanı */
 label i {
   font-style: normal;
-  color: #a02c4a;
+  color: var(--accent);
   font-weight: 700;
 }
 
 input,
 textarea,
 select {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 10px;
   padding: 9px 13px;
   font-size: 0.88rem;
-  color: #1a1118;
+  color: var(--ink);
   outline: none;
   font-family: inherit;
   transition: border-color 0.15s;
@@ -839,7 +839,7 @@ select {
 
 input:focus,
 textarea:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 label.check {
@@ -864,7 +864,7 @@ label.check {
 
 .chip {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 6px 13px;
   border-radius: 20px;
@@ -874,8 +874,8 @@ label.check {
 }
 
 .chip.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -893,7 +893,7 @@ label.check {
   align-items: center;
   margin-bottom: 10px;
   font-size: 0.9rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .row-input {
@@ -909,7 +909,7 @@ label.check {
 .del-btn {
   border: 1px solid #f3dbe1;
   background: #fff;
-  color: #a02c4a;
+  color: var(--accent);
   width: 34px;
   border-radius: 9px;
   cursor: pointer;
@@ -917,8 +917,8 @@ label.check {
 
 .add-link {
   background: none;
-  border: 1px dashed #dfb15b;
-  color: #721438;
+  border: 1px dashed var(--gold);
+  color: var(--brand);
   padding: 8px 16px;
   border-radius: 10px;
   font-size: 0.82rem;
@@ -953,7 +953,7 @@ label.check {
 
 .ask-box b {
   font-size: 0.92rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .ask-box p {
@@ -989,26 +989,26 @@ label.check {
   display: flex;
   gap: 14px;
   font-size: 0.86rem;
-  border-bottom: 1px solid #faf7f8;
+  border-bottom: 1px solid var(--bg);
   padding-bottom: 8px;
 }
 
 .summary dt {
   width: 140px;
   flex: none;
-  color: #a6969c;
+  color: var(--muted-2);
   font-size: 0.78rem;
 }
 
 .summary dd {
   margin: 0;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .note-box {
   margin-top: 16px;
   background: #fffaf2;
-  border-left: 3px solid #dfb15b;
+  border-left: 3px solid var(--gold);
   border-radius: 0 10px 10px 0;
   padding: 11px 14px;
   font-size: 0.83rem;
@@ -1020,7 +1020,7 @@ label.check {
   margin-top: 16px;
   background: #fdf4f6;
   border: 1px solid #f5dbe2;
-  color: #a02c4a;
+  color: var(--accent);
   padding: 11px 14px;
   border-radius: 10px;
   font-size: 0.85rem;
@@ -1050,8 +1050,8 @@ label.check {
 }
 
 .primary-btn {
-  background: #721438;
-  border: 1px solid #721438;
+  background: var(--brand);
+  border: 1px solid var(--brand);
   color: #fff;
 }
 
@@ -1067,11 +1067,11 @@ label.check {
 .ghost-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #4a3f44;
+  color: var(--ink-2);
 }
 
 .ghost-btn:hover:not(:disabled) {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 /* Nəticə ekranı */
@@ -1090,7 +1090,7 @@ label.check {
 .done-box h1 {
   margin: 12px 0 8px;
   font-size: 1.5rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .done-text {
@@ -1119,7 +1119,7 @@ label.check {
 
 .missing-note {
   font-size: 0.78rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .done-actions {

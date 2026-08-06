@@ -256,7 +256,7 @@ onMounted(async () => {
 
 .page-title {
   margin: 0 0 4px;
-  color: #1a1118;
+  color: var(--ink);
   font-size: 1.7rem;
 }
 
@@ -293,13 +293,13 @@ onMounted(async () => {
   font-size: 1.5rem;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, #721438, #b07d2b);
+  background: linear-gradient(135deg, var(--brand), #b07d2b);
   box-shadow: 0 8px 18px rgba(114, 20, 56, 0.25);
 }
 
 .account-card h3 {
   margin: 0 0 8px;
-  color: #1a1118;
+  color: var(--ink);
   font-size: 1.1rem;
 }
 
@@ -310,7 +310,7 @@ onMounted(async () => {
   padding: 4px 12px;
   border-radius: 20px;
   background: #f1f3f5;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .role-tag.customer {
@@ -319,8 +319,8 @@ onMounted(async () => {
 }
 
 .role-tag.owner {
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
 .account-facts {
@@ -348,7 +348,7 @@ onMounted(async () => {
 
 .account-facts b {
   font-size: 0.88rem;
-  color: #1a1118;
+  color: var(--ink);
   word-break: break-all;
 }
 
@@ -389,7 +389,7 @@ onMounted(async () => {
 .card-title {
   margin: 0 0 4px;
   font-size: 1.15rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 /* Bildiriş seçimi sətri */
@@ -406,12 +406,12 @@ onMounted(async () => {
 .switch-row b {
   display: block;
   font-size: 0.87rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .switch-row span {
   font-size: 0.78rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .prefs-note {
@@ -425,13 +425,13 @@ onMounted(async () => {
 }
 
 .prefs-note b {
-  color: #4a3f44;
+  color: var(--ink-2);
 }
 
 .card-sub {
   margin: 0 0 16px;
   font-size: 0.85rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .form-foot {
@@ -442,7 +442,7 @@ onMounted(async () => {
 }
 
 .primary-btn {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
   border: none;
   padding: 10px 22px;
@@ -454,7 +454,7 @@ onMounted(async () => {
 }
 
 .primary-btn:hover:not(:disabled) {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 
 .primary-btn:disabled {
@@ -465,7 +465,7 @@ onMounted(async () => {
 .link-btn {
   background: none;
   border: none;
-  color: #868e96;
+  color: var(--muted);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -473,7 +473,7 @@ onMounted(async () => {
 }
 
 .link-btn:hover {
-  color: #721438;
+  color: var(--brand);
   text-decoration: underline;
 }
 

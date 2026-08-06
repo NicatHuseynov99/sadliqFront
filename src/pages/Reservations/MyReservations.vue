@@ -306,7 +306,7 @@ onMounted(load)
 
 .page-title {
   margin: 0 0 4px;
-  color: #1a1118;
+  color: var(--ink);
   font-size: 1.7rem;
 }
 
@@ -317,7 +317,7 @@ onMounted(load)
 }
 
 .new-link {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
   text-decoration: none;
   padding: 9px 18px;
@@ -329,7 +329,7 @@ onMounted(load)
 }
 
 .new-link:hover {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 
 /* Status xülasəsi */
@@ -361,13 +361,13 @@ onMounted(load)
 .summary-count {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #1a1118;
+  color: var(--ink);
   line-height: 1;
 }
 
 .summary-label {
   font-size: 0.76rem;
-  color: #868e96;
+  color: var(--muted);
   font-weight: 600;
 }
 
@@ -375,11 +375,11 @@ onMounted(load)
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
-.summary-card.all.active { border-bottom-color: #721438; }
+.summary-card.all.active { border-bottom-color: var(--brand); }
 .summary-card.pending.active { border-bottom-color: #b07d2b; }
 .summary-card.confirmed.active { border-bottom-color: #1e7e34; }
 .summary-card.rejected.active { border-bottom-color: #c0392b; }
-.summary-card.cancelled.active { border-bottom-color: #868e96; }
+.summary-card.cancelled.active { border-bottom-color: var(--muted); }
 
 /* Rezerv kartları */
 .res-list {
@@ -404,7 +404,7 @@ onMounted(load)
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
 }
 
-.res-card.pending { border-left-color: #dfb15b; }
+.res-card.pending { border-left-color: var(--gold); }
 .res-card.confirmed { border-left-color: #1e7e34; }
 .res-card.rejected { border-left-color: #c0392b; }
 .res-card.cancelled { border-left-color: #ced4da; }
@@ -423,7 +423,7 @@ onMounted(load)
 .offer-box > b {
   display: block;
   font-size: 0.86rem;
-  color: #2d5f9a;
+  color: var(--info);
   margin-bottom: 7px;
 }
 
@@ -436,7 +436,7 @@ onMounted(load)
 }
 
 .offer-list s {
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .offer-message {
@@ -471,8 +471,8 @@ onMounted(load)
 /* «Baxıldı» nişanı */
 .seen-tag {
   font-size: 0.74rem;
-  color: #b06a2b;
-  background: #fdf6ec;
+  color: var(--warn);
+  background: var(--warn-soft);
   padding: 3px 10px;
   border-radius: 20px;
   margin-right: auto;
@@ -481,15 +481,15 @@ onMounted(load)
 
 .hold-tag {
   font-size: 0.74rem;
-  color: #2d5f9a;
-  background: #eef4fb;
+  color: var(--info);
+  background: var(--info-soft);
   padding: 3px 10px;
   border-radius: 20px;
   margin-right: 10px;
 }
 
 .seen-tag.seen {
-  color: #217a41;
+  color: var(--ok);
   background: #f0f8f3;
 }
 
@@ -525,7 +525,7 @@ onMounted(load)
 
 .res-title-row h3 {
   margin: 0 0 2px;
-  color: #1a1118;
+  color: var(--ink);
   font-size: 1.15rem;
 }
 
@@ -544,9 +544,9 @@ onMounted(load)
 
 .status-tag.pending { background: #fff6e0; color: #b07d2b; }
 .status-tag.confirmed { background: #e3f6e8; color: #1e7e34; }
-.status-tag.rejected { background: #fdeaea; color: #c0392b; }
-.status-tag.cancelled { background: #f1f3f5; color: #868e96; }
-.status-tag.offered { background: #eaf1fa; color: #2d5f9a; }
+.status-tag.rejected { background: var(--danger-soft); color: #c0392b; }
+.status-tag.cancelled { background: #f1f3f5; color: var(--muted); }
+.status-tag.offered { background: #eaf1fa; color: var(--info); }
 .status-tag.expired { background: #f4efe6; color: #8a6d3b; }
 
 /* Detal sətirləri */
@@ -576,18 +576,18 @@ onMounted(load)
 
 .fact b {
   font-size: 0.92rem;
-  color: #1a1118;
+  color: var(--ink);
   font-weight: 600;
 }
 
 .fact-extra {
   font-style: normal;
   font-size: 0.75rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .fact-total b {
-  color: #721438;
+  color: var(--brand);
   font-size: 1.1rem;
   font-weight: 800;
 }
@@ -595,7 +595,7 @@ onMounted(load)
 .res-note {
   margin: 12px 0 0;
   font-size: 0.83rem;
-  color: #868e96;
+  color: var(--muted);
   font-style: italic;
 }
 
@@ -656,7 +656,7 @@ onMounted(load)
 }
 
 .primary-btn {
-  background: #721438;
+  background: var(--brand);
   color: white;
   border: none;
   padding: 9px 22px;
@@ -666,7 +666,7 @@ onMounted(load)
 }
 
 .primary-btn:hover {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 
 @media (max-width: 760px) {

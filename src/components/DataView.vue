@@ -366,7 +366,7 @@ onMounted(refresh)
   border-radius: 9px;
   font-size: 0.83rem;
   font-weight: 600;
-  color: #4a3f44;
+  color: var(--ink-2);
   cursor: pointer;
   text-align: left;
   transition: background 0.15s, color 0.15s;
@@ -377,7 +377,7 @@ onMounted(refresh)
 }
 
 .table-btn.active {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
 }
 
@@ -412,13 +412,13 @@ onMounted(refresh)
 .block-title {
   margin: 0;
   font-size: 1rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .block-title em {
   font-style: normal;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.78rem;
   padding: 2px 9px;
   border-radius: 20px;
@@ -434,11 +434,11 @@ onMounted(refresh)
 
 .search-box,
 .value-box {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 10px;
   padding: 9px 13px;
   font-size: 0.82rem;
-  color: #1a1118;
+  color: var(--ink);
   background: #fff;
   outline: none;
   transition: border-color 0.15s;
@@ -450,7 +450,7 @@ onMounted(refresh)
 
 .search-box:focus,
 .value-box:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .switch {
@@ -463,7 +463,7 @@ onMounted(refresh)
 }
 
 .add-btn {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
   border: none;
   padding: 9px 16px;
@@ -501,17 +501,17 @@ onMounted(refresh)
 }
 
 .grid th:hover {
-  color: #721438;
+  color: var(--brand);
 }
 
 .arrow {
-  color: #721438;
+  color: var(--brand);
 }
 
 .grid td {
   padding: 8px 10px;
-  border-bottom: 1px solid #faf7f8;
-  color: #1a1118;
+  border-bottom: 1px solid var(--bg);
+  color: var(--ink);
   max-width: 240px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -547,7 +547,7 @@ onMounted(refresh)
   flex-direction: column;
   gap: 5px;
   font-size: 0.75rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .form-grid label.wide {
@@ -555,13 +555,13 @@ onMounted(refresh)
 }
 
 .req {
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .mini-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #4a3f44;
+  color: var(--ink-2);
   padding: 5px 12px;
   border-radius: 8px;
   font-size: 0.75rem;
@@ -572,7 +572,7 @@ onMounted(refresh)
 }
 
 .mini-btn:hover:not(:disabled) {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .mini-btn:disabled {
@@ -581,17 +581,17 @@ onMounted(refresh)
 }
 
 .mini-btn.danger {
-  color: #a02c4a;
+  color: var(--accent);
   border-color: #f3dbe1;
 }
 
 .mini-btn.ok {
-  color: #217a41;
+  color: var(--ok);
   border-color: #d7ecdf;
 }
 
 .empty-row {
-  color: #a6969c;
+  color: var(--muted-2);
   text-align: center;
   padding: 22px 10px;
 }
@@ -606,13 +606,13 @@ onMounted(refresh)
 
 .pager-info {
   font-size: 0.8rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .hint {
   margin: 16px 0 0;
   font-size: 0.76rem;
-  color: #a6969c;
+  color: var(--muted-2);
   line-height: 1.6;
 }
 

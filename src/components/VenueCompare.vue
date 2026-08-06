@@ -174,7 +174,7 @@ const rows = computed(() => [
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   color: #fff;
   padding: 15px 22px;
   border-radius: 16px 16px 0 0;
@@ -217,7 +217,7 @@ const rows = computed(() => [
 
 .cmp-table th {
   padding: 14px 12px;
-  border-bottom: 1px solid #f2ebee;
+  border-bottom: 1px solid var(--line);
   vertical-align: top;
   text-align: center;
   min-width: 180px;
@@ -234,13 +234,13 @@ const rows = computed(() => [
 .cmp-table th b {
   display: block;
   font-size: 0.9rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .cmp-table th span {
   display: block;
   font-size: 0.74rem;
-  color: #a6969c;
+  color: var(--muted-2);
   font-weight: 400;
 }
 
@@ -248,7 +248,7 @@ const rows = computed(() => [
   margin-top: 6px;
   background: none;
   border: none;
-  color: #a02c4a;
+  color: var(--accent);
   font-size: 0.72rem;
   cursor: pointer;
 }
@@ -261,12 +261,12 @@ const rows = computed(() => [
   padding: 10px 12px;
   border-bottom: 1px solid #f8f3f5;
   text-align: center;
-  color: #4a3f44;
+  color: var(--ink-2);
 }
 
 .row-label {
   text-align: left !important;
-  color: #868e96 !important;
+  color: var(--muted) !important;
   font-size: 0.78rem;
   white-space: nowrap;
   background: #fbf8f9;
@@ -277,7 +277,7 @@ const rows = computed(() => [
 /* Sətirdə ən yaxşı dəyər */
 .cmp-table td.best {
   background: #f2faf5;
-  color: #217a41;
+  color: var(--ok);
   font-weight: 700;
   position: relative;
 }
@@ -294,8 +294,8 @@ const rows = computed(() => [
 
 .mini-chip {
   display: inline-block;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.71rem;
   padding: 2px 8px;
   border-radius: 20px;
@@ -304,11 +304,11 @@ const rows = computed(() => [
 
 .features-cell em {
   font-style: normal;
-  color: #c1b3b8;
+  color: var(--faint);
 }
 
 .open-btn {
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   border: none;
   color: #fff;
   padding: 8px 18px;

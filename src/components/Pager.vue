@@ -94,7 +94,7 @@ const go = (value) => {
   min-width: 34px;
   height: 34px;
   padding: 0 10px;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   background: #fff;
   color: #6c757d;
   border-radius: 9px;
@@ -106,15 +106,15 @@ const go = (value) => {
 
 .page:hover:not(.active),
 .arrow:hover:not(:disabled) {
-  border-color: #dfb15b;
-  color: #721438;
+  border-color: var(--gold);
+  color: var(--brand);
   transform: translateY(-1px);
 }
 
 /* Cari səhifə */
 .page.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
   box-shadow: 0 5px 14px rgba(114, 20, 56, 0.25);
   cursor: default;
@@ -142,7 +142,7 @@ const go = (value) => {
 .total {
   margin-left: 10px;
   font-size: 0.76rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 @media (max-width: 520px) {

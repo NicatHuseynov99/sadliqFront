@@ -71,7 +71,7 @@ const onImgError = (event) => {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #dfb15b;
+  color: var(--gold);
   font-weight: 700;
 }
 
@@ -105,7 +105,7 @@ const onImgError = (event) => {
 
 .badge.wait {
   background: rgba(223, 177, 91, 0.22);
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 .badge.off {

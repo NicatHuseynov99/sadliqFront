@@ -351,13 +351,13 @@ onMounted(loadAll)
 .block-title {
   margin: 0 0 14px;
   font-size: 1rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .block-title em {
   font-style: normal;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.78rem;
   padding: 2px 9px;
   border-radius: 20px;
@@ -372,7 +372,7 @@ onMounted(loadAll)
 
 .hint {
   font-size: 0.76rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.5;
 }
 
@@ -403,7 +403,7 @@ onMounted(loadAll)
 
 /* Saxlanılmamış dəyişiklik gözə çarpsın */
 .setting-card.dirty {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   background: #fffdf7;
 }
 
@@ -418,7 +418,7 @@ onMounted(loadAll)
   height: 34px;
   flex: none;
   border-radius: 10px;
-  background: #f6e9ee;
+  background: var(--brand-soft);
   display: grid;
   place-items: center;
   font-size: 1rem;
@@ -426,14 +426,14 @@ onMounted(loadAll)
 
 .setting-name {
   font-size: 0.87rem;
-  color: #1a1118;
+  color: var(--ink);
   line-height: 1.3;
 }
 
 .setting-desc {
   margin: 0;
   font-size: 0.76rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.5;
   flex: 1;
 }
@@ -446,12 +446,12 @@ onMounted(loadAll)
 
 .unit {
   font-size: 0.76rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .save-btn {
   margin-left: auto;
-  background: #721438;
+  background: var(--brand);
   color: #fff;
   border: none;
   padding: 8px 14px;
@@ -474,7 +474,7 @@ onMounted(loadAll)
 
 .setting-foot {
   font-size: 0.7rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .setting-foot.muted {
@@ -482,11 +482,11 @@ onMounted(loadAll)
 }
 
 .value-box {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 10px;
   padding: 8px 12px;
   font-size: 0.85rem;
-  color: #1a1118;
+  color: var(--ink);
   background: #fff;
   outline: none;
   width: 110px;
@@ -499,12 +499,12 @@ onMounted(loadAll)
 }
 
 .value-box:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .value-box:disabled {
   background: #faf8f9;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 /* Kitabçalar */
@@ -563,7 +563,7 @@ onMounted(loadAll)
 }
 
 .mini-search {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 9px;
   padding: 6px 11px;
   font-size: 0.78rem;
@@ -573,11 +573,11 @@ onMounted(loadAll)
 }
 
 .mini-search:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .empty-line {
-  color: #a6969c;
+  color: var(--muted-2);
   font-size: 0.8rem;
   padding: 12px 0;
   justify-content: center;
@@ -595,12 +595,12 @@ onMounted(loadAll)
   align-items: center;
   gap: 5px;
   font-size: 0.74rem;
-  color: #868e96;
+  color: var(--muted);
   cursor: pointer;
 }
 
 .add-btn {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
   border: none;
   padding: 6px 13px;
@@ -642,7 +642,7 @@ onMounted(loadAll)
 
 .ref-name {
   flex: 1;
-  color: #1a1118;
+  color: var(--ink);
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -651,19 +651,19 @@ onMounted(loadAll)
 
 .ref-count {
   font-size: 0.75rem;
-  color: #868e96;
+  color: var(--muted);
   white-space: nowrap;
 }
 
 /* Nadir özəlliklər gözə çarpsın — birləşdirmək lazım ola bilər */
 .ref-list li.rare .ref-count {
-  color: #b06a2b;
+  color: var(--warn);
 }
 
 .mini-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #4a3f44;
+  color: var(--ink-2);
   padding: 5px 12px;
   border-radius: 8px;
   font-size: 0.76rem;
@@ -674,7 +674,7 @@ onMounted(loadAll)
 }
 
 .mini-btn:hover:not(:disabled) {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .mini-btn:disabled {
@@ -683,12 +683,12 @@ onMounted(loadAll)
 }
 
 .mini-btn.danger {
-  color: #a02c4a;
+  color: var(--accent);
   border-color: #f3dbe1;
 }
 
 .mini-btn.ok {
-  color: #217a41;
+  color: var(--ok);
   border-color: #d7ecdf;
 }
 </style>

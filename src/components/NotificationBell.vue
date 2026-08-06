@@ -211,7 +211,7 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 0;
   right: 0;
-  background: #a02c4a;
+  background: var(--accent);
   color: #fff;
   font-size: 0.62rem;
   font-weight: 700;
@@ -251,13 +251,13 @@ onBeforeUnmount(() => {
 
 .panel-head b {
   font-size: 0.9rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .link-btn {
   background: none;
   border: none;
-  color: #721438;
+  color: var(--brand);
   font-size: 0.76rem;
   cursor: pointer;
   font-weight: 600;
@@ -298,7 +298,7 @@ onBeforeUnmount(() => {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #dfb15b;
+  background: var(--gold);
 }
 
 .icon {
@@ -320,7 +320,7 @@ onBeforeUnmount(() => {
 
 .row b {
   font-size: 0.82rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .time {
@@ -344,8 +344,8 @@ onBeforeUnmount(() => {
 
 .tag {
   font-size: 0.64rem;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   padding: 2px 8px;
   border-radius: 20px;
 }
@@ -360,14 +360,14 @@ onBeforeUnmount(() => {
 }
 
 .del:hover {
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .empty {
   padding: 26px 16px;
   text-align: center;
   font-size: 0.8rem;
-  color: #a6969c;
+  color: var(--muted-2);
   margin: 0;
 }
 

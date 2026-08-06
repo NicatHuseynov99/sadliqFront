@@ -42,7 +42,7 @@
 
 <style scoped>
 .app-footer {
-  background: #1a1118;
+  background: var(--ink);
   color: #cbc3c8;
   padding: 44px 40px 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -58,7 +58,7 @@
 }
 
 .footer-logo {
-  color: #dfb15b;
+  color: var(--gold);
   font-size: 1.25rem;
   margin: 0 0 10px;
 }
@@ -90,7 +90,7 @@
 }
 
 .footer-col a:hover {
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 .footer-bottom {

@@ -466,13 +466,13 @@ onMounted(() => {
 .block-title {
   margin: 0 0 4px;
   font-size: 1.1rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .block-sub {
   margin: 0 0 16px;
   font-size: 0.83rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.5;
 }
 
@@ -496,7 +496,7 @@ onMounted(() => {
 
 .staff-card {
   border: 1px solid #f2ecee;
-  border-left: 4px solid #dfb15b;
+  border-left: 4px solid var(--gold);
   border-radius: 14px;
   padding: 14px 16px;
   margin-bottom: 12px;
@@ -534,7 +534,7 @@ onMounted(() => {
 
 .sc-title b {
   font-size: 0.98rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .sc-title span {
@@ -569,7 +569,7 @@ onMounted(() => {
 
 .sc-row b {
   font-size: 0.85rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 /* Zal çipləri */
@@ -596,9 +596,9 @@ onMounted(() => {
 }
 
 .hall-chip.all {
-  background: #f6e9ee;
+  background: var(--brand-soft);
   border-color: #e8cdd8;
-  color: #721438;
+  color: var(--brand);
 }
 
 .chip-edit {
@@ -616,8 +616,8 @@ onMounted(() => {
 
 .chip-edit:hover {
   border-style: solid;
-  border-color: #721438;
-  color: #721438;
+  border-color: var(--brand);
+  color: var(--brand);
 }
 
 /* Əməliyyat düymələri */
@@ -632,7 +632,7 @@ onMounted(() => {
   align-items: center;
   gap: 5px;
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 6px 12px;
   border-radius: 8px;
@@ -647,8 +647,8 @@ onMounted(() => {
 }
 
 .act-btn:hover {
-  border-color: #721438;
-  color: #721438;
+  border-color: var(--brand);
+  color: var(--brand);
   background: #fdfbfc;
 }
 
@@ -674,7 +674,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 12px;
   padding: 10px 14px;
   background: #fff;
@@ -684,11 +684,11 @@ onMounted(() => {
 }
 
 .hall-option:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .hall-option.selected {
-  border-color: #721438;
+  border-color: var(--brand);
   background: #fdf7f9;
 }
 
@@ -705,8 +705,8 @@ onMounted(() => {
 }
 
 .hall-option.selected .ho-check {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
 }
 
 .ho-text {
@@ -716,7 +716,7 @@ onMounted(() => {
 
 .ho-text b {
   font-size: 0.9rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .ho-text em {
@@ -728,7 +728,7 @@ onMounted(() => {
 .picker-summary {
   margin: 14px 0 0;
   font-size: 0.8rem;
-  color: #868e96;
+  color: var(--muted);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -737,7 +737,7 @@ onMounted(() => {
 .link-clear {
   background: none;
   border: none;
-  color: #721438;
+  color: var(--brand);
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
@@ -756,7 +756,7 @@ onMounted(() => {
   place-items: center;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, #721438, #b07d2b);
+  background: linear-gradient(135deg, var(--brand), #b07d2b);
   flex-shrink: 0;
   font-size: 0.9rem;
 }
@@ -771,7 +771,7 @@ onMounted(() => {
 .dialog-note {
   margin: 0 0 14px;
   font-size: 0.83rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.5;
 }
 
@@ -784,7 +784,7 @@ onMounted(() => {
   padding: 4px 11px;
   border-radius: 20px;
   background: #f1f3f5;
-  color: #868e96;
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -810,7 +810,7 @@ onMounted(() => {
   border-radius: 14px;
   padding: 40px 20px;
   text-align: center;
-  color: #868e96;
+  color: var(--muted);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 

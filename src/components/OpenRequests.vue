@@ -246,8 +246,8 @@ onMounted(load)
 
 .req {
   background: #fff;
-  border: 1px solid #f2ebee;
-  border-left: 4px solid #dfb15b;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--gold);
   border-radius: 13px;
   padding: 15px 18px 16px;
 }
@@ -262,13 +262,13 @@ onMounted(load)
 
 .req-head b {
   font-size: 0.95rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .meta {
   display: block;
   font-size: 0.79rem;
-  color: #868e96;
+  color: var(--muted);
   margin-top: 3px;
 }
 
@@ -289,12 +289,12 @@ onMounted(load)
 /* Rəqabət artdıqca tez cavab vermək lazımdır */
 .rivals.hot {
   background: #fdecec;
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .left-days {
   font-size: 0.72rem;
-  color: #b06a2b;
+  color: var(--warn);
 }
 
 .note {
@@ -322,14 +322,14 @@ onMounted(load)
 
 .venue-name b {
   font-size: 0.84rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .sent-tag {
   margin-left: 8px;
   font-size: 0.7rem;
   background: #e5f4ea;
-  color: #217a41;
+  color: var(--ok);
   padding: 2px 9px;
   border-radius: 20px;
 }
@@ -337,7 +337,7 @@ onMounted(load)
 .offer-btn {
   background: #fff;
   border: 1px solid #cfdcec;
-  color: #2d5f9a;
+  color: var(--info);
   padding: 6px 15px;
   border-radius: 8px;
   font-size: 0.79rem;
@@ -348,7 +348,7 @@ onMounted(load)
 
 .offer-btn:hover {
   background: #f4f8fd;
-  border-color: #2d5f9a;
+  border-color: var(--info);
 }
 
 .empty-box {
@@ -358,7 +358,7 @@ onMounted(load)
   padding: 30px;
   text-align: center;
   font-size: 0.85rem;
-  color: #a6969c;
+  color: var(--muted-2);
   line-height: 1.6;
 }
 
@@ -387,7 +387,7 @@ onMounted(load)
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   color: #fff;
   padding: 15px 22px;
   border-radius: 16px 16px 0 0;
@@ -437,7 +437,7 @@ label {
   flex-direction: column;
   gap: 3px;
   font-size: 0.73rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 label.wide {
@@ -446,18 +446,18 @@ label.wide {
 
 label em {
   font-style: normal;
-  color: #a6969c;
+  color: var(--muted-2);
   font-size: 0.71rem;
 }
 
 input,
 select,
 textarea {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 9px;
   padding: 7px 11px;
   font-size: 0.83rem;
-  color: #1a1118;
+  color: var(--ink);
   outline: none;
   font-family: inherit;
   background: #fff;
@@ -466,19 +466,19 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 input:disabled {
   background: #f8f5f6;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .warn {
   margin: 11px 0 0;
   font-size: 0.78rem;
-  color: #b06a2b;
-  background: #fdf6ec;
+  color: var(--warn);
+  background: var(--warn-soft);
   border-radius: 9px;
   padding: 8px 12px;
 }
@@ -486,7 +486,7 @@ input:disabled {
 .ghost-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #721438;
+  color: var(--brand);
   padding: 8px 16px;
   border-radius: 9px;
   font-size: 0.8rem;
@@ -495,7 +495,7 @@ input:disabled {
 }
 
 .gold-btn {
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   border: none;
   color: #fff;
   padding: 9px 20px;

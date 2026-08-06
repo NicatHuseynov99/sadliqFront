@@ -106,7 +106,7 @@ onMounted(load)
   align-items: center;
   gap: 16px;
   background: #fff;
-  border: 1px solid #f2ebee;
+  border: 1px solid var(--line);
   border-left: 4px solid #cfdcec;
   border-radius: 12px;
   padding: 13px 17px;
@@ -136,7 +136,7 @@ onMounted(load)
 
 .top b {
   font-size: 0.88rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .status {
@@ -144,29 +144,29 @@ onMounted(load)
   padding: 2px 9px;
   border-radius: 20px;
   background: #eaf1fa;
-  color: #2d5f9a;
+  color: var(--info);
 }
 
 .status.accepted {
   background: #e5f4ea;
-  color: #217a41;
+  color: var(--ok);
 }
 
 .status.declined,
 .status.withdrawn {
   background: #f1f3f5;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .chat-tag {
   font-size: 0.68rem;
-  color: #217a41;
+  color: var(--ok);
 }
 
 .meta {
   display: block;
   font-size: 0.77rem;
-  color: #868e96;
+  color: var(--muted);
   margin-top: 3px;
 }
 
@@ -187,25 +187,25 @@ onMounted(load)
 
 .price b {
   font-size: 1rem;
-  color: #721438;
+  color: var(--brand);
 }
 
 .price span {
   font-size: 0.7rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .price em {
   display: block;
   font-style: normal;
   font-size: 0.73rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .chat-btn {
   background: #fff;
   border: 1px solid #cfdcec;
-  color: #2d5f9a;
+  color: var(--info);
   padding: 7px 16px;
   border-radius: 9px;
   font-size: 0.8rem;
@@ -217,13 +217,13 @@ onMounted(load)
 
 .chat-btn:hover {
   background: #f4f8fd;
-  border-color: #2d5f9a;
+  border-color: var(--info);
 }
 
 .badge {
   display: inline-block;
   margin-left: 6px;
-  background: #a02c4a;
+  background: var(--accent);
   color: #fff;
   font-style: normal;
   font-size: 0.66rem;
@@ -233,7 +233,7 @@ onMounted(load)
 
 .waiting {
   font-size: 0.74rem;
-  color: #a6969c;
+  color: var(--muted-2);
   flex-shrink: 0;
 }
 
@@ -244,6 +244,6 @@ onMounted(load)
   padding: 30px;
   text-align: center;
   font-size: 0.85rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 </style>

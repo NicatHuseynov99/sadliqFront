@@ -617,13 +617,13 @@ const onImgError = (e) => {
 .block-title {
   margin: 0;
   font-size: 1.15rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .block-title em {
   font-style: normal;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.8rem;
   padding: 2px 10px;
   border-radius: 20px;
@@ -668,13 +668,13 @@ const onImgError = (e) => {
 .vm-card.pending .vm-text b,
 .vm-card.pending .vm-text span,
 .vm-card.pending .vm-text em {
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .wait-badge {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #b06a2b;
+  color: var(--warn);
   background: #fdf0e3;
   padding: 2px 9px;
   border-radius: 20px;
@@ -684,7 +684,7 @@ const onImgError = (e) => {
 
 .wait-note {
   font-size: 0.74rem !important;
-  color: #b06a2b !important;
+  color: var(--warn) !important;
   line-height: 1.5;
   margin-top: 4px;
 }
@@ -692,7 +692,7 @@ const onImgError = (e) => {
 .wait-strip {
   margin: 0 0 14px;
   background: #fdf0e3;
-  border-left: 3px solid #dfb15b;
+  border-left: 3px solid var(--gold);
   border-radius: 0 10px 10px 0;
   padding: 10px 14px;
   font-size: 0.83rem;
@@ -715,7 +715,7 @@ const onImgError = (e) => {
 
 .vm-text b {
   font-size: 1rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .vm-text span,
@@ -746,8 +746,8 @@ const onImgError = (e) => {
 }
 
 .mini-btn:hover {
-  border-color: #721438;
-  color: #721438;
+  border-color: var(--brand);
+  color: var(--brand);
 }
 
 .mini-btn.danger:hover {
@@ -756,7 +756,7 @@ const onImgError = (e) => {
 }
 
 .confirm-btn {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
   border: none;
   padding: 9px 20px;
@@ -767,7 +767,7 @@ const onImgError = (e) => {
 }
 
 .confirm-btn:hover {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 
 .confirm-btn:disabled {
@@ -789,7 +789,7 @@ const onImgError = (e) => {
 
 .feature-chip {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 5px 12px;
   border-radius: 20px;
@@ -799,8 +799,8 @@ const onImgError = (e) => {
 }
 
 .feature-chip.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -868,12 +868,12 @@ const onImgError = (e) => {
 .hc-body h4 {
   margin: 0 0 4px;
   font-size: 1rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .hc-capacity {
   font-size: 0.78rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .hc-desc {
@@ -901,7 +901,7 @@ const onImgError = (e) => {
   align-items: center;
   gap: 5px;
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 6px 12px;
   border-radius: 8px;
@@ -912,8 +912,8 @@ const onImgError = (e) => {
 }
 
 .act-btn:hover {
-  border-color: #721438;
-  color: #721438;
+  border-color: var(--brand);
+  color: var(--brand);
   background: #fdfbfc;
 }
 
@@ -936,7 +936,7 @@ const onImgError = (e) => {
   min-height: 190px;
   border-radius: 12px;
   overflow: hidden;
-  background: #faf7f8;
+  background: var(--bg);
   border: 1px solid #f2ecee;
 }
 
@@ -1004,7 +1004,7 @@ const onImgError = (e) => {
 
 .sub-text b {
   font-size: 0.9rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .sub-text span,
@@ -1025,7 +1025,7 @@ const onImgError = (e) => {
 .sub-form h4 {
   margin: 0 0 12px;
   font-size: 0.95rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .sub-form-foot {
@@ -1057,7 +1057,7 @@ const onImgError = (e) => {
   border-radius: 10px;
   padding: 20px;
   text-align: center;
-  color: #868e96;
+  color: var(--muted);
   font-size: 0.87rem;
 }
 

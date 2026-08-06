@@ -148,7 +148,7 @@ const dayTitle = (d) =>
 
 .cal-title {
   font-weight: 700;
-  color: #1a1118;
+  color: var(--ink);
   text-transform: capitalize;
   font-size: 1.02rem;
   letter-spacing: 0.01em;
@@ -160,7 +160,7 @@ const dayTitle = (d) =>
   border-radius: 50%;
   border: 1px solid #f0e6ea;
   background: #fff;
-  color: #721438;
+  color: var(--brand);
   font-size: 1.1rem;
   cursor: pointer;
   line-height: 1;
@@ -168,8 +168,8 @@ const dayTitle = (d) =>
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -198,7 +198,7 @@ const dayTitle = (d) =>
   display: block;
   height: 100%;
   border-radius: 20px;
-  background: linear-gradient(90deg, #dfb15b, #721438);
+  background: linear-gradient(90deg, var(--gold), var(--brand));
   transition: width 0.35s ease;
 }
 
@@ -209,7 +209,7 @@ const dayTitle = (d) =>
 }
 
 .occ-text b {
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .week-days,
@@ -255,14 +255,14 @@ const dayTitle = (d) =>
 /* Boş gün — sakit, dəvətedici */
 .day.free {
   background: #fff;
-  border-color: #f0eaec;
-  color: #1a1118;
+  border-color: var(--line-2);
+  color: var(--ink);
   cursor: pointer;
 }
 
 .day.free:hover {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(114, 20, 56, 0.25);
@@ -276,8 +276,8 @@ const dayTitle = (d) =>
 }
 
 .day.free.weekend:hover {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -294,7 +294,7 @@ const dayTitle = (d) =>
 }
 
 .day.today {
-  box-shadow: inset 0 0 0 2px #dfb15b;
+  box-shadow: inset 0 0 0 2px var(--gold);
 }
 
 .legend {
@@ -304,7 +304,7 @@ const dayTitle = (d) =>
   padding-top: 12px;
   border-top: 1px solid #f5f1f2;
   font-size: 0.75rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .legend span {

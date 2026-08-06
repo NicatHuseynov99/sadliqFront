@@ -459,7 +459,7 @@ onMounted(async () => {
 
 <style scoped>
 .req-page {
-  background: #faf7f8;
+  background: var(--bg);
   min-height: 100vh;
   padding: 28px 20px 60px;
 }
@@ -476,7 +476,7 @@ onMounted(async () => {
 .page-title {
   margin: 0 0 5px;
   font-size: 1.5rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .page-sub {
@@ -573,7 +573,7 @@ onMounted(async () => {
 /* Forma */
 .form-card {
   background: #fff;
-  border: 1px solid #f2ebee;
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 20px 24px 18px;
   margin-bottom: 18px;
@@ -582,7 +582,7 @@ onMounted(async () => {
 .card-title {
   margin: 0 0 14px;
   font-size: 0.95rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .form-grid {
@@ -596,7 +596,7 @@ label {
   flex-direction: column;
   gap: 4px;
   font-size: 0.75rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 label.wide {
@@ -608,7 +608,7 @@ label.check {
   align-items: center;
   gap: 8px;
   padding-top: 22px;
-  color: #4a3f44;
+  color: var(--ink-2);
   font-size: 0.8rem;
 }
 
@@ -618,17 +618,17 @@ label.off {
 
 label em {
   font-style: normal;
-  color: #c1b3b8;
+  color: var(--faint);
 }
 
 input,
 select,
 textarea {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 9px;
   padding: 8px 12px;
   font-size: 0.85rem;
-  color: #1a1118;
+  color: var(--ink);
   outline: none;
   font-family: inherit;
   background: #fff;
@@ -637,7 +637,7 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .form-foot {
@@ -651,24 +651,24 @@ textarea:focus {
 
 .foot-hint {
   font-size: 0.76rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .open-note {
-  background: #fdf6ec;
+  background: var(--warn-soft);
   border: 1px solid #f5e3c8;
   border-radius: 12px;
   padding: 12px 16px;
   font-size: 0.83rem;
-  color: #b06a2b;
+  color: var(--warn);
   margin: 0 0 18px;
 }
 
 /* Sorğu kartı */
 .req-card {
   background: #fff;
-  border: 1px solid #f2ebee;
-  border-left: 4px solid #dfb15b;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--gold);
   border-radius: 14px;
   padding: 16px 20px 18px;
   margin-bottom: 14px;
@@ -694,13 +694,13 @@ textarea:focus {
 
 .req-head b {
   font-size: 0.95rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .req-meta {
   display: block;
   font-size: 0.78rem;
-  color: #868e96;
+  color: var(--muted);
   margin-top: 3px;
 }
 
@@ -714,19 +714,19 @@ textarea:focus {
   font-size: 0.7rem;
   padding: 3px 11px;
   border-radius: 20px;
-  background: #fdf3e2;
-  color: #b06a2b;
+  background: var(--gold-soft);
+  color: var(--warn);
 }
 
 .req-status.done {
   background: #e5f4ea;
-  color: #217a41;
+  color: var(--ok);
 }
 
 .req-status.closed,
 .req-status.expired {
   background: #f1f3f5;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .req-note {
@@ -738,7 +738,7 @@ textarea:focus {
 .waiting {
   margin: 14px 0 0;
   font-size: 0.82rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 /* Cavab gözlənilən sorğu — nə baş verdiyi görünür, quru cümlə deyil */
@@ -746,7 +746,7 @@ textarea:focus {
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  background: var(--info-soft, #eef4fb);
+  background: var(--info-soft, var(--info-soft));
   border-radius: var(--r, 11px);
   padding: 14px 16px;
   margin-top: 14px;
@@ -770,7 +770,7 @@ textarea:focus {
 .waiting-box b {
   display: block;
   font-size: 0.86rem;
-  color: var(--ink, #1a1118);
+  color: var(--ink, var(--ink));
   margin-bottom: 3px;
 }
 
@@ -783,7 +783,7 @@ textarea:focus {
 
 .waiting-time {
   margin-top: 4px;
-  color: var(--info, #2d5f9a) !important;
+  color: var(--info, var(--info)) !important;
   font-weight: 600;
 }
 
@@ -954,7 +954,7 @@ textarea:focus {
 }
 
 .offer {
-  border: 1px solid #f2ebee;
+  border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -992,23 +992,23 @@ textarea:focus {
 
 .offer-top b {
   font-size: 0.88rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .rating {
   font-size: 0.76rem;
-  color: #b06a2b;
+  color: var(--warn);
   white-space: nowrap;
 }
 
 .rating em {
   font-style: normal;
-  color: #c1b3b8;
+  color: var(--faint);
 }
 
 .offer-city {
   font-size: 0.74rem;
-  color: #a6969c;
+  color: var(--muted-2);
   margin-top: 2px;
 }
 
@@ -1026,12 +1026,12 @@ textarea:focus {
 }
 
 .offer-facts dt {
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .offer-facts dd {
   margin: 0;
-  color: #4a3f44;
+  color: var(--ink-2);
   text-align: right;
 }
 
@@ -1053,12 +1053,12 @@ textarea:focus {
 
 .offer-price b {
   font-size: 1.1rem;
-  color: #721438;
+  color: var(--brand);
 }
 
 .offer-price span {
   font-size: 0.74rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .offer-price em {
@@ -1077,7 +1077,7 @@ textarea:focus {
 .last-msg {
   margin: 9px 0 0;
   font-size: 0.74rem;
-  color: #868e96;
+  color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1086,7 +1086,7 @@ textarea:focus {
 .badge {
   display: inline-block;
   margin-left: 5px;
-  background: #a02c4a;
+  background: var(--accent);
   color: #fff;
   font-style: normal;
   font-size: 0.66rem;
@@ -1097,17 +1097,17 @@ textarea:focus {
 .offer-tag {
   margin-top: 12px;
   font-size: 0.76rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .offer-tag.ok {
-  color: #217a41;
+  color: var(--ok);
   font-weight: 600;
 }
 
 /* Düymələr */
 .gold-btn {
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   border: none;
   color: #fff;
   padding: 10px 24px;
@@ -1131,7 +1131,7 @@ textarea:focus {
 .ghost-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #721438;
+  color: var(--brand);
   padding: 8px 16px;
   border-radius: 9px;
   font-size: 0.8rem;
@@ -1146,7 +1146,7 @@ textarea:focus {
 }
 
 .ghost-btn:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .empty-box {
@@ -1156,7 +1156,7 @@ textarea:focus {
   padding: 30px;
   text-align: center;
   font-size: 0.85rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 @media (max-width: 780px) {

@@ -151,7 +151,7 @@ const register = async () => {
   gap: 7px;
   text-align: left;
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 14px;
   padding: 20px 18px;
   cursor: pointer;
@@ -159,7 +159,7 @@ const register = async () => {
 }
 
 .choice:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(184, 134, 11, 0.14);
 }
@@ -176,7 +176,7 @@ const register = async () => {
 
 .choice b {
   font-size: 1rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .choice-text {
@@ -205,7 +205,7 @@ const register = async () => {
 }
 
 .back-link:hover {
-  color: #721438;
+  color: var(--brand);
 }
 
 @media (max-width: 640px) {

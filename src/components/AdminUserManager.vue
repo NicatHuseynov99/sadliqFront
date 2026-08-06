@@ -460,13 +460,13 @@ onMounted(load)
 .block-title {
   margin: 0;
   font-size: 1.15rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .block-title em {
   font-style: normal;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.8rem;
   padding: 2px 10px;
   border-radius: 20px;
@@ -508,7 +508,7 @@ onMounted(load)
   flex-direction: column;
   gap: 5px;
   font-size: 0.76rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .form-grid label.wide {
@@ -520,18 +520,18 @@ onMounted(load)
   flex: 1;
   min-width: 240px;
   max-width: 380px;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 10px;
   padding: 9px 14px;
   font-size: 0.85rem;
-  color: #1a1118;
+  color: var(--ink);
   background: #fff;
   outline: none;
   transition: border-color 0.15s;
 }
 
 .search-box:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .filter-row {
@@ -552,7 +552,7 @@ onMounted(load)
 
 .chip {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 6px 14px;
   border-radius: 20px;
@@ -563,12 +563,12 @@ onMounted(load)
 }
 
 .chip:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .chip.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -596,12 +596,12 @@ onMounted(load)
 
 .user-table td {
   padding: 10px;
-  border-bottom: 1px solid #faf7f8;
-  color: #1a1118;
+  border-bottom: 1px solid var(--bg);
+  color: var(--ink);
 }
 
 .user-table .muted {
-  color: #868e96;
+  color: var(--muted);
   font-size: 0.83rem;
 }
 
@@ -627,8 +627,8 @@ onMounted(load)
 }
 
 .name-link:hover {
-  color: #721438;
-  border-bottom-color: #721438;
+  color: var(--brand);
+  border-bottom-color: var(--brand);
 }
 
 .status-badge {
@@ -658,7 +658,7 @@ onMounted(load)
 .mini-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #4a3f44;
+  color: var(--ink-2);
   padding: 5px 11px;
   border-radius: 8px;
   font-size: 0.75rem;
@@ -668,8 +668,8 @@ onMounted(load)
 }
 
 .mini-btn:hover:not(:disabled) {
-  border-color: #dfb15b;
-  color: #1a1118;
+  border-color: var(--gold);
+  color: var(--ink);
 }
 
 .mini-btn:disabled {
@@ -696,7 +696,7 @@ onMounted(load)
 
 .empty-row {
   text-align: center;
-  color: #a6969c;
+  color: var(--muted-2);
   padding: 26px 10px !important;
   font-size: 0.85rem;
 }
@@ -711,7 +711,7 @@ onMounted(load)
 
 .detail-role {
   font-size: 0.8rem;
-  color: #721438;
+  color: var(--brand);
   font-weight: 600;
 }
 
@@ -734,13 +734,13 @@ onMounted(load)
 }
 
 .detail-list dt {
-  color: #868e96;
+  color: var(--muted);
   font-size: 0.8rem;
 }
 
 .detail-list dd {
   margin: 0;
-  color: #1a1118;
+  color: var(--ink);
   font-size: 0.85rem;
   font-weight: 600;
   text-align: right;
@@ -748,7 +748,7 @@ onMounted(load)
 
 .dialog-sub {
   margin: 0 0 12px;
-  color: #868e96;
+  color: var(--muted);
   font-size: 0.85rem;
 }
 
@@ -762,7 +762,7 @@ onMounted(load)
 }
 
 .dialog-input:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .you-tag {
@@ -792,8 +792,8 @@ onMounted(load)
   cursor: not-allowed;
 }
 
-.role-select.owner { border-color: #e8cdd8; color: #721438; }
-.role-select.superadmin { border-color: #1a1118; color: #1a1118; }
+.role-select.owner { border-color: #e8cdd8; color: var(--brand); }
+.role-select.superadmin { border-color: var(--ink); color: var(--ink); }
 .role-select.venueadmin { border-color: #f0dfbe; color: #8a6220; }
 .role-select.support { border-color: #cfe3d4; color: #1e7e34; }
 </style>

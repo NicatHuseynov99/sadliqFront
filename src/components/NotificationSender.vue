@@ -333,7 +333,7 @@ onMounted(async () => {
 .card h4 {
   margin: 0 0 12px;
   font-size: 0.86rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .card h4:not(:first-child) {
@@ -344,7 +344,7 @@ label,
 .field-label {
   display: block;
   font-size: 0.74rem;
-  color: #868e96;
+  color: var(--muted);
   margin-bottom: 12px;
 }
 
@@ -355,7 +355,7 @@ label,
 label em,
 .field-label em {
   font-style: normal;
-  color: #c1b3b8;
+  color: var(--faint);
   margin-left: 5px;
 }
 
@@ -365,11 +365,11 @@ select {
   display: block;
   width: 100%;
   margin-top: 4px;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 9px;
   padding: 8px 12px;
   font-size: 0.84rem;
-  color: #1a1118;
+  color: var(--ink);
   outline: none;
   font-family: inherit;
   background: #fff;
@@ -378,7 +378,7 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .chips {
@@ -390,7 +390,7 @@ select:focus {
 
 .chip {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 6px 13px;
   border-radius: 20px;
@@ -400,19 +400,19 @@ select:focus {
 }
 
 .chip:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .chip.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
 .hint {
   margin: 0;
   font-size: 0.73rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 /* Göndəriş sətri */
@@ -437,7 +437,7 @@ select:focus {
 
 .count {
   font-size: 1.05rem;
-  color: #721438;
+  color: var(--brand);
 }
 
 .summary {
@@ -453,13 +453,13 @@ select:focus {
 .sample {
   margin: -4px 4px 0;
   font-size: 0.73rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .ghost-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #721438;
+  color: var(--brand);
   padding: 8px 16px;
   border-radius: 9px;
   font-size: 0.8rem;
@@ -468,7 +468,7 @@ select:focus {
 }
 
 .ghost-btn:hover:not(:disabled) {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .ghost-btn.small {
@@ -478,7 +478,7 @@ select:focus {
 }
 
 .gold-btn {
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   border: none;
   color: #fff;
   padding: 9px 22px;
@@ -513,7 +513,7 @@ select:focus {
 .history-head h4 {
   margin: 0;
   font-size: 0.86rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .history-head select {
@@ -551,7 +551,7 @@ select:focus {
 
 .row-top b {
   font-size: 0.84rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .status {
@@ -564,17 +564,17 @@ select:focus {
 
 .status.sent {
   background: #e5f4ea;
-  color: #217a41;
+  color: var(--ok);
 }
 
 .status.scheduled {
-  background: #fdf3e2;
-  color: #b06a2b;
+  background: var(--gold-soft);
+  color: var(--warn);
 }
 
 .status.failed {
   background: #f8e3e8;
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .row-body {
@@ -597,7 +597,7 @@ select:focus {
 .row-error {
   margin: 5px 0 0;
   font-size: 0.72rem;
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .row-stats {
@@ -613,18 +613,18 @@ select:focus {
 .row-stats b {
   display: block;
   font-size: 0.9rem;
-  color: #721438;
+  color: var(--brand);
 }
 
 .row-stats span {
   font-size: 0.66rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .empty {
   text-align: center;
   font-size: 0.8rem;
-  color: #a6969c;
+  color: var(--muted-2);
   padding: 18px 0;
   margin: 0;
 }

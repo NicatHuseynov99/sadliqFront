@@ -119,7 +119,7 @@ const onDrop = (event) => {
 
 .drop:hover,
 .drop.dragging {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   background: #fffdf7;
 }
 
@@ -133,12 +133,12 @@ const onDrop = (event) => {
 
 .drop b {
   font-size: 0.84rem;
-  color: #4a3f44;
+  color: var(--ink-2);
 }
 
 .drop-hint {
   font-size: 0.72rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .bar {
@@ -153,7 +153,7 @@ const onDrop = (event) => {
 .bar i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #721438, #dfb15b);
+  background: linear-gradient(90deg, var(--brand), var(--gold));
   transition: width 0.2s;
 }
 
@@ -199,6 +199,6 @@ const onDrop = (event) => {
 .err {
   margin: 6px 0 0;
   font-size: 0.76rem;
-  color: #a02c4a;
+  color: var(--accent);
 }
 </style>

@@ -424,7 +424,7 @@ onMounted(load)
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #dfb15b;
+  color: var(--gold);
   font-weight: 700;
 }
 
@@ -456,7 +456,7 @@ onMounted(load)
 
 .badge.wait {
   background: rgba(223, 177, 91, 0.22);
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 .rv-close {
@@ -487,27 +487,27 @@ onMounted(load)
   align-items: center;
   gap: 5px;
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   padding: 5px 10px;
   border-radius: 20px;
   font-size: 0.72rem;
-  color: #a6969c;
+  color: var(--muted-2);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .steps li:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .steps li.filled {
-  color: #217a41;
+  color: var(--ok);
   border-color: #d7ecdf;
 }
 
 .steps li.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
   font-weight: 600;
 }
@@ -542,7 +542,7 @@ onMounted(load)
 
 .chip {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 5px 12px;
   border-radius: 20px;
@@ -552,12 +552,12 @@ onMounted(load)
 }
 
 .chip:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .chip.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -577,7 +577,7 @@ label,
   flex-direction: column;
   gap: 3px;
   font-size: 0.72rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 label.wide,
@@ -592,18 +592,18 @@ label em {
 
 input,
 textarea {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 9px;
   padding: 5px 10px;
   font-size: 0.8rem;
-  color: #1a1118;
+  color: var(--ink);
   outline: none;
   font-family: inherit;
 }
 
 input:focus,
 textarea:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 label.check {
@@ -611,20 +611,20 @@ label.check {
   align-items: center;
   gap: 8px;
   padding-top: 14px;
-  color: #4a3f44;
+  color: var(--ink-2);
 }
 
 .pane-label {
   display: block;
   font-size: 0.76rem;
-  color: #868e96;
+  color: var(--muted);
   margin: 8px 0 5px;
 }
 
 .pane-label em {
   font-style: normal;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   padding: 1px 8px;
   border-radius: 20px;
   margin-left: 5px;
@@ -663,13 +663,13 @@ label.check {
   justify-content: space-between;
   gap: 12px;
   font-size: 0.9rem;
-  color: #1a1118;
+  color: var(--ink);
   margin-bottom: 4px;
 }
 
 .sub-meta {
   font-size: 0.78rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .sub-desc {
@@ -690,26 +690,26 @@ label.check {
   display: flex;
   gap: 12px;
   font-size: 0.85rem;
-  border-bottom: 1px solid #faf7f8;
+  border-bottom: 1px solid var(--bg);
   padding-bottom: 7px;
 }
 
 .summary dt {
   width: 140px;
   flex: none;
-  color: #a6969c;
+  color: var(--muted-2);
   font-size: 0.77rem;
 }
 
 .summary dd {
   margin: 0;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .warn-line {
   margin: 14px 0 0;
   background: #fdf0e3;
-  border-left: 3px solid #dfb15b;
+  border-left: 3px solid var(--gold);
   padding: 10px 13px;
   border-radius: 0 9px 9px 0;
   font-size: 0.82rem;
@@ -718,12 +718,12 @@ label.check {
 
 .ok-line {
   margin: 14px 0 0;
-  color: #217a41;
+  color: var(--ok);
   font-size: 0.85rem;
 }
 
 .empty {
-  color: #a6969c;
+  color: var(--muted-2);
   font-size: 0.84rem;
   text-align: center;
   padding: 30px 10px;
@@ -747,11 +747,11 @@ label.check {
 .ghost-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #4a3f44;
+  color: var(--ink-2);
 }
 
 .ghost-btn:hover:not(:disabled) {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .approve-btn {

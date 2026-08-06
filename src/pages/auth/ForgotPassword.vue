@@ -119,7 +119,7 @@ const submit = async () => {
 .sent-box {
   text-align: center;
   background: #fdf6e3;
-  border: 1px dashed #dfb15b;
+  border: 1px dashed var(--gold);
   border-radius: 12px;
   padding: 20px 16px;
 }

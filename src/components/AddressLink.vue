@@ -76,7 +76,7 @@ const openMap = async (command) => {
 }
 
 .address-link:hover {
-  color: #721438;
+  color: var(--brand);
 }
 
 .address-link:hover .text {

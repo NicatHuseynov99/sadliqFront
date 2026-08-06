@@ -342,7 +342,7 @@ onBeforeUnmount(() => {
 
 .thumbs img.active {
   opacity: 1;
-  border-color: #721438;
+  border-color: var(--brand);
 }
 
 /* Qalereya oxları — şəklin üstündə, kənarlarda */
@@ -355,7 +355,7 @@ onBeforeUnmount(() => {
   border: none;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.85);
-  color: #1a1118;
+  color: var(--ink);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -430,7 +430,7 @@ onBeforeUnmount(() => {
 }
 
 .thumb-video.active {
-  border-color: #721438;
+  border-color: var(--brand);
 }
 
 .thumb-video.active img {

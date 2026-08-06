@@ -158,7 +158,7 @@ onBeforeUnmount(() => clearInterval(timer))
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   color: #fff;
   padding: 14px 20px;
   border-radius: 16px 16px 0 0;
@@ -210,7 +210,7 @@ onBeforeUnmount(() => clearInterval(timer))
   margin: auto;
   text-align: center;
   font-size: 0.8rem;
-  color: #a6969c;
+  color: var(--muted-2);
   line-height: 1.6;
   max-width: 320px;
 }
@@ -229,14 +229,14 @@ onBeforeUnmount(() => clearInterval(timer))
 
 .bubble {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 12px 12px 12px 4px;
   padding: 8px 12px;
 }
 
 .msg.mine .bubble {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
   border-radius: 12px 12px 4px 12px;
 }
@@ -269,7 +269,7 @@ onBeforeUnmount(() => clearInterval(timer))
 
 textarea {
   flex: 1;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 10px;
   padding: 9px 12px;
   font-size: 0.84rem;
@@ -279,11 +279,11 @@ textarea {
 }
 
 textarea:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .gold-btn {
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   border: none;
   color: #fff;
   padding: 10px 20px;

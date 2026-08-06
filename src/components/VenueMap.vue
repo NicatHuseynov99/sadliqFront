@@ -257,12 +257,12 @@ watch(
   padding: 7px 14px;
   border-radius: 20px;
   font-size: 0.8rem;
-  color: #4a3f44;
+  color: var(--ink-2);
   box-shadow: 0 3px 10px rgba(26, 17, 24, 0.12);
 }
 
 .map-info .muted {
-  color: #a6969c;
+  color: var(--muted-2);
   border-bottom: 1px dashed #d8c3cb;
   cursor: help;
 }
@@ -275,7 +275,7 @@ watch(
   place-items: center;
   background: rgba(255, 255, 255, 0.55);
   font-size: 0.9rem;
-  color: #721438;
+  color: var(--brand);
   pointer-events: none;
 }
 
@@ -300,12 +300,12 @@ watch(
   align-items: center;
   gap: 6px;
   background: #fff;
-  color: #1a1118;
+  color: var(--ink);
   padding: 5px 11px;
   border-radius: 20px;
   white-space: nowrap;
   box-shadow: 0 3px 10px rgba(26, 17, 24, 0.28);
-  border: 2px solid #721438;
+  border: 2px solid var(--brand);
   transition: all 0.12s;
   transform: translateX(-50%);
 }
@@ -322,8 +322,8 @@ watch(
   font-style: normal;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #721438;
-  background: #f6e9ee;
+  color: var(--brand);
+  background: var(--brand-soft);
   padding: 1px 7px;
   border-radius: 20px;
 }
@@ -333,13 +333,13 @@ watch(
 }
 
 .venue-pin-wrap:hover .venue-pin {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .venue-pin-wrap:hover .venue-pin i {
-  background: #dfb15b;
+  background: var(--gold);
   color: #4a0d24;
 }
 
@@ -370,12 +370,12 @@ watch(
 
 .pin-body b {
   font-size: 0.9rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .pin-sub {
   font-size: 0.74rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .pin-meta {
@@ -385,7 +385,7 @@ watch(
 
 .pin-btn {
   margin-top: 8px;
-  background: #721438;
+  background: var(--brand);
   color: #fff;
   border: none;
   padding: 7px 12px;

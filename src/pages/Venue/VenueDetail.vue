@@ -554,7 +554,7 @@ onMounted(async () => {
 .back-btn {
   background: none;
   border: none;
-  color: #721438;
+  color: var(--brand);
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
@@ -571,7 +571,7 @@ onMounted(async () => {
 
 .venue-name {
   margin: 0 0 6px;
-  color: #1a1118;
+  color: var(--ink);
   font-size: 1.8rem;
 }
 
@@ -591,11 +591,11 @@ onMounted(async () => {
 }
 
 .venue-parking b {
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .valet-tag {
-  background: #eef4fb;
+  background: var(--info-soft);
   color: #1c5cab;
   font-size: 0.74rem;
   font-weight: 600;
@@ -609,7 +609,7 @@ onMounted(async () => {
 }
 
 .venue-phone a:hover {
-  color: #721438;
+  color: var(--brand);
   text-decoration: underline;
 }
 
@@ -739,7 +739,7 @@ onMounted(async () => {
 .hall-body h3 {
   margin: 0 0 4px;
   font-size: 1.15rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .hall-meta {
@@ -751,7 +751,7 @@ onMounted(async () => {
 .hall-desc {
   margin: 8px 0 14px;
   font-size: 0.85rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.45;
 }
 
@@ -779,7 +779,7 @@ onMounted(async () => {
 }
 
 .strip-free b {
-  color: #721438;
+  color: var(--brand);
 }
 
 .day-strip {
@@ -817,12 +817,12 @@ onMounted(async () => {
 .strip-day.free {
   background: #fff;
   border: 1px solid #efe7ea;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .strip-day.free:hover {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(114, 20, 56, 0.22);
@@ -848,7 +848,7 @@ onMounted(async () => {
 .calendar-toggle {
   background: none;
   border: none;
-  color: #721438;
+  color: var(--brand);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -878,7 +878,7 @@ onMounted(async () => {
 }
 
 .side-block {
-  background: linear-gradient(180deg, #fdfbfc, #faf7f8);
+  background: linear-gradient(180deg, #fdfbfc, var(--bg));
   border: 1px solid #f2ecee;
   border-radius: 14px;
   padding: 14px 16px;
@@ -916,8 +916,8 @@ onMounted(async () => {
 }
 
 .free-day:hover {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   transform: translateY(-3px);
   box-shadow: 0 8px 18px rgba(114, 20, 56, 0.22);
 }
@@ -946,7 +946,7 @@ onMounted(async () => {
 .fd-day {
   font-size: 1.2rem;
   font-weight: 800;
-  color: #721438;
+  color: var(--brand);
   line-height: 1.05;
 }
 
@@ -981,7 +981,7 @@ onMounted(async () => {
 .stat-value {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #1a1118;
+  color: var(--ink);
   line-height: 1.1;
 }
 
@@ -1079,13 +1079,13 @@ onMounted(async () => {
 .menu-body h3 {
   margin: 0 0 5px;
   font-size: 1.15rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .menu-desc {
   margin: 0 0 14px;
   font-size: 0.85rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.45;
 }
 
@@ -1118,7 +1118,7 @@ onMounted(async () => {
 }
 
 .composition .dot {
-  color: #dfb15b;
+  color: var(--gold);
   font-weight: 700;
 }
 
@@ -1142,7 +1142,7 @@ onMounted(async () => {
 .photo-btn {
   width: 100%;
   background: #fff;
-  color: #721438;
+  color: var(--brand);
   border: 1px solid #e5cdd6;
   padding: 9px 14px;
   border-radius: 6px;
@@ -1155,7 +1155,7 @@ onMounted(async () => {
 
 .photo-btn:hover {
   background: #fdf3f6;
-  border-color: #721438;
+  border-color: var(--brand);
 }
 
 /* Menyu dialoqu */
@@ -1219,13 +1219,13 @@ onMounted(async () => {
 }
 
 .price {
-  color: #721438;
+  color: var(--brand);
   font-weight: 700;
   font-size: 0.95rem;
 }
 
 .reserve-btn {
-  background: #721438;
+  background: var(--brand);
   color: white;
   border: none;
   padding: 8px 18px;
@@ -1237,7 +1237,7 @@ onMounted(async () => {
 }
 
 .reserve-btn:hover {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 
 .reserve-btn:disabled {
@@ -1257,11 +1257,11 @@ onMounted(async () => {
 .total-line {
   margin: 0 0 8px;
   font-size: 15px;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .total-line b {
-  color: #721438;
+  color: var(--brand);
 }
 
 .form-error {

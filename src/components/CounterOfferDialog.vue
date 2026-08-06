@@ -178,7 +178,7 @@ const send = async () => {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   color: #fff;
   padding: 16px 22px;
   border-radius: 16px 16px 0 0;
@@ -228,7 +228,7 @@ label {
   flex-direction: column;
   gap: 3px;
   font-size: 0.73rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 label.wide {
@@ -237,17 +237,17 @@ label.wide {
 
 label em {
   font-style: normal;
-  color: #c1b3b8;
+  color: var(--faint);
 }
 
 input,
 select,
 textarea {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 9px;
   padding: 7px 11px;
   font-size: 0.82rem;
-  color: #1a1118;
+  color: var(--ink);
   outline: none;
   font-family: inherit;
   background: #fff;
@@ -256,27 +256,27 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .summary {
   margin: 12px 0 0;
   font-size: 0.78rem;
-  color: #217a41;
+  color: var(--ok);
   background: #f2faf5;
   border-radius: 9px;
   padding: 8px 12px;
 }
 
 .summary.warn {
-  color: #b06a2b;
-  background: #fdf6ec;
+  color: var(--warn);
+  background: var(--warn-soft);
 }
 
 .ghost-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #721438;
+  color: var(--brand);
   padding: 8px 16px;
   border-radius: 9px;
   font-size: 0.8rem;
@@ -285,7 +285,7 @@ textarea:focus {
 }
 
 .gold-btn {
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   border: none;
   color: #fff;
   padding: 9px 20px;

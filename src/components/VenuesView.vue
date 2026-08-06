@@ -672,13 +672,13 @@ onMounted(async () => {
 .block-title {
   margin: 0;
   font-size: 1rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .block-title em {
   font-style: normal;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.78rem;
   padding: 2px 9px;
   border-radius: 20px;
@@ -689,11 +689,11 @@ onMounted(async () => {
 .search-box,
 .select,
 .value-box {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 10px;
   padding: 9px 13px;
   font-size: 0.82rem;
-  color: #1a1118;
+  color: var(--ink);
   background: #fff;
   outline: none;
   transition: border-color 0.15s;
@@ -708,7 +708,7 @@ onMounted(async () => {
 .search-box:focus,
 .select:focus,
 .value-box:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .filter-row {
@@ -727,7 +727,7 @@ onMounted(async () => {
 
 .chip {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 5px 13px;
   border-radius: 20px;
@@ -738,12 +738,12 @@ onMounted(async () => {
 }
 
 .chip:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .chip.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -789,7 +789,7 @@ onMounted(async () => {
 
 .status-badge.off {
   background: #f8e3e8;
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .venue-actions.single {
@@ -845,7 +845,7 @@ onMounted(async () => {
   top: 10px;
   right: 10px;
   background: rgba(26, 17, 24, 0.7);
-  color: #dfb15b;
+  color: var(--gold);
   font-size: 0.74rem;
   font-weight: 700;
   padding: 3px 9px;
@@ -876,17 +876,17 @@ onMounted(async () => {
 
 .mini-chip.warn {
   background: #fdf0e3;
-  color: #b06a2b;
+  color: var(--warn);
 }
 
 .owner-line {
   font-size: 0.76rem;
-  color: #868e96;
+  color: var(--muted);
   margin-top: 2px;
 }
 
 .owner-line b {
-  color: #4a3f44;
+  color: var(--ink-2);
 }
 
 .owner-line em {
@@ -904,12 +904,12 @@ onMounted(async () => {
 
 .status-badge.ok {
   background: #e6f4ea;
-  color: #217a41;
+  color: var(--ok);
 }
 
 .status-badge.wait {
   background: #fdf0e3;
-  color: #b06a2b;
+  color: var(--warn);
 }
 
 /* Əməliyyatlar kartın altında bərabər paylanır */
@@ -935,15 +935,15 @@ onMounted(async () => {
 
 .act:hover {
   background: #fbf7f8;
-  color: #721438;
+  color: var(--brand);
 }
 
 .act.ok {
-  color: #217a41;
+  color: var(--ok);
 }
 
 .act.danger {
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 /* ---------- Pəncərələr ---------- */
@@ -988,12 +988,12 @@ onMounted(async () => {
 .stat-strip b {
   display: block;
   font-size: 1.05rem;
-  color: #721438;
+  color: var(--brand);
 }
 
 .stat-strip span {
   font-size: 0.68rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .feature-chips {
@@ -1007,7 +1007,7 @@ onMounted(async () => {
   margin: 0 0 14px;
   font-size: 0.86rem;
   line-height: 1.6;
-  color: #4a3f44;
+  color: var(--ink-2);
 }
 
 .preview-list {
@@ -1021,32 +1021,32 @@ onMounted(async () => {
   display: flex;
   gap: 12px;
   font-size: 0.84rem;
-  border-bottom: 1px solid #faf7f8;
+  border-bottom: 1px solid var(--bg);
   padding-bottom: 7px;
 }
 
 .preview-list dt {
   width: 110px;
   flex: none;
-  color: #a6969c;
+  color: var(--muted-2);
   font-size: 0.76rem;
 }
 
 .preview-list dd {
   margin: 0;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .sub-title {
   margin: 0 0 10px;
   font-size: 0.88rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .sub-title em {
   font-style: normal;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.72rem;
   padding: 2px 8px;
   border-radius: 20px;
@@ -1073,7 +1073,7 @@ onMounted(async () => {
 }
 
 .inner-sub {
-  color: #868e96;
+  color: var(--muted);
   font-size: 0.78rem;
   margin-left: auto;
 }
@@ -1092,7 +1092,7 @@ onMounted(async () => {
 .note-box {
   margin: 14px 0 0;
   background: #fbf7f8;
-  border-left: 3px solid #dfb15b;
+  border-left: 3px solid var(--gold);
   border-radius: 0 10px 10px 0;
   padding: 10px 13px;
   font-size: 0.79rem;
@@ -1159,7 +1159,7 @@ onMounted(async () => {
   text-transform: none;
   letter-spacing: 0;
   background: #fdf0e3;
-  color: #b06a2b;
+  color: var(--warn);
   padding: 2px 8px;
   border-radius: 20px;
   margin-left: 6px;
@@ -1194,7 +1194,7 @@ onMounted(async () => {
 
 .owner-list li.active {
   background: #fdf6f8;
-  border-color: #721438;
+  border-color: var(--brand);
 }
 
 .owner-list li.current {
@@ -1212,7 +1212,7 @@ onMounted(async () => {
   font-size: 0.68rem;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #721438, #a8446a);
+  background: linear-gradient(135deg, var(--brand), #a8446a);
 }
 
 .owner-text {
@@ -1224,13 +1224,13 @@ onMounted(async () => {
 
 .owner-text b {
   font-size: 0.84rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .owner-text em {
   font-style: normal;
   font-size: 0.72rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .role-chip {
@@ -1248,13 +1248,13 @@ onMounted(async () => {
 }
 
 .tick {
-  color: #217a41;
+  color: var(--ok);
   font-weight: 700;
 }
 
 .empty-line {
   justify-content: center;
-  color: #a6969c;
+  color: var(--muted-2);
   font-size: 0.8rem;
   cursor: default;
 }
@@ -1286,7 +1286,7 @@ onMounted(async () => {
 .confirm-body h3 {
   margin: 0 0 8px;
   font-size: 1.05rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .confirm-body p {
@@ -1316,17 +1316,17 @@ onMounted(async () => {
 .ghost-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #4a3f44;
+  color: var(--ink-2);
 }
 
 .ghost-btn:hover {
-  border-color: #dfb15b;
-  color: #721438;
+  border-color: var(--gold);
+  color: var(--brand);
 }
 
 .primary-btn {
-  background: #721438;
-  border: 1px solid #721438;
+  background: var(--brand);
+  border: 1px solid var(--brand);
   color: #fff;
 }
 
@@ -1340,8 +1340,8 @@ onMounted(async () => {
 }
 
 .primary-btn.danger {
-  background: #a02c4a;
-  border-color: #a02c4a;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .primary-btn.danger:hover {
@@ -1349,8 +1349,8 @@ onMounted(async () => {
 }
 
 .primary-btn.warn {
-  background: #b06a2b;
-  border-color: #b06a2b;
+  background: var(--warn);
+  border-color: var(--warn);
 }
 
 .primary-btn.warn:hover {
@@ -1369,7 +1369,7 @@ onMounted(async () => {
   flex-direction: column;
   gap: 3px;
   font-size: 0.73rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .form-grid .value-box {
@@ -1382,7 +1382,7 @@ onMounted(async () => {
   align-items: center;
   gap: 7px !important;
   font-size: 0.8rem !important;
-  color: #4a3f44 !important;
+  color: var(--ink-2) !important;
   padding-top: 16px;
 }
 
@@ -1401,7 +1401,7 @@ onMounted(async () => {
 
 .hint {
   font-size: 0.8rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.5;
   margin: 0 0 12px;
 }
@@ -1410,7 +1410,7 @@ onMounted(async () => {
 .mini-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #4a3f44;
+  color: var(--ink-2);
   padding: 6px 14px;
   border-radius: 8px;
   font-size: 0.76rem;
@@ -1423,7 +1423,7 @@ onMounted(async () => {
 }
 
 .mini-btn:hover:not(:disabled) {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .mini-btn:disabled {
@@ -1432,12 +1432,12 @@ onMounted(async () => {
 }
 
 .mini-btn.danger {
-  color: #a02c4a;
+  color: var(--accent);
   border-color: #f3dbe1;
 }
 
 .mini-btn.ok {
-  color: #217a41;
+  color: var(--ok);
   border-color: #d7ecdf;
 }
 
@@ -1447,7 +1447,7 @@ onMounted(async () => {
 }
 
 .empty {
-  color: #a6969c;
+  color: var(--muted-2);
   font-size: 0.83rem;
   text-align: center;
   padding: 22px 10px;
@@ -1464,7 +1464,7 @@ onMounted(async () => {
 
 .pager-info {
   font-size: 0.8rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 @media (max-width: 720px) {

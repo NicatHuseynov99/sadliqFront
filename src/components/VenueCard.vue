@@ -187,12 +187,12 @@ const onImgError = (e) => {
 }
 
 .cmp-btn:hover {
-  color: #2d5f9a;
+  color: var(--info);
   transform: scale(1.08);
 }
 
 .cmp-btn.on {
-  background: #2d5f9a;
+  background: var(--info);
   color: #fff;
 }
 
@@ -216,11 +216,11 @@ const onImgError = (e) => {
 
 .fav-btn:hover {
   transform: scale(1.12);
-  color: #721438;
+  color: var(--brand);
 }
 
 .fav-btn[aria-pressed="true"] {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
 }
 
@@ -266,7 +266,7 @@ const onImgError = (e) => {
 .title-row h3 {
   margin: 0;
   font-size: 1.25rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .rating-pill {
@@ -297,7 +297,7 @@ const onImgError = (e) => {
 }
 
 .avail-badge.busy {
-  background: #fdeaea;
+  background: var(--danger-soft);
   color: #c0392b;
 }
 
@@ -316,7 +316,7 @@ const onImgError = (e) => {
 
 .parking-tag {
   margin-left: auto;
-  background: #eef4fb;
+  background: var(--info-soft);
   color: #1c5cab;
   font-size: 0.75rem;
   font-weight: 600;
@@ -387,7 +387,7 @@ const onImgError = (e) => {
 }
 
 .menu-chip:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   background: #fffaf0;
 }
 
@@ -406,12 +406,12 @@ const onImgError = (e) => {
 
 .menu-chip-text strong {
   font-size: 0.8rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .menu-chip-text span {
   font-size: 0.72rem;
-  color: #721438;
+  color: var(--brand);
   font-weight: 600;
 }
 
@@ -436,7 +436,7 @@ const onImgError = (e) => {
 }
 
 .detail-btn {
-  background: #721438;
+  background: var(--brand);
   color: white;
   border: none;
   padding: 7px 16px;
@@ -449,6 +449,6 @@ const onImgError = (e) => {
 }
 
 .detail-btn:hover {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 </style>

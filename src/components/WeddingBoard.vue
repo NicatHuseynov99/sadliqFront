@@ -166,7 +166,7 @@ const steps = computed(() => {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #dfb15b;
+  color: var(--gold);
   margin-bottom: 5px;
 }
 
@@ -196,7 +196,7 @@ const steps = computed(() => {
   display: block;
   font-size: 2.1rem;
   line-height: 1;
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 .countdown span {
@@ -207,7 +207,7 @@ const steps = computed(() => {
 /* Sağ tərəf: hazırlıq addımları */
 .board-side {
   background: #fff;
-  border: 1px solid #f2ebee;
+  border: 1px solid var(--line);
   border-radius: 18px;
   padding: 18px 20px;
   display: flex;
@@ -217,7 +217,7 @@ const steps = computed(() => {
 .side-title {
   font-size: 0.83rem;
   font-weight: 600;
-  color: #1a1118;
+  color: var(--ink);
   margin-bottom: 12px;
 }
 
@@ -261,19 +261,19 @@ const steps = computed(() => {
 }
 
 .steps li.now i {
-  background: #dfb15b;
-  border-color: #dfb15b;
+  background: var(--gold);
+  border-color: var(--gold);
 }
 
 .steps b {
   display: block;
   font-size: 0.82rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .steps span {
   font-size: 0.74rem;
-  color: #868e96;
+  color: var(--muted);
   line-height: 1.45;
 }
 
@@ -287,7 +287,7 @@ const steps = computed(() => {
   flex: 1;
   text-align: center;
   text-decoration: none;
-  background: linear-gradient(135deg, #721438, #a02c4a);
+  background: linear-gradient(135deg, var(--brand), var(--accent));
   color: #fff;
   padding: 9px 12px;
   border-radius: 10px;
@@ -298,7 +298,7 @@ const steps = computed(() => {
 .side-btn.ghost {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #721438;
+  color: var(--brand);
 }
 
 @media (max-width: 860px) {

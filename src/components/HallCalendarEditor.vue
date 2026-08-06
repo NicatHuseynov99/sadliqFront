@@ -171,7 +171,7 @@ const dayTitle = (d) =>
 
 .cal-title {
   font-weight: 700;
-  color: #1a1118;
+  color: var(--ink);
   text-transform: capitalize;
 }
 
@@ -181,15 +181,15 @@ const dayTitle = (d) =>
   border-radius: 50%;
   border: 1px solid #f0e6ea;
   background: #fff;
-  color: #721438;
+  color: var(--brand);
   font-size: 1.1rem;
   cursor: pointer;
   line-height: 1;
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -240,13 +240,13 @@ const dayTitle = (d) =>
 }
 
 .day.free {
-  border-color: #f0eaec;
-  color: #1a1118;
+  border-color: var(--line-2);
+  color: var(--ink);
 }
 
 .day.free:hover {
-  background: #1a1118;
-  border-color: #1a1118;
+  background: var(--ink);
+  border-color: var(--ink);
   color: #fff;
 }
 
@@ -257,8 +257,8 @@ const dayTitle = (d) =>
 }
 
 .day.blocked {
-  background: #1a1118;
-  border-color: #1a1118;
+  background: var(--ink);
+  border-color: var(--ink);
   color: #fff;
 }
 
@@ -267,9 +267,9 @@ const dayTitle = (d) =>
 }
 
 .day.held {
-  background: #f6e9ee;
+  background: var(--brand-soft);
   border-color: #e8cdd8;
-  color: #721438;
+  color: var(--brand);
   cursor: not-allowed;
 }
 
@@ -285,7 +285,7 @@ const dayTitle = (d) =>
   padding-top: 12px;
   border-top: 1px solid #f5f1f2;
   font-size: 0.75rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .legend span {
@@ -303,8 +303,8 @@ const dayTitle = (d) =>
 }
 
 .dot.free { background: #fff; border-color: #e5dcdf; }
-.dot.blocked { background: #1a1118; }
-.dot.held { background: #f6e9ee; border-color: #e8cdd8; }
+.dot.blocked { background: var(--ink); }
+.dot.held { background: var(--brand-soft); border-color: #e8cdd8; }
 
 .hint {
   margin: 10px 0 0;

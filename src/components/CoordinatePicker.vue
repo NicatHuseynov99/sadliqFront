@@ -241,7 +241,7 @@ watch(
 .find-btn {
   background: #fff;
   border: 1px solid #ece5e8;
-  color: #721438;
+  color: var(--brand);
   padding: 7px 14px;
   border-radius: 9px;
   font-size: 0.78rem;
@@ -251,7 +251,7 @@ watch(
 }
 
 .find-btn:hover:not(:disabled) {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .find-btn:disabled {
@@ -261,11 +261,11 @@ watch(
 
 .picker-hint {
   font-size: 0.74rem;
-  color: #a6969c;
+  color: var(--muted-2);
 }
 
 .find-btn.undo {
-  color: #b06a2b;
+  color: var(--warn);
 }
 
 .map-wrap {
@@ -297,7 +297,7 @@ watch(
 }
 
 .locate-btn:hover:not(:disabled) {
-  border-color: #dfb15b;
+  border-color: var(--gold);
   background: #fffdf7;
 }
 
@@ -317,11 +317,11 @@ watch(
   flex-direction: column;
   gap: 3px;
   font-size: 0.72rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .value-box {
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   border-radius: 9px;
   padding: 7px 11px;
   font-size: 0.8rem;
@@ -330,13 +330,13 @@ watch(
 }
 
 .value-box:focus {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .clear-btn {
   border: 1px solid #f3dbe1;
   background: #fff;
-  color: #a02c4a;
+  color: var(--accent);
   width: 32px;
   height: 32px;
   border-radius: 9px;
@@ -346,11 +346,11 @@ watch(
 .picker-msg {
   margin: 0;
   font-size: 0.74rem;
-  color: #217a41;
+  color: var(--ok);
   line-height: 1.4;
 }
 
 .picker-msg.bad {
-  color: #b06a2b;
+  color: var(--warn);
 }
 </style>

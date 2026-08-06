@@ -213,7 +213,7 @@ onMounted(load)
 
 .page-title {
   margin: 0 0 4px;
-  color: #1a1118;
+  color: var(--ink);
   font-size: 1.7rem;
 }
 
@@ -224,7 +224,7 @@ onMounted(load)
 }
 
 .new-link {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
   text-decoration: none;
   padding: 9px 18px;
@@ -236,7 +236,7 @@ onMounted(load)
 }
 
 .new-link:hover {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 
 /* Seçilmişlərin xülasə sətri */
@@ -260,22 +260,22 @@ onMounted(load)
 .fs-value {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #721438;
+  color: var(--brand);
   line-height: 1.2;
 }
 
 .fs-label {
   font-size: 0.74rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .fs-item.warn .fs-value {
-  color: #a02c4a;
+  color: var(--accent);
 }
 
 .fs-btn {
   margin-left: auto;
-  background: #2d5f9a;
+  background: var(--info);
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -324,7 +324,7 @@ onMounted(load)
 }
 
 .primary-btn {
-  background: #721438;
+  background: var(--brand);
   color: white;
   border: none;
   padding: 9px 22px;
@@ -334,7 +334,7 @@ onMounted(load)
 }
 
 .primary-btn:hover {
-  background: #590f2b;
+  background: var(--brand-dark);
 }
 
 @media (max-width: 700px) {

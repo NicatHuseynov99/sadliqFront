@@ -407,7 +407,7 @@ onMounted(load)
 
 .page-title {
   margin: 0 0 4px;
-  color: #1a1118;
+  color: var(--ink);
   font-size: 1.7rem;
 }
 
@@ -418,8 +418,8 @@ onMounted(load)
 }
 
 .owner-tag {
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.85rem;
   font-weight: 700;
   padding: 8px 16px;
@@ -447,7 +447,7 @@ onMounted(load)
 }
 
 .stat-card.accent {
-  background: linear-gradient(135deg, #721438, #9c2350);
+  background: linear-gradient(135deg, var(--brand), #9c2350);
   border-color: transparent;
 }
 
@@ -463,7 +463,7 @@ onMounted(load)
 .stat-value {
   font-size: 1.6rem;
   font-weight: 800;
-  color: #1a1118;
+  color: var(--ink);
   line-height: 1.1;
 }
 
@@ -484,7 +484,7 @@ onMounted(load)
 
 .section-tab {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 9px 20px;
   border-radius: 10px;
@@ -496,8 +496,8 @@ onMounted(load)
 
 .section-tab em {
   font-style: normal;
-  background: #f6e9ee;
-  color: #721438;
+  background: var(--brand-soft);
+  color: var(--brand);
   font-size: 0.72rem;
   padding: 1px 8px;
   border-radius: 20px;
@@ -505,12 +505,12 @@ onMounted(load)
 }
 
 .section-tab:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .section-tab.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -563,11 +563,11 @@ onMounted(load)
 }
 
 .venue-item:hover {
-  background: #faf7f8;
+  background: var(--bg);
 }
 
 .venue-item.active {
-  background: #f6e9ee;
+  background: var(--brand-soft);
   border-color: #e8cdd8;
 }
 
@@ -588,7 +588,7 @@ onMounted(load)
 
 .vi-text b {
   font-size: 0.87rem;
-  color: #1a1118;
+  color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -601,7 +601,7 @@ onMounted(load)
 }
 
 .vi-badge {
-  background: #721438;
+  background: var(--brand);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 800;
@@ -630,7 +630,7 @@ onMounted(load)
 .res-head h2 {
   margin: 0;
   font-size: 1.15rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .tabs {
@@ -640,7 +640,7 @@ onMounted(load)
 
 .tab {
   background: #fff;
-  border: 1px solid #f0eaec;
+  border: 1px solid var(--line-2);
   color: #6c757d;
   padding: 6px 14px;
   border-radius: 20px;
@@ -657,12 +657,12 @@ onMounted(load)
 }
 
 .tab:hover {
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .tab.active {
-  background: #721438;
-  border-color: #721438;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
@@ -676,7 +676,7 @@ onMounted(load)
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
 }
 
-.res-card.pending { border-left-color: #dfb15b; }
+.res-card.pending { border-left-color: var(--gold); }
 .res-card.confirmed { border-left-color: #1e7e34; }
 .res-card.rejected { border-left-color: #c0392b; }
 .res-card.cancelled { border-left-color: #ced4da; }
@@ -694,7 +694,7 @@ onMounted(load)
 .res-top h3 {
   margin: 0 0 2px;
   font-size: 1.05rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .res-meta {
@@ -712,10 +712,10 @@ onMounted(load)
 
 .status-tag.pending { background: #fff6e0; color: #b07d2b; }
 .status-tag.confirmed { background: #e3f6e8; color: #1e7e34; }
-.status-tag.rejected { background: #fdeaea; color: #c0392b; }
-.status-tag.cancelled { background: #f1f3f5; color: #868e96; }
+.status-tag.rejected { background: var(--danger-soft); color: #c0392b; }
+.status-tag.cancelled { background: #f1f3f5; color: var(--muted); }
 .status-tag.expired { background: #f4efe6; color: #8a6d3b; }
-.status-tag.offered { background: #eaf1fa; color: #2d5f9a; }
+.status-tag.offered { background: #eaf1fa; color: var(--info); }
 
 .res-facts {
   display: grid;
@@ -743,17 +743,17 @@ onMounted(load)
 
 .fact b {
   font-size: 0.9rem;
-  color: #1a1118;
+  color: var(--ink);
 }
 
 .fact em {
   font-style: normal;
   font-size: 0.75rem;
-  color: #868e96;
+  color: var(--muted);
 }
 
 .fact-total b {
-  color: #721438;
+  color: var(--brand);
   font-size: 1.1rem;
   font-weight: 800;
 }
@@ -761,7 +761,7 @@ onMounted(load)
 .res-note {
   margin: 12px 0 0;
   font-size: 0.83rem;
-  color: #868e96;
+  color: var(--muted);
   font-style: italic;
 }
 
@@ -787,7 +787,7 @@ onMounted(load)
 /* «Rədd» ilə «Təsdiq» arasındakı üçüncü yol */
 .offer-btn {
   background: #fff;
-  color: #2d5f9a;
+  color: var(--info);
   border: 1px solid #cfdcec;
   padding: 8px 18px;
   border-radius: 8px;
@@ -799,7 +799,7 @@ onMounted(load)
 
 .offer-btn:hover {
   background: #f4f8fd;
-  border-color: #2d5f9a;
+  border-color: var(--info);
 }
 
 /* Göndərilmiş, cavab gözləyən təklif */
@@ -814,7 +814,7 @@ onMounted(load)
 .offer-box b {
   display: block;
   font-size: 0.8rem;
-  color: #2d5f9a;
+  color: var(--info);
   margin-bottom: 3px;
 }
 
@@ -872,7 +872,7 @@ onMounted(load)
   border-radius: 14px;
   padding: 40px 20px;
   text-align: center;
-  color: #868e96;
+  color: var(--muted);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
