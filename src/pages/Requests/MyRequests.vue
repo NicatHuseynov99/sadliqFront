@@ -11,9 +11,25 @@
         </div>
       </header>
 
+      <!-- Elan qutusu: bağlı halda bir sətir, klikləyəndə forma açılır -->
+      <section v-if="!hasOpenRequest && !isComposerOpen" class="composer" @click="isComposerOpen = true">
+        <span class="composer-avatar">📣</span>
+        <span class="composer-text">Toyunuz üçün nə axtarırsınız?</span>
+        <span class="composer-btn">Elan yaz</span>
+      </section>
+
       <!-- Yeni sorğu -->
-      <section v-if="!hasOpenRequest" class="form-card">
-        <h2 class="card-title">Şərtlərinizi yazın</h2>
+      <section v-else-if="!hasOpenRequest" class="form-card">
+        <header class="form-head">
+          <h2 class="card-title">Şərtlərinizi yazın</h2>
+          <button class="close-x" title="Bağla" @click="isComposerOpen = false">✕</button>
+        </header>
+
+        <!-- Yazdıqca elanın necə görünəcəyi -->
+        <p class="preview-line">
+          <b>{{ previewText }}</b>
+          <em>— uyğun saraylar bunu görəcək</em>
+        </p>
 
         <div class="form-grid">
           <label>
@@ -280,6 +296,7 @@ const submit = async () => {
 
     ElMessage.success(result.message)
     form.note = ''
+    isComposerOpen.value = false
     await load()
   } catch (e) {
     ElMessage.error(e?.userMessage ?? e?.message ?? 'Sorğu göndərilmədi')
@@ -321,6 +338,24 @@ const accept = async (offer) => {
 }
 
 // ————— təkliflərin sıralanması və açılışı —————
+
+// Elan qutusu bağlı başlayır — səhifə forma divarı ilə açılmasın
+const isComposerOpen = ref(false)
+
+// Elanın canlı önizləməsi: müştəri nə yazdığını bir sətirdə görür
+const previewText = computed(() => {
+  const parts = [form.city || 'Şəhər seçin']
+
+  parts.push(`${form.guestCount || 0} qonaq`)
+
+  if (form.isDateFlexible) parts.push('tarix çevikdir')
+  else if (form.eventDate) parts.push(formatDate(form.eventDate))
+
+  if (form.budgetPerPerson) parts.push(`${form.budgetPerPerson} ₼ / nəfər`)
+  if (form.needsParking) parts.push('parkinq lazımdır')
+
+  return parts.join(' · ')
+})
 
 const sortOptions = [
   { value: 'price', label: 'Ən ucuz' },
@@ -425,6 +460,89 @@ onMounted(async () => {
   color: #6c757d;
   line-height: 1.6;
   max-width: 640px;
+}
+
+/* Elan qutusu — bağlı hal */
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.composer:hover {
+  border-color: var(--gold);
+  box-shadow: var(--shadow-2);
+}
+
+.composer-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+}
+
+.composer-text {
+  flex: 1;
+  color: var(--muted);
+  font-size: var(--fs-md);
+}
+
+.composer-btn {
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  color: #fff;
+  padding: 9px 20px;
+  border-radius: var(--r);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.close-x {
+  background: none;
+  border: none;
+  color: var(--faint);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.close-x:hover {
+  color: var(--accent);
+}
+
+/* Canlı önizləmə */
+.preview-line {
+  margin: 0 0 14px;
+  background: var(--gold-soft);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  font-size: var(--fs-sm);
+}
+
+.preview-line b {
+  color: var(--ink);
+}
+
+.preview-line em {
+  font-style: normal;
+  color: var(--warn);
+  margin-left: 6px;
 }
 
 /* Forma */
