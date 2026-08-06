@@ -16,6 +16,19 @@ body {
   color: var(--ink);
 }
 
+/* Klaviatura ilə naviqasiya edən istifadəçi hara olduğunu görsün.
+   Yalnız klaviatura fokusunda (siçan klikində yox) görünür. */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--brand, #721438);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* Telefonda alt naviqasiya məzmunun üstünü örtməsin */
 @media (max-width: 700px) {
   body {

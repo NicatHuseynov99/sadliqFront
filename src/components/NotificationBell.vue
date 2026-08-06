@@ -1,11 +1,18 @@
 <template>
   <div ref="root" class="bell-wrap">
-    <button class="bell" :class="{ active: isOpen }" @click="toggle">
+    <button
+      class="bell"
+      :class="{ active: isOpen }"
+      :aria-expanded="isOpen"
+      aria-haspopup="true"
+      :aria-label="unread > 0 ? `Bildirişlər, ${unread} oxunmamış` : 'Bildirişlər'"
+      @click="toggle"
+    >
       🔔
       <span v-if="unread > 0" class="dot">{{ unread > 99 ? '99+' : unread }}</span>
     </button>
 
-    <div v-if="isOpen" class="panel">
+    <div v-if="isOpen" class="panel" role="menu">
       <header class="panel-head">
         <b>Bildirişlər</b>
         <button v-if="unread > 0" class="link-btn" @click="readAll">Hamısını oxundu et</button>
@@ -32,7 +39,7 @@
             <span class="tag">{{ n.typeLabel }}</span>
           </div>
 
-          <button class="del" title="Sil" @click.stop="remove(n)">✕</button>
+          <button class="del" title="Sil" aria-label="Bildirişi sil" @click.stop="remove(n)">✕</button>
         </article>
       </div>
 
@@ -110,6 +117,11 @@ const onDocumentClick = (event) => {
   if (isOpen.value && root.value && !root.value.contains(event.target)) close()
 }
 
+// Esc ilə də bağlanır — klaviatura ilə açılan pəncərəni əl ilə bağlamaq lazım olmasın
+const onKeydown = (event) => {
+  if (event.key === 'Escape' && isOpen.value) close()
+}
+
 // Bildirişə klik: oxundu sayılır və linkinə keçilir
 const open = async (n) => {
   await registerClick(n.id)
@@ -163,11 +175,13 @@ onMounted(() => {
   refreshCount()
   timer = setInterval(refreshCount, 60000)
   document.addEventListener("click", onDocumentClick)
+  document.addEventListener("keydown", onKeydown)
 })
 
 onBeforeUnmount(() => {
   clearInterval(timer)
   document.removeEventListener("click", onDocumentClick)
+  document.removeEventListener("keydown", onKeydown)
 })
 </script>
 

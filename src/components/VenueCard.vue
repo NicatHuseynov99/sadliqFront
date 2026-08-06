@@ -15,6 +15,8 @@
       <button
         class="cmp-btn"
         :class="{ on: isCompared }"
+        :aria-pressed="isCompared"
+        :aria-label="isCompared ? 'Müqayisədən çıxar' : 'Müqayisəyə əlavə et'"
         :title="isCompared ? 'Müqayisədən çıxar' : 'Müqayisəyə əlavə et'"
         @click.stop="$emit('toggle-compare', venue)"
       >
@@ -24,6 +26,7 @@
       <button
         class="fav-btn"
         :aria-pressed="isFavorite"
+        :aria-label="isFavorite ? 'Seçilmişlərdən sil' : 'Seçilmişlərə əlavə et'"
         :title="isFavorite ? 'Seçilmişlərdən sil' : 'Seçilmişlərə əlavə et'"
         @click.stop="$emit('toggle-favorite', venue)"
       >

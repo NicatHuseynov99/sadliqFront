@@ -35,7 +35,7 @@
             <span class="slide-count">{{ slideIndex + 1 }} / {{ slides.length }}</span>
           </template>
 
-          <button v-if="!showVideo" class="zoom-hint" title="Böyüt" @click="openLightbox">⤢</button>
+          <button v-if="!showVideo" class="zoom-hint" title="Böyüt" aria-label="Şəkli böyüt" @click="openLightbox">⤢</button>
         </div>
 
         <!-- Kiçik şəkillər əsas qalereya ilə eyni sırada gedir -->
@@ -66,13 +66,13 @@
       <!-- Şəkli tam ekranda böyütmək: klik, ← → oxları, Esc ilə bağlanır -->
       <Teleport to="body">
         <div v-if="isLightboxOpen" class="lightbox" @click.self="closeLightbox">
-          <button class="lb-close" title="Bağla (Esc)" @click="closeLightbox">✕</button>
+          <button class="lb-close" title="Bağla (Esc)" aria-label="Bağla" @click="closeLightbox">✕</button>
 
-          <button v-if="slides.length > 1" class="lb-arrow left" title="Əvvəlki (←)" @click="prevSlide">‹</button>
+          <button v-if="slides.length > 1" class="lb-arrow left" title="Əvvəlki (←)" aria-label="Əvvəlki şəkil" @click="prevSlide">‹</button>
 
           <img :src="activeImage" :alt="venue.name" class="lb-image" />
 
-          <button v-if="slides.length > 1" class="lb-arrow right" title="Növbəti (→)" @click="nextSlide">›</button>
+          <button v-if="slides.length > 1" class="lb-arrow right" title="Növbəti (→)" aria-label="Növbəti şəkil" @click="nextSlide">›</button>
 
           <span v-if="slides.length > 1" class="lb-count">{{ slideIndex + 1 }} / {{ slides.length }}</span>
         </div>
