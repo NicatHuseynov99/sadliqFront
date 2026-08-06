@@ -821,7 +821,7 @@ onMounted(load)
 /* Göstəricilər */
 .stat-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
   gap: 14px;
   margin-bottom: 26px;
 }
@@ -1302,11 +1302,19 @@ button.stat-card:hover {
 .role-select.support { border-color: #cfe3d4; color: #1e7e34; }
 
 @media (max-width: 980px) {
-  .stat-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .admin-page {
     padding: 24px 16px 50px;
+  }
+
+  /* Bölmə sətri telefonda öz içində sürüşsün */
+  .section-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+
+  .section-tab {
+    white-space: nowrap;
   }
 }
 </style>

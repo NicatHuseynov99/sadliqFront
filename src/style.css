@@ -33,3 +33,37 @@ body {
 .el-drawer__body .el-slider {
   padding: 0 6px;
 }
+
+/* ————— Mobil üçün ümumi qaydalar ————— */
+
+/* Pəncərələr telefonda ekrana sığsın: sabit piksel enləri kənara çıxırdı */
+@media (max-width: 700px) {
+  .el-dialog {
+    width: 94vw !important;
+    max-width: 94vw;
+    margin: 5vh auto !important;
+  }
+
+  .el-drawer.rtl,
+  .el-drawer.ltr {
+    width: 90% !important;
+  }
+
+  .el-message-box {
+    width: 90vw !important;
+  }
+}
+
+/* Cədvəllər telefonda öz içində sürüşsün, səhifəni genişlətməsin */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Toxunma sahələri barmaq üçün kifayət qədər böyük olsun */
+@media (max-width: 700px) {
+  button,
+  .el-button {
+    min-height: 38px;
+  }
+}

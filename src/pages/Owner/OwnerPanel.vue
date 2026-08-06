@@ -855,7 +855,7 @@ onMounted(load)
 /* Göstəricilər */
 .stat-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
   gap: 14px;
   margin-bottom: 24px;
 }
@@ -1723,8 +1723,15 @@ onMounted(load)
   .staff-block {
     grid-template-columns: 1fr;
   }
-  .stat-row {
-    grid-template-columns: repeat(2, 1fr);
+
+  .section-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+
+  .section-tab {
+    white-space: nowrap;
   }
   .panel-page {
     padding: 24px 16px 50px;

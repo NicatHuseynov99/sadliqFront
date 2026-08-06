@@ -1139,6 +1139,30 @@ const selectVenue = (venue) => {
   cursor: pointer;
 }
 
+@media (max-width: 700px) {
+  .hero-section {
+    padding: 34px 14px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .venues-container {
+    padding: 20px 14px 50px;
+  }
+
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .cmp-bar {
+    bottom: 68px;
+  }
+}
+
 @media (max-width: 820px) {
   .search-row {
     grid-template-columns: 1fr 1fr;
@@ -1516,7 +1540,7 @@ const selectVenue = (venue) => {
 
 .venues-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: 24px;
 }
 

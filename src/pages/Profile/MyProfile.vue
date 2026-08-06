@@ -494,8 +494,17 @@ onMounted(async () => {
   .profile-grid {
     grid-template-columns: 1fr;
   }
+
   .profile-page {
     padding: 24px 16px 50px;
+  }
+
+  .name-row {
+    grid-template-columns: 1fr;
+  }
+
+  .switch-row {
+    align-items: flex-start;
   }
 }
 </style>

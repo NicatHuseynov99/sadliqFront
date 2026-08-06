@@ -296,7 +296,7 @@ onMounted(load)
 
 .venues-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: 24px;
 }
 
@@ -337,9 +337,22 @@ onMounted(load)
   background: #590f2b;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .fav-page {
-    padding: 24px 16px 50px;
+    padding: 22px 14px 50px;
+  }
+
+  .fav-summary {
+    gap: 14px;
+  }
+
+  .fs-btn {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .page-head {
+    flex-direction: column;
   }
   .venues-grid {
     grid-template-columns: 1fr;

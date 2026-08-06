@@ -632,7 +632,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 @media (max-width: 1100px) {
   .filter-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
   }
   .log-main {
     grid-template-columns: 1fr;

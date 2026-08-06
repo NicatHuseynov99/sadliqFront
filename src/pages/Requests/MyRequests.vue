@@ -562,7 +562,7 @@ onMounted(async () => {
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   gap: 12px 14px;
 }
 
@@ -1089,6 +1089,23 @@ textarea:focus {
 }
 
 @media (max-width: 780px) {
+  .req-page {
+    padding: 22px 14px 50px;
+  }
+
+  .composer {
+    flex-wrap: wrap;
+  }
+
+  .composer-text {
+    flex-basis: 100%;
+    order: 3;
+  }
+
+  .req-head {
+    flex-direction: column;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }

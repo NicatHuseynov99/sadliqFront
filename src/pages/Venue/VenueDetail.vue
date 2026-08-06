@@ -2115,8 +2115,32 @@ onMounted(async () => {
   .main-image {
     height: 230px;
   }
+
   .head-row {
     flex-direction: column;
+  }
+
+  /* Zal statistikası və düymələr telefonda sıxılmasın */
+  .side-block.stats {
+    grid-template-columns: 1fr;
+  }
+
+  .hall-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hall-footer button {
+    width: 100%;
+  }
+
+  .day-strip {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .detail-page {
+    padding: 20px 14px 50px;
   }
 }
 </style>

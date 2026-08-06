@@ -335,7 +335,7 @@ onMounted(load)
 /* Status xülasəsi */
 .summary {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -670,9 +670,20 @@ onMounted(load)
 }
 
 @media (max-width: 760px) {
-  .summary {
-    grid-template-columns: repeat(3, 1fr);
+  .res-page {
+    padding: 22px 14px 50px;
   }
+
+  .page-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .res-foot {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
   .res-card {
     flex-direction: column;
   }
