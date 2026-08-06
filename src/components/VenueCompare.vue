@@ -158,7 +158,7 @@ const rows = computed(() => [
 <style scoped>
 :deep(.cmp-dialog) {
   border-radius: 16px;
-  max-width: calc(100vw - 32px);
+  max-width: calc(100% - 32px);
 }
 
 :deep(.cmp-dialog .el-dialog__header) {

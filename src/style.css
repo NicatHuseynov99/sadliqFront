@@ -2,6 +2,13 @@
   box-sizing: border-box;
 }
 
+/* Üfüqi sürüşmə heç bir səhifədə olmamalıdır — yapışıq və üzən
+   elementlər kənara çıxanda sağ-aşağıda zolaq yaranırdı */
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   font-family: var(--font);

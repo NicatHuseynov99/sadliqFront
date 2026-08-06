@@ -47,7 +47,7 @@
           </div>
 
           <!-- Görünən hissədə yalnız üç şey: şəhər, qonaq sayı və çekmecə açarı.
-               Qalan süzgəclər divar kimi yer tutmasın deyə yandan açılır. -->
+               Qalan şərtlər divar kimi yer tutmasın deyə yandan açılır. -->
           <div class="search-row">
             <div class="field">
               <label>Şəhər</label>
@@ -82,7 +82,7 @@
             </div>
 
             <button class="filter-btn" @click="isFilterOpen = true">
-              ⚙ Ətraflı süzgəc
+              🔍 Axtarış
               <em v-if="activeFilterCount">{{ activeFilterCount }}</em>
             </button>
 
@@ -96,8 +96,8 @@
       </div>
     </section>
 
-    <!-- Ətraflı süzgəc: büdcə, qiymət aralığı, reytinq, parkinq və özəlliklər -->
-    <el-drawer v-model="isFilterOpen" title="Ətraflı süzgəc" size="390px" class="filter-drawer">
+    <!-- Axtarış çekmecəsi: büdcə, qiymət aralığı, reytinq, parkinq və özəlliklər -->
+    <el-drawer v-model="isFilterOpen" title="Axtarış" size="390px" class="filter-drawer">
       <div class="drawer-body">
         <div class="field">
           <label>Ümumi büdcəniz</label>
@@ -671,7 +671,7 @@ const selectVenue = (venue) => {
   border-radius: 14px;
   padding: 11px 16px;
   box-shadow: 0 14px 36px rgba(26, 17, 24, 0.35);
-  max-width: calc(100vw - 32px);
+  max-width: calc(100% - 32px);
   flex-wrap: wrap;
 }
 

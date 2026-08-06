@@ -215,7 +215,7 @@ onBeforeUnmount(() => {
   top: 42px;
   right: 0;
   width: 370px;
-  max-width: calc(100vw - 32px);
+  max-width: calc(100% - 32px);
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 18px 44px rgba(26, 17, 24, 0.28);
