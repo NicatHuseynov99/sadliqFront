@@ -56,26 +56,26 @@
       <!-- Göstəricilər: hər kart öz bölməsinə aparır -->
       <div class="stat-row">
         <div class="stat-card dark">
-          <span class="stat-value">{{ stats.users ?? 0 }}</span>
+          <span class="stat-value">{{ usersDisplay }}</span>
           <span class="stat-label">İstifadəçi</span>
           <span class="stat-sub">{{ stats.customers ?? 0 }} müştəri · {{ stats.owners ?? 0 }} sahib</span>
         </div>
         <button class="stat-card" @click="section = 'venues'">
-          <span class="stat-value">{{ stats.venues ?? 0 }}</span>
+          <span class="stat-value">{{ venuesDisplay }}</span>
           <span class="stat-label">Saray</span>
           <span class="stat-sub" :class="{ warn: stats.pendingVenues }">
             {{ stats.pendingVenues ?? 0 }} təsdiq gözləyir
           </span>
         </button>
         <button class="stat-card" @click="section = 'bookings'">
-          <span class="stat-value">{{ stats.reservations ?? 0 }}</span>
+          <span class="stat-value">{{ reservationsDisplay }}</span>
           <span class="stat-label">Rezerv</span>
           <span class="stat-sub" :class="{ warn: stats.pendingReservations }">
             {{ stats.pendingReservations ?? 0 }} cavabsız
           </span>
         </button>
         <button class="stat-card" @click="section = 'reviews'">
-          <span class="stat-value">{{ stats.reviews ?? 0 }}</span>
+          <span class="stat-value">{{ reviewsDisplay }}</span>
           <span class="stat-label">Rəy</span>
           <span class="stat-sub" :class="{ warn: stats.blockedUsers }">
             {{ stats.blockedUsers ?? 0 }} bloklanmış hesab
@@ -309,6 +309,7 @@
 
 <script setup>
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from 'vue'
+import { useCountUp } from '@/composables/useCountUp'
 import { ElMessageBox, ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 
@@ -342,6 +343,12 @@ import { formatDateFull } from '@/utils/date'
 const auth = useAuthStore()
 
 const stats = ref({})
+
+// Göstərici kartları rəqəmi sıçramadan, sayaraq dəyişir
+const usersDisplay = useCountUp(() => stats.value.users)
+const venuesDisplay = useCountUp(() => stats.value.venues)
+const reservationsDisplay = useCountUp(() => stats.value.reservations)
+const reviewsDisplay = useCountUp(() => stats.value.reviews)
 const users = ref([])
 const pendingVenues = ref([])
 const roleFilter = ref('')

@@ -12,20 +12,20 @@
       <!-- Ümumi göstəricilər -->
       <div class="stat-row">
         <div class="stat-card accent">
-          <span class="stat-value">{{ pendingCount }}</span>
+          <span class="stat-value">{{ pendingDisplay }}</span>
           <span class="stat-label">Cavab gözləyir</span>
         </div>
         <div class="stat-card">
-          <span class="stat-value">{{ confirmedCount }}</span>
+          <span class="stat-value">{{ confirmedDisplay }}</span>
           <span class="stat-label">Təsdiqlənmiş</span>
         </div>
         <div class="stat-card">
-          <span class="stat-value">{{ venues.length }}</span>
+          <span class="stat-value">{{ venuesDisplay }}</span>
           <span class="stat-label">Sarayınız</span>
         </div>
         <!-- Gəlir göstəricisi hesabat sayılır — administrator onu görmür -->
         <div class="stat-card" v-if="auth.canEditVenues">
-          <span class="stat-value">{{ expectedIncome.toLocaleString() }} ₼</span>
+          <span class="stat-value">{{ incomeDisplay.toLocaleString() }} ₼</span>
           <span class="stat-label">Təsdiqlənmiş gəlir</span>
         </div>
       </div>
@@ -420,6 +420,7 @@
 
 <script setup>
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from 'vue'
+import { useCountUp } from '@/composables/useCountUp'
 import { ElNotification } from 'element-plus'
 import { useAuthStore } from '@/store/auth'
 import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
@@ -536,12 +537,19 @@ const flatReservations = computed(() => Object.values(allReservations.value).fla
 const pendingCount = computed(() => flatReservations.value.filter((r) => r.status === 0).length)
 const confirmedCount = computed(() => flatReservations.value.filter((r) => r.status === 1).length)
 
+// Göstərici kartları rəqəmi sıçramadan, sayaraq dəyişir
+const pendingDisplay = useCountUp(() => pendingCount.value)
+const confirmedDisplay = useCountUp(() => confirmedCount.value)
+const venuesDisplay = useCountUp(() => venues.value.length)
+
 // Təsdiqlənmiş rezervlərdən gözlənilən ümumi gəlir
 const expectedIncome = computed(() =>
   flatReservations.value
     .filter((r) => r.status === 1)
     .reduce((sum, r) => sum + r.pricePerPerson * r.guestCount, 0),
 )
+
+const incomeDisplay = useCountUp(() => expectedIncome.value)
 
 const counts = computed(() => {
   const result = { all: reservations.value.length }
