@@ -183,7 +183,7 @@
     </section>
 
     <!-- Restoranlar Siyahısı -->
-    <section class="venues-container" v-loading="isLoading">
+    <section class="venues-container">
       <div class="results-header">
         <!-- Xəritə rejimində say xəritənin öz sətrində göstərilir —
              burada təkrarlansa, koordinatı olmayan saraylara görə iki
@@ -217,7 +217,12 @@
       />
 
       <template v-else>
-      <div v-if="!isLoading && venues.length === 0" class="no-result">
+      <!-- İlk yükləmə: kartların öz formasında boz bloklar -->
+      <div v-if="isLoading && !venues.length" class="venues-grid">
+        <UiCardSkeleton v-for="n in 6" :key="n" />
+      </div>
+
+      <div v-else-if="!isLoading && venues.length === 0" class="no-result">
         <h3>Axtarışınıza uyğun heç bir saray tapılmadı.</h3>
         <p>Filtrləri dəyişərək yenidən yoxlaya bilərsiniz.</p>
         <button @click="resetFilters" class="btn-reset-empty">Filtrləri sıfırla</button>
@@ -291,7 +296,8 @@ import {
 import { getMyFavoriteIds, toggleFavorite } from '@/services/favoriteService'
 import { trackPage } from '@/services/visitService'
 import { useAuthStore } from '@/store/auth'
-import VenueCompare from '@/components/VenueCompare.vue'
+import VenueCompare from "@/components/VenueCompare.vue"
+import UiCardSkeleton from "@/components/ui/UiCardSkeleton.vue"
 
 const PAGE_SIZE = 12
 

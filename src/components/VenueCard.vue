@@ -1,7 +1,14 @@
 <template>
   <div class="venue-card">
     <div class="image-wrapper">
-      <img :src="venue.coverImageUrl" :alt="venue.name" class="venue-img" @error="onImgError" />
+      <img
+        :src="venue.coverImageUrl"
+        :alt="venue.name"
+        class="venue-img"
+        loading="lazy"
+        decoding="async"
+        @error="onImgError"
+      />
       <span class="badge">{{ venue.city }}</span>
 
       <!-- Müqayisə seçimi: müştəri 2-3 sarayı yan-yana qoya bilir -->

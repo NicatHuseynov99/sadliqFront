@@ -4,5 +4,14 @@
 
 body {
   margin: 0;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* Telefonda alt naviqasiya məzmunun üstünü örtməsin */
+@media (max-width: 700px) {
+  body {
+    padding-bottom: 58px;
+  }
 }

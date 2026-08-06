@@ -1,8 +1,11 @@
 <template>
   <header class="app-header">
-    <router-link to="/" class="logo">Şadlıq <span>Sarayları</span></router-link>
+    <router-link to="/" class="logo" @click="isMenuOpen = false">
+      Şadlıq <span>Sarayları</span>
+    </router-link>
 
-    <nav class="nav-links">
+    <!-- Geniş ekranda düz sətir, darda açılan menyu -->
+    <nav class="nav-links" :class="{ open: isMenuOpen }" @click="isMenuOpen = false">
       <router-link to="/">Ana səhifə</router-link>
       <router-link v-if="auth.isSuperAdmin" to="/admin" class="panel-link">⚙️ Admin panel</router-link>
       <router-link v-else-if="auth.isSupport" to="/admin" class="panel-link">🛟 Admin panel</router-link>
@@ -10,13 +13,24 @@
       <router-link v-if="auth.isCustomer" to="/favorites">♥ Seçilmişlər</router-link>
       <router-link v-if="auth.isCustomer" to="/my-reservations">Rezervlərim</router-link>
       <router-link v-if="auth.isCustomer" to="/sorgularim">Sorğularım</router-link>
+
+      <!-- Menyu açılanda hesab əməliyyatları da burada olsun -->
+      <div class="nav-account" v-if="auth.isAuth">
+        <router-link to="/profile">👤 {{ auth.user?.fullName }}</router-link>
+        <button class="ghost-btn" @click="auth.logout()">Çıxış</button>
+      </div>
     </nav>
 
     <div class="user-box" v-if="auth.isAuth">
       <NotificationBell />
       <router-link to="/profile" class="user-name">👤 {{ auth.user?.fullName }}</router-link>
-      <button class="ghost-btn" @click="auth.logout()">Çıxış</button>
+      <button class="ghost-btn hide-narrow" @click="auth.logout()">Çıxış</button>
+
+      <button class="burger" :class="{ on: isMenuOpen }" title="Menyu" @click="isMenuOpen = !isMenuOpen">
+        <i></i><i></i><i></i>
+      </button>
     </div>
+
     <div class="user-box" v-else>
       <router-link to="/register">
         <button class="ghost-btn">Qeydiyyat</button>
@@ -24,15 +38,38 @@
       <router-link to="/login">
         <button class="gold-btn">Daxil ol</button>
       </router-link>
+
+      <button class="burger" :class="{ on: isMenuOpen }" title="Menyu" @click="isMenuOpen = !isMenuOpen">
+        <i></i><i></i><i></i>
+      </button>
     </div>
   </header>
+
+  <!-- Telefonda əsas keçidlər barmağın çatdığı yerdə: aşağıda -->
+  <nav v-if="auth.isCustomer" class="bottom-nav">
+    <router-link to="/"><span>🔍</span>Axtar</router-link>
+    <router-link to="/sorgularim"><span>📣</span>Sorğularım</router-link>
+    <router-link to="/favorites"><span>♥</span>Seçilmiş</router-link>
+    <router-link to="/my-reservations"><span>📅</span>Rezervlər</router-link>
+  </nav>
 </template>
 
 <script setup>
-import { useAuthStore } from "@/store/auth"
-import NotificationBell from "@/components/NotificationBell.vue"
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/store/auth'
+import NotificationBell from '@/components/NotificationBell.vue'
 
 const auth = useAuthStore()
+const route = useRoute()
+
+const isMenuOpen = ref(false)
+
+// Səhifə dəyişəndə menyu açıq qalmasın
+watch(
+  () => route.fullPath,
+  () => (isMenuOpen.value = false),
+)
 </script>
 
 <style scoped>
@@ -41,11 +78,11 @@ const auth = useAuthStore()
   align-items: center;
   justify-content: space-between;
   padding: 14px 40px;
-  background: #1a1118;
+  background: var(--ink);
   position: sticky;
   top: 0;
   z-index: 100;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font);
 }
 
 .logo {
@@ -53,10 +90,11 @@ const auth = useAuthStore()
   font-size: 1.25rem;
   color: #fff;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .logo span {
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 .nav-links a {
@@ -65,17 +103,21 @@ const auth = useAuthStore()
   margin: 0 12px;
   font-size: 0.92rem;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: color var(--t);
 }
 
 .nav-links a:hover,
 .nav-links a.menu-item-active {
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 .panel-link {
-  color: #dfb15b !important;
+  color: var(--gold) !important;
   font-weight: 700 !important;
+}
+
+.nav-account {
+  display: none;
 }
 
 .user-box {
@@ -93,11 +135,15 @@ const auth = useAuthStore()
   color: #fff;
   font-size: 0.9rem;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color var(--t);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-name:hover {
-  color: #dfb15b;
+  color: var(--gold);
 }
 
 .ghost-btn {
@@ -105,31 +151,155 @@ const auth = useAuthStore()
   color: #cbc3c8;
   border: 1px solid rgba(255, 255, 255, 0.25);
   padding: 7px 16px;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: all var(--t);
 }
 
 .ghost-btn:hover {
   color: #fff;
-  border-color: #dfb15b;
+  border-color: var(--gold);
 }
 
 .gold-btn {
-  background: #dfb15b;
-  color: #1a1118;
+  background: var(--gold);
+  color: var(--ink);
   border: none;
   padding: 8px 18px;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 700;
-  transition: background 0.2s;
+  transition: background var(--t);
 }
 
 .gold-btn:hover {
-  background: #c99a45;
+  background: #ecc272;
+}
+
+/* Burger — yalnız dar ekranda görünür */
+.burger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.burger i {
+  width: 20px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform var(--t), opacity var(--t);
+}
+
+.burger.on i:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.burger.on i:nth-child(2) {
+  opacity: 0;
+}
+
+.burger.on i:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Telefonda alt naviqasiya */
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .app-header {
+    padding: 12px 18px;
+  }
+
+  .burger {
+    display: flex;
+  }
+
+  .hide-narrow {
+    display: none;
+  }
+
+  .user-name {
+    max-width: 110px;
+  }
+
+  /* Menyu başlığın altından açılır */
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--ink);
+    display: none;
+    flex-direction: column;
+    padding: 10px 18px 18px;
+    box-shadow: var(--shadow-3);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a {
+    margin: 0;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .nav-account {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 12px;
+  }
+
+  .nav-account a {
+    color: #fff;
+  }
+}
+
+@media (max-width: 700px) {
+  .bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 95;
+    display: flex;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -4px 18px rgba(26, 17, 24, 0.08);
+    padding: 6px 0 8px;
+  }
+
+  .bottom-nav a {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    text-decoration: none;
+    font-size: 0.66rem;
+    color: var(--muted);
+  }
+
+  .bottom-nav a span {
+    font-size: 1.1rem;
+  }
+
+  .bottom-nav a.menu-item-active {
+    color: var(--brand);
+    font-weight: 600;
+  }
 }
 </style>
