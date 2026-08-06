@@ -84,9 +84,24 @@
 
       <p class="venue-desc">{{ venue.description }}</p>
 
+      <!-- Məzmun sekmələrə bölünür: hamısı alt-alta olanda səhifə 3-4 ekran çəkirdi -->
+      <nav class="tabs" role="tablist">
+        <button
+          v-for="t in tabs"
+          :key="t.key"
+          class="tab"
+          :class="{ on: tab === t.key }"
+          role="tab"
+          :aria-selected="tab === t.key"
+          @click="tab = t.key"
+        >
+          {{ t.icon }} {{ t.label }}
+          <em v-if="t.count">{{ t.count }}</em>
+        </button>
+      </nav>
+
       <!-- Zallar — hər zalın öz boş/dolu günləri ilə (rezervlər zal əsaslıdır) -->
-      <h2 class="section-title">Zallar və boş günləri</h2>
-      <div class="hall-list">
+      <div v-show="tab === 'halls'" class="hall-list">
         <div v-for="h in venue.halls" :key="h.id" class="hall-card">
           <img :src="h.imageUrl" :alt="h.name" class="hall-img" @error="onImgError" />
 
@@ -175,8 +190,7 @@
       </div>
 
       <!-- Menyular — süfrə şəkli, altında tərkibi və qiyməti -->
-      <h2 class="section-title">Menyular</h2>
-      <div class="menu-list">
+      <div v-show="tab === 'menus'" class="menu-list">
         <div v-for="m in venue.menus" :key="m.id" class="menu-card">
           <div class="menu-cover" @click="openMenu(m)">
             <img :src="m.coverImageUrl" :alt="`${m.name} süfrəsi`" @error="onImgError" />
@@ -206,14 +220,17 @@
       </div>
 
       <!-- Məkanın xəritədəki yeri -->
-      <MiniMap
-        :latitude="venue.latitude"
-        :longitude="venue.longitude"
-        :name="venue.name"
-        :address="`${venue.address}, ${venue.city}`"
-      />
+      <div v-show="tab === 'map'">
+        <MiniMap
+          :latitude="venue.latitude"
+          :longitude="venue.longitude"
+          :name="venue.name"
+          :address="`${venue.address}, ${venue.city}`"
+        />
+      </div>
 
       <!-- Rəylər -->
+      <div v-show="tab === 'reviews'">
       <h2 class="section-title">
         Qonaq rəyləri
         <span class="review-summary" v-if="reviews.length">
@@ -315,6 +332,7 @@
         </div>
       </div>
       <el-empty v-else description="Hələ rəy yoxdur — ilk rəyi siz yazın" />
+      </div>
     </div>
 
     <!-- Rəy şikayəti -->
@@ -466,6 +484,16 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const venue = ref(null)
+
+// Səhifə sekmələrə bölünüb: hamısı bir yerdə olanda 3-4 ekran scroll olurdu
+const tab = ref('halls')
+
+const tabs = computed(() => [
+  { key: 'halls', label: 'Zallar', icon: '🚪', count: venue.value?.halls?.length ?? 0 },
+  { key: 'menus', label: 'Menyular', icon: '🍽', count: venue.value?.menus?.length ?? 0 },
+  { key: 'reviews', label: 'Rəylər', icon: '⭐', count: venue.value?.reviewCount ?? 0 },
+  { key: 'map', label: 'Yer', icon: '📍', count: 0 },
+])
 const isLoading = ref(false)
 const activeImage = ref('')
 
@@ -1172,6 +1200,49 @@ onMounted(async () => {
   color: #495057;
   line-height: 1.65;
   font-size: 0.95rem;
+}
+
+/* Sekmə sətri — yapışıq qalır ki, uzun siyahıda da əlçatan olsun */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin: 22px 0 18px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: var(--header-h);
+  background: var(--bg);
+  z-index: 5;
+  padding-top: 6px;
+  overflow-x: auto;
+}
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  padding: 10px 16px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+
+.tab:hover {
+  color: var(--brand);
+}
+
+.tab.on {
+  color: var(--brand);
+  border-bottom-color: var(--brand);
+}
+
+.tab em {
+  font-style: normal;
+  color: var(--faint);
+  margin-left: 4px;
+  font-size: var(--fs-xs);
 }
 
 .section-title {
