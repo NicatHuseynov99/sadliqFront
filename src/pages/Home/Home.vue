@@ -46,7 +46,9 @@
             </ul>
           </div>
 
-          <div class="search-grid">
+          <!-- Görünən hissədə yalnız üç şey: şəhər, qonaq sayı və çekmecə açarı.
+               Qalan süzgəclər divar kimi yer tutmasın deyə yandan açılır. -->
+          <div class="search-row">
             <div class="field">
               <label>Şəhər</label>
               <select v-model="filters.city">
@@ -77,38 +79,53 @@
                   {{ c }}
                 </button>
               </div>
-              <!-- Qonaq sayı seçiləndə lazım olan parkinq yerini xatırladırıq -->
-              <span v-if="parkingHint" class="field-hint">{{ parkingHint }}</span>
             </div>
 
-            <div class="field">
-              <label>Ümumi büdcəniz</label>
-              <div class="input-suffix">
-                <input v-model.number="filters.budget" type="number" min="0" step="500" placeholder="məs. 12000" />
-                <span>₼</span>
-              </div>
-              <span class="field-hint">{{ budgetHint }}</span>
-            </div>
+            <button class="filter-btn" @click="isFilterOpen = true">
+              ⚙ Ətraflı süzgəc
+              <em v-if="activeFilterCount">{{ activeFilterCount }}</em>
+            </button>
 
-            <div class="field field-wide">
-              <label>
-                Bir nəfər üçün qiymət
-                <b class="range-val">{{ filters.priceRange[0] }} – {{ filters.priceRange[1] }} ₼</b>
-              </label>
-              <el-slider
-                v-model="filters.priceRange"
-                range
-                :min="options.minPrice"
-                :max="options.maxPrice"
-                :step="5"
-                class="price-slider"
-              />
-            </div>
+            <button v-if="hasActiveFilters" class="clear-link" @click="resetFilters">
+              Təmizlə ✕
+            </button>
           </div>
 
-          <!-- Reytinq -->
-          <div class="chip-row">
-            <span class="chips-label">Reytinq</span>
+          <span v-if="parkingHint" class="field-hint row-hint">{{ parkingHint }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ətraflı süzgəc: büdcə, qiymət aralığı, reytinq, parkinq və özəlliklər -->
+    <el-drawer v-model="isFilterOpen" title="Ətraflı süzgəc" size="390px" class="filter-drawer">
+      <div class="drawer-body">
+        <div class="field">
+          <label>Ümumi büdcəniz</label>
+          <div class="input-suffix">
+            <input v-model.number="filters.budget" type="number" min="0" step="500" placeholder="məs. 12000" />
+            <span>₼</span>
+          </div>
+          <span class="field-hint">{{ budgetHint }}</span>
+        </div>
+
+        <div class="field">
+          <label>
+            Bir nəfər üçün qiymət
+            <b class="range-val">{{ filters.priceRange[0] }} – {{ filters.priceRange[1] }} ₼</b>
+          </label>
+          <el-slider
+            v-model="filters.priceRange"
+            range
+            :min="options.minPrice"
+            :max="options.maxPrice"
+            :step="5"
+            class="price-slider"
+          />
+        </div>
+
+        <div class="drawer-group">
+          <span class="chips-label">Reytinq</span>
+          <div class="chip-wrap">
             <button
               v-for="r in ratingOptions"
               :key="r"
@@ -118,8 +135,12 @@
             >
               ★ {{ r }}+
             </button>
+          </div>
+        </div>
 
-            <span class="chips-label divider-label">Parkinq</span>
+        <div class="drawer-group">
+          <span class="chips-label">Parkinq</span>
+          <div class="chip-wrap">
             <button
               v-for="p in parkingOptions"
               :key="p.value"
@@ -129,8 +150,12 @@
             >
               🅿️ {{ p.label }}
             </button>
+          </div>
+        </div>
 
-            <span class="chips-label divider-label">Özəlliklər</span>
+        <div class="drawer-group">
+          <span class="chips-label">Özəlliklər</span>
+          <div class="chip-wrap">
             <button
               v-for="f in options.features"
               :key="f.name"
@@ -140,14 +165,19 @@
             >
               {{ f.name }} <em>{{ f.count }}</em>
             </button>
-
-            <button v-if="hasActiveFilters" class="clear-link" @click="resetFilters">
-              Təmizlə ({{ activeFilterCount }}) ✕
-            </button>
           </div>
         </div>
       </div>
-    </section>
+
+      <template #footer>
+        <div class="drawer-foot">
+          <button class="clear-link" @click="resetFilters">Hamısını təmizlə</button>
+          <button class="apply-btn" @click="isFilterOpen = false">
+            {{ totalCount }} sarayı göstər
+          </button>
+        </div>
+      </template>
+    </el-drawer>
 
     <!-- Tərs axtarış: axtarmaq əvəzinə elan qoymaq.
          Qonağa da, giriş etmiş müştəriyə də göstərilir — sahibkara yox. -->
@@ -305,6 +335,9 @@ const PAGE_SIZE = 12
 // süzgəc dəyişib saray siyahıdan çıxsa da, seçim yerində qalır.
 const compareMap = reactive(new Map())
 const compareOpen = ref(false)
+
+// Ətraflı süzgəc çekmecəsi
+const isFilterOpen = ref(false)
 
 const compareVenues = computed(() => [...compareMap.values()])
 
@@ -1007,11 +1040,98 @@ const selectVenue = (venue) => {
   color: #212529;
 }
 
-.search-grid {
+/* Görünən süzgəc sətri: şəhər, qonaq sayı və çekmecə açarı */
+.search-row {
   display: grid;
-  grid-template-columns: 1fr 1.1fr 1fr 1.4fr;
-  gap: 18px;
-  align-items: start;
+  grid-template-columns: 1.1fr 1.2fr auto auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  color: var(--brand);
+  padding: 11px 18px;
+  border-radius: var(--r);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color var(--t-fast);
+}
+
+.filter-btn:hover {
+  border-color: var(--gold);
+}
+
+.filter-btn em {
+  font-style: normal;
+  background: var(--brand);
+  color: #fff;
+  font-size: 0.68rem;
+  min-width: 18px;
+  height: 18px;
+  border-radius: var(--r-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.row-hint {
+  display: block;
+  margin-top: 8px;
+}
+
+/* Çekmecə */
+.drawer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.drawer-group .chips-label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.drawer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.apply-btn {
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  border: none;
+  color: #fff;
+  padding: 11px 22px;
+  border-radius: var(--r);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 820px) {
+  .search-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filter-btn {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
 }
 
 .mini-chips {
