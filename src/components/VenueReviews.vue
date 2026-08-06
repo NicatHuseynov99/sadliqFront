@@ -39,9 +39,9 @@
         <p v-if="reviewError" class="form-error">{{ reviewError }}</p>
 
         <div class="review-form-foot">
-          <button class="reserve-btn" :disabled="isSendingReview" @click="submitReview">
-            {{ isSendingReview ? 'Göndərilir...' : editingId ? 'Yadda saxla' : 'Rəyi göndər' }}
-          </button>
+          <UiButton :is-loading="isSendingReview" @click="submitReview">
+            {{ editingId ? 'Yadda saxla' : 'Rəyi göndər' }}
+          </UiButton>
           <button v-if="editingId" class="link-btn" @click="cancelEdit">İmtina</button>
         </div>
       </template>
@@ -57,7 +57,7 @@
 
       <div v-else class="review-login">
         <span>Rəy yazmaq üçün hesabınıza daxil olun.</span>
-        <router-link to="/login"><button class="reserve-btn">Daxil ol</button></router-link>
+        <UiButton to="/login">Daxil ol</UiButton>
       </div>
     </div>
 
@@ -147,6 +147,7 @@ import {
 import { reportReview, REPORT_REASONS } from '@/services/reviewModerationService'
 import { formatDateFull } from '@/utils/date'
 import { useAuthStore } from '@/store/auth'
+import UiButton from '@/components/ui/UiButton.vue'
 
 const props = defineProps({
   venue: { type: Object, required: true },
@@ -585,24 +586,4 @@ onMounted(() => {
   white-space: pre-line;
 }
 
-.reserve-btn {
-  background: var(--brand);
-  color: white;
-  border: none;
-  padding: 8px 18px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.87rem;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.reserve-btn:hover {
-  background: var(--brand-dark);
-}
-
-.reserve-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 </style>
