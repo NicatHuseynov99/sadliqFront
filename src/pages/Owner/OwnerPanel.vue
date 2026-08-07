@@ -165,6 +165,38 @@
               <em>{{ r.counterOffer.message }}</em>
             </div>
 
+            <!-- Müştərinin öz təklifi: danışıq iki tərəflidir -->
+            <div v-if="r.customerOffer" class="offer-box customer">
+              <b>Müştəri şərt təklif edir</b>
+              <ul class="cust-offer-list">
+                <li v-if="r.customerOffer.eventDate">
+                  Tarix: <s>{{ formatDateFull(r.eventDate.slice(0, 10)) }}</s>
+                  → <b>{{ formatDateFull(r.customerOffer.eventDate.slice(0, 10)) }}</b>
+                </li>
+                <li v-if="r.customerOffer.pricePerPerson">
+                  Təklif etdiyi qiymət: <b>{{ r.customerOffer.pricePerPerson }} ₼ / nəfər</b>
+                  <s>{{ r.pricePerPerson }} ₼</s>
+                </li>
+              </ul>
+              <em>{{ r.customerOffer.message }}</em>
+
+              <div class="cust-offer-actions">
+                <el-popconfirm
+                  title="Müştərinin təklifi rədd edilsin? Sorğu açıq qalacaq."
+                  confirm-button-text="Bəli, rədd et"
+                  cancel-button-text="Xeyr"
+                  @confirm="respondToCustomerOffer(r, false)"
+                >
+                  <template #reference>
+                    <button class="reject-btn">Rədd et</button>
+                  </template>
+                </el-popconfirm>
+                <button class="confirm-btn" @click="respondToCustomerOffer(r, true)">
+                  Qəbul et və təsdiqlə
+                </button>
+              </div>
+            </div>
+
             <footer class="res-foot">
               <span class="res-date">Sorğu tarixi: {{ formatDateFull(r.createdAt.slice(0, 10)) }}</span>
 
@@ -220,6 +252,8 @@ import {
   getVenueReservations,
   markReservationSeen,
   updateReservationStatus,
+  acceptCustomerOffer,
+  declineCustomerOffer,
 } from '@/services/ownerService'
 import { formatDateFull } from '@/utils/date'
 
@@ -357,6 +391,25 @@ const offerSummary = (reservation) => {
 const onOfferSent = async () => {
   allReservations.value[selectedVenueId.value] = await getVenueReservations(selectedVenueId.value)
   reservations.value = allReservations.value[selectedVenueId.value]
+}
+
+// Müştərinin təklifinə cavab: qəbul edəndə şərtlər rezervə köçürülür
+// və rezerv təsdiqlənir; rədd edəndə sorğu açıq qalır
+const respondToCustomerOffer = async (reservation, accept) => {
+  isLoadingReservations.value = true
+  try {
+    const message = accept
+      ? await acceptCustomerOffer(reservation.customerOffer.id)
+      : await declineCustomerOffer(reservation.customerOffer.id)
+
+    allReservations.value[selectedVenueId.value] = await getVenueReservations(selectedVenueId.value)
+    reservations.value = allReservations.value[selectedVenueId.value]
+    toast.success(message)
+  } catch (e) {
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
+  } finally {
+    isLoadingReservations.value = false
+  }
 }
 
 // Sorğunu təsdiqləyir və ya rədd edir, sonra siyahını yeniləyir
@@ -827,6 +880,36 @@ onMounted(load)
   font-size: 0.76rem;
   color: #6c757d;
   margin-top: 4px;
+}
+
+/* Müştərinin təklifi — bizimkindən fərqlənsin, cavab tələb edir */
+.offer-box.customer {
+  background: var(--gold-soft);
+  border-color: #f0dfba;
+}
+
+.offer-box.customer b {
+  color: var(--warn);
+}
+
+.cust-offer-list {
+  margin: 4px 0 0;
+  padding-left: 16px;
+  font-size: 0.78rem;
+  color: #4a5b70;
+  line-height: 1.6;
+}
+
+.cust-offer-list s {
+  color: var(--muted-2);
+  margin-left: 5px;
+}
+
+.cust-offer-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 10px;
 }
 
 .confirm-btn {

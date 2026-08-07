@@ -99,7 +99,7 @@
 
               <div class="offer-actions">
                 <el-popconfirm
-                  title="Təklif rədd edilsin? Sorğu bağlanacaq."
+                  title="Təklif rədd edilsin? Sorğunuz saraya qaytarılacaq."
                   confirm-button-text="Bəli, rədd et"
                   cancel-button-text="Xeyr"
                   @confirm="declineOffer(r)"
@@ -108,8 +108,26 @@
                     <button class="cancel-btn">Rədd et</button>
                   </template>
                 </el-popconfirm>
+                <button class="offer-btn" @click="offerTarget = r">Öz şərtimi təklif et</button>
                 <button class="accept-btn" @click="acceptOffer(r)">Qəbul edirəm</button>
               </div>
+            </div>
+
+            <!-- Müştərinin göndərdiyi, sarayın cavabını gözləyən təklif -->
+            <div v-if="r.myCounterOffer" class="offer-box mine">
+              <b>Təklifiniz saraya göndərilib</b>
+              <ul class="offer-list">
+                <li v-if="r.myCounterOffer.eventDate">
+                  Tarix: <s>{{ formatDateFull(r.eventDate) }}</s>
+                  → <b>{{ formatDateFull(r.myCounterOffer.eventDate) }}</b>
+                </li>
+                <li v-if="r.myCounterOffer.pricePerPerson">
+                  Təklif etdiyiniz qiymət: <b>{{ r.myCounterOffer.pricePerPerson }} ₼ / nəfər</b>
+                </li>
+              </ul>
+
+              <p class="offer-message">{{ r.myCounterOffer.message }}</p>
+              <span class="waiting-tag">⏳ Sarayın cavabı gözlənilir</span>
             </div>
 
             <footer class="res-foot">
@@ -145,6 +163,15 @@
         </article>
       </div>
     </div>
+
+    <!-- Öz şərtini təklif etmək: danışıq iki tərəflidir -->
+    <CounterOfferDialog
+      v-if="offerTarget"
+      mode="customer"
+      :reservation="offerTarget"
+      @close="offerTarget = null"
+      @sent="load"
+    />
   </div>
 </template>
 
@@ -160,11 +187,15 @@ import {
 } from '@/services/reservationService'
 import { formatDateFull } from '@/utils/date'
 import WeddingBoard from '@/components/WeddingBoard.vue'
+import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
 
 const reservations = ref([])
 const isLoading = ref(false)
+
+// Öz şərtini təklif etdiyi rezerv
+const offerTarget = ref(null)
 const activeTab = ref('all')
 
 const tabs = [
@@ -489,6 +520,34 @@ onMounted(load)
 
 .accept-btn:hover {
   background: #17692b;
+}
+
+/* «Öz şərtimi təklif et» — qəbul və rəddin arasında orta variant */
+.offer-btn {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  color: var(--brand);
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--t-fast);
+}
+
+.offer-btn:hover {
+  border-color: var(--gold);
+}
+
+/* Müştərinin öz göndərdiyi təklif — sarayınkından fərqlənsin */
+.offer-box.mine {
+  border-left-color: var(--info);
+  background: var(--info-soft);
+}
+
+.waiting-tag {
+  font-size: 0.74rem;
+  color: var(--info);
 }
 
 /* «Baxıldı» nişanı */

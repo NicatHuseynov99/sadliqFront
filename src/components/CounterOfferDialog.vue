@@ -4,8 +4,8 @@
     <template #header>
       <div class="co-head">
         <div>
-          <span class="co-caption">Əks-təklif</span>
-          <b>{{ reservation.customerName }}</b>
+          <span class="co-caption">{{ isCustomer ? 'Şərt təklif et' : 'Əks-təklif' }}</span>
+          <b>{{ isCustomer ? reservation.venueName : reservation.customerName }}</b>
         </div>
         <button class="co-close" @click="$emit('close')">✕</button>
       </div>
@@ -23,7 +23,7 @@
         <input v-model="form.eventDate" type="date" :min="tomorrow" />
       </label>
 
-      <label>
+      <label v-if="!isCustomer">
         Zal <em>boş = dəyişmir</em>
         <select v-model="form.hallId">
           <option :value="null">Dəyişmir</option>
@@ -33,7 +33,7 @@
         </select>
       </label>
 
-      <label>
+      <label v-if="!isCustomer">
         Menyu <em>boş = dəyişmir</em>
         <select v-model="form.menuId">
           <option :value="null">Dəyişmir</option>
@@ -44,17 +44,20 @@
       </label>
 
       <label>
-        Razılaşdırılmış qiymət <em>nəfər başına, istəyə bağlı</em>
+        {{ isCustomer ? 'Təklif etdiyiniz qiymət' : 'Razılaşdırılmış qiymət' }}
+        <em>nəfər başına, istəyə bağlı</em>
         <input v-model.number="form.pricePerPerson" type="number" min="0" step="1" />
       </label>
 
       <label class="wide">
-        Müştəriyə izah
+        {{ isCustomer ? 'Saraya izah' : 'Müştəriyə izah' }}
         <textarea
           v-model="form.message"
           rows="3"
           maxlength="500"
-          placeholder="Məsələn: O gün doludur, amma 19 oktyabr boşdur — eyni zal, eyni qiymət."
+          :placeholder="isCustomer
+            ? 'Məsələn: Tarix uyğundur, amma nəfər başı 55 ₼ bizim üçün yüksəkdir — 48 ₼ olar?'
+            : 'Məsələn: O gün doludur, amma 19 oktyabr boşdur — eyni zal, eyni qiymət.'"
         ></textarea>
       </label>
     </div>
@@ -75,12 +78,20 @@
 import { computed, reactive, ref } from 'vue'
 import { toast } from '@/utils/toast'
 import { createCounterOffer } from '@/services/ownerService'
+import { createCustomerCounterOffer } from '@/services/reservationService'
 
 const props = defineProps({
   reservation: { type: Object, required: true },
   halls: { type: Array, default: () => [] },
   menus: { type: Array, default: () => [] },
+
+  // Danışıq iki tərəflidir: eyni forma həm sarayın, həm müştərinin
+  // təklifi üçün işlədilir. Müştəri zal/menyu siyahısına malik olmadığı
+  // üçün ona yalnız tarix, qiymət və izah göstərilir.
+  mode: { type: String, default: 'owner' }, // owner | customer
 })
+
+const isCustomer = computed(() => props.mode === 'customer')
 
 const emit = defineEmits(['close', 'sent'])
 
@@ -126,21 +137,25 @@ const changeSummary = computed(() => {
 
 const send = async () => {
   if (form.message.trim().length < 5) {
-    toast.warning('Müştəriyə qısa izah yazın.')
+    toast.warning(isCustomer.value ? 'Saraya qısa izah yazın.' : 'Müştəriyə qısa izah yazın.')
     return
   }
 
   isSending.value = true
 
   try {
-    const message = await createCounterOffer({
+    const payload = {
       reservationId: props.reservation.id,
       eventDate: form.eventDate || null,
       hallId: form.hallId,
       menuId: form.menuId,
       pricePerPerson: form.pricePerPerson || null,
       message: form.message.trim(),
-    })
+    }
+
+    const message = isCustomer.value
+      ? await createCustomerCounterOffer(payload)
+      : await createCounterOffer(payload)
 
     toast.success(message)
     emit('sent')

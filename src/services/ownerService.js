@@ -33,8 +33,13 @@ const mapReservation = (r) => ({
   hallId: r.hallId,
   menuId: r.menuId,
 
-  // Cavabsız əks-təklif varsa panel onu göstərir
-  counterOffer: (r.counterOffers ?? []).find((o) => o.status === 0) ?? null,
+  // Bizim göndərdiyimiz, müştərinin cavabını gözləyən təklif
+  counterOffer:
+    (r.counterOffers ?? []).find((o) => o.status === 0 && !o.isFromCustomer) ?? null,
+
+  // Müştərinin göndərdiyi, bizim cavabımızı gözləyən təklif
+  customerOffer:
+    (r.counterOffers ?? []).find((o) => o.status === 0 && o.isFromCustomer) ?? null,
 })
 
 // GET /Reservations/GetForOwner — bütün sarayların rezervləri tək sorğu ilə,
@@ -178,6 +183,19 @@ export const markReservationSeen = async (id) => {
 export const createCounterOffer = async (dto) => {
   const { data } = await api.post('/Reservations/CreateCounterOffer', dto)
   return data.message ?? 'Əks-təklif göndərildi.'
+}
+
+// PUT /Reservations/AcceptCustomerOffer/{id} — müştərinin təklifini qəbul edir,
+// şərtlər rezervə köçürülür və rezerv təsdiqlənir
+export const acceptCustomerOffer = async (offerId) => {
+  const { data } = await api.put(`/Reservations/AcceptCustomerOffer/${offerId}`)
+  return data.message ?? 'Təklif qəbul edildi.'
+}
+
+// PUT /Reservations/DeclineCustomerOffer/{id} — sorğu açıq qalır
+export const declineCustomerOffer = async (offerId) => {
+  const { data } = await api.put(`/Reservations/DeclineCustomerOffer/${offerId}`)
+  return data.message ?? 'Təklif rədd edildi.'
 }
 
 // PUT /Reservations/UpdateStatus/{id} — 1 = təsdiqlə, 2 = rədd et, 3 = ləğv et.

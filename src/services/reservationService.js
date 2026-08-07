@@ -26,8 +26,13 @@ const mapReservation = (r) => ({
   seenAt: r.seenAt,
   holdExpiresAt: r.holdExpiresAt,
 
-  // Sahibin göndərdiyi, cavab gözləyən əks-təklif
-  counterOffer: (r.counterOffers ?? []).find((o) => o.status === 0) ?? null,
+  // Sarayın göndərdiyi, cavabımı gözləyən təklif
+  counterOffer:
+    (r.counterOffers ?? []).find((o) => o.status === 0 && !o.isFromCustomer) ?? null,
+
+  // Mənim göndərdiyim, sarayın cavabını gözləyən təklif
+  myCounterOffer:
+    (r.counterOffers ?? []).find((o) => o.status === 0 && o.isFromCustomer) ?? null,
 })
 
 // POST /Reservations/Create — yeni rezerv sorğusu göndərir
@@ -64,7 +69,21 @@ export const acceptCounterOffer = async (offerId) => {
 }
 
 // PUT /Reservations/DeclineCounterOffer/{id}
+// Rədd sorğunu bağlamır — sorğu ilkin şərtləri ilə saraya qaytarılır
 export const declineCounterOffer = async (offerId) => {
   const { data } = await api.put(`/Reservations/DeclineCounterOffer/${offerId}`)
   return data.message ?? 'Təklif rədd edildi.'
+}
+
+// POST /Reservations/CreateCustomerCounterOffer — müştəri öz şərtini təklif edir
+export const createCustomerCounterOffer = async (dto) => {
+  const { data } = await api.post('/Reservations/CreateCustomerCounterOffer', {
+    reservationId: dto.reservationId,
+    eventDate: dto.eventDate || null,
+    hallId: dto.hallId || null,
+    menuId: dto.menuId || null,
+    pricePerPerson: dto.pricePerPerson || null,
+    message: dto.message,
+  })
+  return data.message ?? 'Təklifiniz göndərildi.'
 }
