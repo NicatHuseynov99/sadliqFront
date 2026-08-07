@@ -18,7 +18,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 
 const props = defineProps({
   address: { type: String, required: true },
@@ -52,9 +52,9 @@ const openMap = async (command) => {
   if (command === 'copy') {
     try {
       await navigator.clipboard.writeText(label.value)
-      ElNotification({ title: 'Kopyalandı', message: label.value, type: 'success', zIndex: 99999 })
+      toast.success(label.value, 'Kopyalandı')
     } catch {
-      ElNotification({ title: 'Xəta', message: 'Kopyalamaq mümkün olmadı.', type: 'error', zIndex: 99999 })
+      toast.error('Kopyalamaq mümkün olmadı.')
     }
     return
   }

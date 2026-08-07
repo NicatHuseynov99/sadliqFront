@@ -291,7 +291,7 @@
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import HallCalendarEditor from '@/components/HallCalendarEditor.vue'
 import {
   createVenue,
@@ -349,8 +349,7 @@ const venueForm = reactive({
 const hallForm = reactive({ id: null, name: '', capacity: 200, minPrice: 40, description: '', imageUrl: '' })
 const menuForm = reactive({ id: null, name: '', pricePerPerson: 50, description: '', imageUrl: '', items: [] })
 
-const notify = (message, type = 'success') =>
-  ElNotification({ title: type === 'success' ? 'Uğurlu' : 'Xəta', message, type, zIndex: 99999 })
+const notify = (message, type = 'success') => toast[type](message)
 
 const handleError = (e) => {
   formError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'

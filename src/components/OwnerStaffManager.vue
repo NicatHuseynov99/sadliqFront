@@ -223,7 +223,7 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import {
   getMyStaff,
   createStaff,
@@ -298,14 +298,9 @@ const saveStaffHalls = async () => {
     const message = await setStaffHalls(hallPickerStaff.value.id, hallPickerSelection.value)
     hallPickerDialog.value = false
     await loadStaff()
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   } finally {
     isSavingStaff.value = false
   }
@@ -326,7 +321,7 @@ const submitStaff = async () => {
       hallIds: [], firstName: '', lastName: '', email: '', phone: '', password: '',
     })
     await loadStaff()
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
   } catch (e) {
     staffError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
@@ -359,7 +354,7 @@ const saveStaffInfo = async () => {
     const message = await updateStaff(editingStaff.value.id, { ...editForm })
     editDialog.value = false
     await loadStaff()
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
   } catch (e) {
     staffError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
@@ -379,14 +374,9 @@ const removeStaff = async (member) => {
   try {
     const message = await deleteStaff(member.id)
     await loadStaff()
-    ElNotification({ title: 'Silindi', message, type: 'success', zIndex: 99999 })
+    toast.success(message, 'Silindi')
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
@@ -395,14 +385,9 @@ const toggleStaff = async (member) => {
   try {
     const message = await setStaffActive(member.id, !member.isActive)
     await loadStaff()
-    ElNotification({ title: 'Yeniləndi', message, type: 'success', zIndex: 99999 })
+    toast.success(message, 'Yeniləndi')
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
@@ -425,7 +410,7 @@ const savePassword = async () => {
   try {
     const message = await resetStaffPassword(editingStaff.value.id, passwordForm.newPassword)
     passwordDialog.value = false
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
   } catch (e) {
     staffError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {

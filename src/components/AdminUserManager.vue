@@ -189,7 +189,8 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElMessageBox, ElNotification } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { toast } from '@/utils/toast'
 import { useAuthStore } from '@/store/auth'
 import {
   getUsers,
@@ -284,13 +285,7 @@ const onSearchInput = () => {
   searchTimer = setTimeout(load, 350)
 }
 
-const notifyError = (e) =>
-  ElNotification({
-    title: 'Xəta',
-    message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-    type: 'error',
-    zIndex: 99999,
-  })
+const notifyError = (e) => toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
 
 const openDetail = async (user) => {
   detail.value = null
@@ -307,7 +302,7 @@ const openDetail = async (user) => {
 const toggleActive = async (user) => {
   try {
     const message = await setUserActive(user.id, !user.isActive)
-    ElNotification({ title: 'Hazırdır', message, type: 'success', zIndex: 99999 })
+    toast.success(message, 'Hazırdır')
     await load()
   } catch (e) {
     notifyError(e)
@@ -364,7 +359,7 @@ const submitForm = async () => {
     if (!result.success) return notifyError({ userMessage: result.message })
 
     formOpen.value = false
-    ElNotification({ title: 'Hazırdır', message: result.message, type: 'success', zIndex: 99999 })
+    toast.success(result.message, 'Hazırdır')
     await load()
   } catch (e) {
     notifyError(e)
@@ -377,7 +372,7 @@ const restore = async (user) => {
     const result = await restoreUser(user.id)
     if (!result.success) return notifyError({ userMessage: result.message })
 
-    ElNotification({ title: 'Hazırdır', message: result.message, type: 'success', zIndex: 99999 })
+    toast.success(result.message, 'Hazırdır')
     await load()
   } catch (e) {
     notifyError(e)
@@ -400,7 +395,7 @@ const removeUser = async (user) => {
     const result = await deleteUser(user.id)
     if (!result.success) return notifyError({ userMessage: result.message })
 
-    ElNotification({ title: 'Silindi', message: result.message, type: 'success', zIndex: 99999 })
+    toast.success(result.message, 'Silindi')
     await load()
   } catch (e) {
     notifyError(e)
@@ -416,7 +411,7 @@ const openPassword = (user) => {
 const submitPassword = async () => {
   try {
     const message = await resetUserPassword(passwordTarget.value.id, newPassword.value)
-    ElNotification({ title: 'Hazırdır', message, type: 'success', zIndex: 99999 })
+    toast.success(message, 'Hazırdır')
     passwordOpen.value = false
   } catch (e) {
     notifyError(e)
@@ -427,7 +422,7 @@ const submitPassword = async () => {
 const onRoleChange = async (user, role) => {
   try {
     const message = await changeUserRole(user.id, role)
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
     await load()
   } catch (e) {
     notifyError(e)

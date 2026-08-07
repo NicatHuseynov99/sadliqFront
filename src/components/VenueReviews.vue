@@ -136,7 +136,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import {
   getVenueReviews,
   createReview,
@@ -236,7 +236,7 @@ const submitReview = async () => {
 
     resetForm()
     await loadReviews()
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
   } catch (e) {
     reviewError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
@@ -250,14 +250,9 @@ const removeReview = async (review) => {
     const { message } = await deleteReview(review.id)
     if (editingId.value === review.id) resetForm()
     await loadReviews()
-    ElNotification({ title: 'Silindi', message, type: 'success', zIndex: 99999 })
+    toast.success(message, 'Silindi')
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
@@ -277,14 +272,9 @@ const submitReport = async () => {
       note: reportNote.value.trim(),
     })
     reportOpen.value = false
-    ElNotification({ title: 'Göndərildi', message, type: 'success', zIndex: 99999 })
+    toast.success(message, 'Göndərildi')
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 

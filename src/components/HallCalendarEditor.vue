@@ -40,7 +40,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import { toDateKey } from '@/services/venueService'
 import { setHallDayStatus } from '@/services/ownerService'
 import { WEEKDAYS_SHORT, formatMonthTitle, formatDateFull } from '@/utils/date'
@@ -127,19 +127,9 @@ const toggleDay = async (day) => {
   try {
     await setHallDayStatus(props.hallId, day.key, newStatus)
     statuses.value = { ...statuses.value, [day.key]: newStatus }
-    ElNotification({
-      title: newStatus === 1 ? 'Gün bağlandı' : 'Gün açıldı',
-      message: formatDateFull(day.key),
-      type: 'success',
-      zIndex: 99999,
-    })
+    toast.success(formatDateFull(day.key), newStatus === 1 ? 'Gün bağlandı' : 'Gün açıldı')
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   } finally {
     isLoading.value = false
   }
