@@ -19,8 +19,8 @@
         </div>
 
         <div class="done-actions">
-          <button class="primary-btn" @click="$router.push('/panel')">Panelə keç</button>
-          <button class="ghost-btn" @click="$router.push('/')">Ana səhifə</button>
+          <UiButton @click="$router.push('/panel')">Panelə keç</UiButton>
+          <UiButton variant="ghost" @click="$router.push('/')">Ana səhifə</UiButton>
         </div>
       </div>
 
@@ -149,14 +149,14 @@
               <b>📍 Bura sarayın yeridir?</b>
               <p>Cihazınızın göstərdiyi yeri xəritədə işarələdik. Doğrudursa təsdiqləyin.</p>
               <div class="ask-actions">
-                <button class="primary-btn" @click="confirmLocation">Bəli, bura saraydır</button>
-                <button class="ghost-btn" @click="rejectLocation">Xeyr, başqa yerdədir</button>
+                <UiButton @click="confirmLocation">Bəli, bura saraydır</UiButton>
+                <UiButton variant="ghost" @click="rejectLocation">Xeyr, başqa yerdədir</UiButton>
               </div>
             </div>
 
-            <button v-else class="ghost-btn" :disabled="isLocating" @click="useMyLocation">
-              {{ isLocating ? 'Tapılır…' : '📍 Hazırkı yerimi götür' }}
-            </button>
+            <UiButton v-else variant="ghost" :is-loading="isLocating" @click="useMyLocation">
+              📍 Hazırkı yerimi götür
+            </UiButton>
 
             <div class="picker-box">
               <CoordinatePicker
@@ -286,16 +286,16 @@
           <p v-if="error" class="error-box">{{ error }}</p>
 
           <div class="actions">
-            <button v-if="stepIndex > 0" class="ghost-btn" @click="stepIndex--">← Geri</button>
+            <UiButton v-if="stepIndex > 0" variant="ghost" @click="stepIndex--">← Geri</UiButton>
             <span class="spacer"></span>
             <!-- Addımı boş qoyub keçmək olar: məcburi sahələr yalnız göndərişdə yoxlanılır -->
-            <button v-if="!isLast" class="primary-btn" @click="next">Növbəti →</button>
-            <button v-if="!isLast" class="ghost-btn" @click="stepIndex = visibleSteps.length - 1">
+            <UiButton v-if="!isLast" @click="next">Növbəti →</UiButton>
+            <UiButton v-if="!isLast" variant="ghost" @click="stepIndex = visibleSteps.length - 1">
               Yekuna keç
-            </button>
-            <button v-else class="primary-btn" :disabled="isSending || !canSubmit" @click="submit">
-              {{ isSending ? 'Göndərilir…' : 'Müraciəti göndər' }}
-            </button>
+            </UiButton>
+            <UiButton v-else :is-loading="isSending" :disabled="!canSubmit" @click="submit">
+              Müraciəti göndər
+            </UiButton>
           </div>
         </section>
       </template>
@@ -307,6 +307,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import CoordinatePicker from '@/components/CoordinatePicker.vue'
 import MediaUpload from '@/components/MediaUpload.vue'
+import UiButton from '@/components/ui/UiButton.vue'
 import { submitVenueApplication, STEPS } from '@/services/venueApplicationService'
 import { getFilterOptions } from '@/services/venueService'
 import { getMyLocation } from '@/services/mapService'
@@ -1037,41 +1038,6 @@ label.check {
 
 .spacer {
   flex: 1;
-}
-
-.primary-btn,
-.ghost-btn {
-  padding: 10px 22px;
-  border-radius: 10px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.primary-btn {
-  background: var(--brand);
-  border: 1px solid var(--brand);
-  color: #fff;
-}
-
-.primary-btn:hover:not(:disabled) {
-  background: #5c1029;
-}
-
-.primary-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.ghost-btn {
-  background: #fff;
-  border: 1px solid #ece5e8;
-  color: var(--ink-2);
-}
-
-.ghost-btn:hover:not(:disabled) {
-  border-color: var(--gold);
 }
 
 /* Nəticə ekranı */
