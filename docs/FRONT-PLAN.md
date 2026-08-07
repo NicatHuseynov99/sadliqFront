@@ -120,9 +120,9 @@ dəyişməsi, yeni bildiriş gələndə zəngin titrəməsi.
 
 ## 6.1 Qalan iş (yenilənmiş, aşağıdan-yuxarı icra sırası)
 
+- **Toast vahidliyi** (əvvəlki G3): **Bitdi** — bütün xam `ElNotification` çağırışları (17 fayl) `src/utils/toast.js` vahid utilinə keçirildi. `ElMessageBox.confirm` (təsdiq dialoqları) toxunulmadı — o toast deyil.
+- **`store/auth.js`**: **Bitdi** — logout `window.location.href` əvəzinə router-based (`router.push('/login')`) edildi
 - **E-nin qalanı**: UiButton köçürməsini bitir (E1), boş hallar → `UiEmpty` (E3), kartlar → `UiCard` (E4)
-- **Toast vahidliyi** (əvvəlki G3): `ElMessage`/`ElNotification` qarışıqlığı hələ var
-- **`store/auth.js`**: logout `window.location.href` əvəzinə router-based ediləcək
 - **H**: performans (lazy-load, aspect-ratio, pagination/virtual scroll) — hələ toxunulmayıb
 
 ---
