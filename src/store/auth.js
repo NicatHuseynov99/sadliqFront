@@ -90,12 +90,14 @@ export const useAuthStore = defineStore('auth', {
       this.user = normalized
     },
 
-    logout() {
+    async logout() {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       this.token = null
       this.user = null
-      window.location.href = '/login'
+      // router.js bu store-u import etdiyi üçün dövri asılılıqdan qaçmaq üçün dinamik import
+      const { default: router } = await import('@/router')
+      router.push('/login')
     },
   },
 })
