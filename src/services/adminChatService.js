@@ -26,6 +26,9 @@ const mapMessage = (m) => ({
   body: m.body,
   createdAt: m.createdAt,
   isRead: m.isRead,
+  isHidden: m.isHidden,
+  hiddenReason: m.hiddenReason,
+  hiddenAt: m.hiddenAt,
 })
 
 // GET /AdminChats/Search
@@ -59,4 +62,11 @@ export const getChat = async (offerId) => {
     chatOpenedAt: chat.chatOpenedAt,
     messages: (chat.messages ?? []).map(mapMessage),
   }
+}
+
+// PUT /AdminChats/SetHidden/{messageId}
+// Mesaj silinmir — yalnız tərəflərdən gizlədilir, admin görməkdə davam edir
+export const setMessageHidden = async (messageId, isHidden, reason) => {
+  const { data } = await api.put(`/AdminChats/SetHidden/${messageId}`, { isHidden, reason })
+  return data.message
 }

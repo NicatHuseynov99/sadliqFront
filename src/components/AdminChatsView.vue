@@ -95,13 +95,23 @@
               <span class="who">
                 {{ m.senderName }} · {{ m.isFromCustomer ? 'müştəri' : 'saray' }}
               </span>
-              <div class="bubble">
+              <div class="bubble" :class="{ hidden: m.isHidden }">
                 <p>{{ m.body }}</p>
+
+                <!-- Gizlədilmiş mesaj tərəflərə görünmür, admin görür -->
+                <p v-if="m.isHidden" class="hidden-note">
+                  🚫 Gizlədilib{{ m.hiddenReason ? `: ${m.hiddenReason}` : '' }}
+                </p>
+
                 <span class="time">
                   {{ shortTime(m.createdAt) }}
                   <template v-if="m.isRead"> · oxunub</template>
                 </span>
               </div>
+
+              <button class="hide-btn" @click="askHide(m)">
+                {{ m.isHidden ? 'Yenidən göstər' : 'Gizlət' }}
+              </button>
             </div>
           </div>
         </template>
@@ -119,11 +129,12 @@
 
 <script setup>
 import { onBeforeUnmount, ref } from 'vue'
+import { ElMessageBox } from 'element-plus'
 import { toast } from '@/utils/toast'
 import { formatDateFull } from '@/utils/date'
 import Pager from '@/components/Pager.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
-import { searchChats, getChat } from '@/services/adminChatService'
+import { searchChats, getChat, setMessageHidden } from '@/services/adminChatService'
 
 const chats = ref([])
 const total = ref(0)
@@ -180,6 +191,38 @@ const open = async (offerId) => {
     toast.error(e?.userMessage ?? e?.message ?? 'Yazışma açılmadı')
   } finally {
     isLoadingDetail.value = false
+  }
+}
+
+// Gizlədəndə səbəb məcburidir — nəyə görə çıxarıldığı qeyd olunmalıdır.
+// Yenidən göstərəndə səbəb soruşulmur.
+const askHide = async (message) => {
+  let reason = null
+
+  if (!message.isHidden) {
+    try {
+      const { value } = await ElMessageBox.prompt(
+        'Bu mesaj müştəriyə və saraya görünməyəcək. Mesajın özü silinmir — siz onu görməkdə davam edəcəksiniz.',
+        'Mesajı gizlət',
+        {
+          confirmButtonText: 'Gizlət',
+          cancelButtonText: 'İmtina',
+          inputPlaceholder: 'Səbəb (məcburi)',
+          inputValidator: (v) => (v?.trim() ? true : 'Səbəbi yazın'),
+        },
+      )
+      reason = value.trim()
+    } catch {
+      return
+    }
+  }
+
+  try {
+    const text = await setMessageHidden(message.id, !message.isHidden, reason)
+    toast.success(text)
+    await open(activeId.value)
+  } catch (e) {
+    toast.error(e?.userMessage ?? e?.message ?? 'Əməliyyat alınmadı')
   }
 }
 
@@ -471,6 +514,35 @@ load()
   color: var(--muted-2);
   margin-top: 4px;
   text-align: right;
+}
+
+/* Gizlədilmiş mesaj: tərəflər görmür, admin görür */
+.bubble.hidden {
+  opacity: 0.62;
+  border-style: dashed;
+  border-color: var(--danger);
+}
+
+.hidden-note {
+  margin: 6px 0 0 !important;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line-2);
+  font-size: 0.7rem !important;
+  color: var(--danger) !important;
+}
+
+.hide-btn {
+  background: none;
+  border: none;
+  color: var(--muted-2);
+  font-size: 0.67rem;
+  cursor: pointer;
+  padding: 3px 2px 0;
+  text-decoration: underline;
+}
+
+.hide-btn:hover {
+  color: var(--danger);
 }
 
 @media (max-width: 900px) {
