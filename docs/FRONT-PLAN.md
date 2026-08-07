@@ -122,7 +122,8 @@ dəyişməsi, yeni bildiriş gələndə zəngin titrəməsi.
 
 - **Toast vahidliyi** (əvvəlki G3): **Bitdi** — bütün xam `ElNotification` çağırışları (17 fayl) `src/utils/toast.js` vahid utilinə keçirildi. `ElMessageBox.confirm` (təsdiq dialoqları) toxunulmadı — o toast deyil.
 - **`store/auth.js`**: **Bitdi** — logout `window.location.href` əvəzinə router-based (`router.push('/login')`) edildi
-- **E-nin qalanı**: UiButton köçürməsini bitir (E1), boş hallar → `UiEmpty` (E3), kartlar → `UiCard` (E4)
+- **E1 (düymələr)**: **Demək olar bitdi** — VenueManager, VenuesView, VenueRegister, VenueDetail, OwnerStaffManager da daxil olmaqla bütün fayllar UiButton-a keçirildi. Qəsdən toxunulmayanlar: auth səhifələri (özəl qızılı brend), OwnerPanel-də yaşıl "Təsdiqlə" düyməsi, VenuesView-də dinamik ton (danger/warn) təsdiq düyməsi — bunların rəngi UiButton-un mövcud variantlarına uyğun gəlmir.
+- **E-nin qalanı**: boş hallar → `UiEmpty` (E3), kartlar → `UiCard` (E4)
 - **H**: performans (lazy-load, aspect-ratio, pagination/virtual scroll) — hələ toxunulmayıb
 
 ---
