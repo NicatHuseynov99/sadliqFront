@@ -30,7 +30,7 @@
         <div class="empty-icon">🗓️</div>
         <h3>{{ reservations.length ? 'Bu bölmədə rezerv yoxdur.' : 'Hələ heç bir rezerviniz yoxdur.' }}</h3>
         <p>Ana səhifədən saray seçib rezerv sorğusu göndərə bilərsiniz.</p>
-        <router-link to="/"><button class="primary-btn">Saraylara bax</button></router-link>
+        <UiButton to="/">Saraylara bax</UiButton>
       </div>
 
       <div v-else class="res-list">
@@ -151,6 +151,7 @@ import {
 } from '@/services/reservationService'
 import { formatDateFull } from '@/utils/date'
 import WeddingBoard from '@/components/WeddingBoard.vue'
+import UiButton from '@/components/ui/UiButton.vue'
 
 const reservations = ref([])
 const isLoading = ref(false)
@@ -653,20 +654,6 @@ onMounted(load)
 .no-result p {
   color: #666;
   margin: 0 0 20px;
-}
-
-.primary-btn {
-  background: var(--brand);
-  color: white;
-  border: none;
-  padding: 9px 22px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.primary-btn:hover {
-  background: var(--brand-dark);
 }
 
 @media (max-width: 760px) {
