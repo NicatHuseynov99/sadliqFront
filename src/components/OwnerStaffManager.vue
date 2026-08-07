@@ -57,9 +57,7 @@
 
         <p v-if="staffError" class="form-error">{{ staffError }}</p>
 
-        <button class="confirm-btn wide" :disabled="isSavingStaff" @click="submitStaff">
-          {{ isSavingStaff ? 'Yaradılır...' : 'Administrator əlavə et' }}
-        </button>
+        <UiButton block :is-loading="isSavingStaff" @click="submitStaff">Administrator əlavə et</UiButton>
       </el-form>
     </section>
 
@@ -162,7 +160,7 @@
 
       <template #footer>
         <el-button @click="hallPickerDialog = false">İmtina</el-button>
-        <button class="confirm-btn" :disabled="isSavingStaff" @click="saveStaffHalls">Yadda saxla</button>
+        <UiButton :is-loading="isSavingStaff" @click="saveStaffHalls">Yadda saxla</UiButton>
       </template>
     </el-dialog>
 
@@ -192,7 +190,7 @@
 
       <template #footer>
         <el-button @click="editDialog = false">İmtina</el-button>
-        <button class="confirm-btn" :disabled="isSavingStaff" @click="saveStaffInfo">Yadda saxla</button>
+        <UiButton :is-loading="isSavingStaff" @click="saveStaffInfo">Yadda saxla</UiButton>
       </template>
     </el-dialog>
 
@@ -215,7 +213,7 @@
 
       <template #footer>
         <el-button @click="passwordDialog = false">İmtina</el-button>
-        <button class="confirm-btn" :disabled="isSavingStaff" @click="savePassword">Parolu yenilə</button>
+        <UiButton :is-loading="isSavingStaff" @click="savePassword">Parolu yenilə</UiButton>
       </template>
     </el-dialog>
   </div>
@@ -234,6 +232,7 @@ import {
   resetStaffPassword,
   getVenueHalls,
 } from '@/services/ownerService'
+import UiButton from '@/components/ui/UiButton.vue'
 
 const props = defineProps({
   venues: { type: Array, required: true },
@@ -465,12 +464,6 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-}
-
-.confirm-btn.wide {
-  width: 100%;
-  padding: 11px;
-  margin-top: 4px;
 }
 
 .form-error {
