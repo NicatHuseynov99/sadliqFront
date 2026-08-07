@@ -252,11 +252,13 @@
         <UiCardSkeleton v-for="n in 6" :key="n" />
       </div>
 
-      <div v-else-if="!isLoading && venues.length === 0" class="no-result">
-        <h3>Axtarışınıza uyğun heç bir saray tapılmadı.</h3>
-        <p>Filtrləri dəyişərək yenidən yoxlaya bilərsiniz.</p>
-        <button @click="resetFilters" class="btn-reset-empty">Filtrləri sıfırla</button>
-      </div>
+      <UiEmpty
+        v-else-if="!isLoading && venues.length === 0"
+        title="Axtarışınıza uyğun heç bir saray tapılmadı."
+        text="Filtrləri dəyişərək yenidən yoxlaya bilərsiniz."
+      >
+        <UiButton variant="ghost" @click="resetFilters">Filtrləri sıfırla</UiButton>
+      </UiEmpty>
 
       <div v-else class="venues-grid">
         <VenueCard
@@ -328,6 +330,8 @@ import { trackPage } from '@/services/visitService'
 import { useAuthStore } from '@/store/auth'
 import VenueCompare from "@/components/VenueCompare.vue"
 import UiCardSkeleton from "@/components/ui/UiCardSkeleton.vue"
+import UiEmpty from '@/components/ui/UiEmpty.vue'
+import UiButton from '@/components/ui/UiButton.vue'
 
 const PAGE_SIZE = 12
 
@@ -1497,35 +1501,6 @@ const selectVenue = (venue) => {
   border-radius: 6px;
   background: #fff;
   font-size: 0.9rem;
-}
-
-.no-result {
-  text-align: center;
-  padding: 50px 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.no-result h3 {
-  font-size: 1.4rem;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.no-result p {
-  color: #666;
-  margin-bottom: 20px;
-}
-
-.btn-reset-empty {
-  background: var(--ink);
-  color: white;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
 }
 
 .venues-grid {
