@@ -57,11 +57,12 @@
         </button>
       </div>
 
-      <div v-if="!isLoading && venues.length === 0" class="no-result">
-        <div class="empty-icon">🏛</div>
-        <h3>Hələ sarayınız yoxdur.</h3>
-        <p>Saray əlavə olunduqdan sonra rezerv sorğuları burada görünəcək.</p>
-      </div>
+      <UiEmpty
+        v-if="!isLoading && venues.length === 0"
+        icon="🏛"
+        title="Hələ sarayınız yoxdur."
+        text="Saray əlavə olunduqdan sonra rezerv sorğuları burada görünəcək."
+      />
 
       <!-- Sahibkarın hesabatı -->
       <OwnerStats v-else-if="section === 'stats'" />
@@ -203,6 +204,7 @@
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useCountUp } from '@/composables/useCountUp'
 import { toast } from '@/utils/toast'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import { useAuthStore } from '@/store/auth'
 import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
 
@@ -861,24 +863,13 @@ onMounted(load)
   color: #fff;
 }
 
-.empty-box,
-.no-result {
+.empty-box {
   background: #fff;
   border-radius: 14px;
   padding: 40px 20px;
   text-align: center;
   color: var(--muted);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-}
-
-.empty-icon {
-  font-size: 2.6rem;
-  margin-bottom: 10px;
-}
-
-.no-result h3 {
-  color: #333;
-  margin: 0 0 8px;
 }
 
 @media (max-width: 980px) {

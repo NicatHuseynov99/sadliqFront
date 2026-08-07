@@ -31,12 +31,14 @@
         </button>
       </div>
 
-      <div v-if="!isLoading && venues.length === 0" class="no-result">
-        <div class="empty-icon">🤍</div>
-        <h3>Hələ seçilmiş sarayınız yoxdur.</h3>
-        <p>Bəyəndiyiniz sarayın şəklindəki ürək düyməsinə klikləyin — burada toplanacaq.</p>
+      <UiEmpty
+        v-if="!isLoading && venues.length === 0"
+        icon="🤍"
+        title="Hələ seçilmiş sarayınız yoxdur."
+        text="Bəyəndiyiniz sarayın şəklindəki ürək düyməsinə klikləyin — burada toplanacaq."
+      >
         <UiButton to="/">Saraylara bax</UiButton>
-      </div>
+      </UiEmpty>
 
       <div v-else class="venues-grid">
         <VenueCard
@@ -70,6 +72,7 @@ import { toast } from '@/utils/toast'
 import VenueCard from '@/components/VenueCard.vue'
 import VenueCompare from '@/components/VenueCompare.vue'
 import UiButton from '@/components/ui/UiButton.vue'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import { getMyFavorites, toggleFavorite } from '@/services/favoriteService'
 import { getNearestFreeDate } from '@/services/venueService'
 
@@ -284,29 +287,6 @@ onMounted(load)
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: 24px;
-}
-
-.no-result {
-  text-align: center;
-  padding: 54px 20px;
-  background: white;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.empty-icon {
-  font-size: 2.8rem;
-  margin-bottom: 10px;
-}
-
-.no-result h3 {
-  color: #333;
-  margin: 0 0 8px;
-}
-
-.no-result p {
-  color: #666;
-  margin: 0 0 20px;
 }
 
 @media (max-width: 700px) {

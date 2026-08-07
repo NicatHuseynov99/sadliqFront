@@ -26,12 +26,14 @@
         </button>
       </div>
 
-      <div v-if="!isLoading && visible.length === 0" class="no-result">
-        <div class="empty-icon">🗓️</div>
-        <h3>{{ reservations.length ? 'Bu bölmədə rezerv yoxdur.' : 'Hələ heç bir rezerviniz yoxdur.' }}</h3>
-        <p>Ana səhifədən saray seçib rezerv sorğusu göndərə bilərsiniz.</p>
+      <UiEmpty
+        v-if="!isLoading && visible.length === 0"
+        icon="🗓️"
+        :title="reservations.length ? 'Bu bölmədə rezerv yoxdur.' : 'Hələ heç bir rezerviniz yoxdur.'"
+        text="Ana səhifədən saray seçib rezerv sorğusu göndərə bilərsiniz."
+      >
         <UiButton to="/">Saraylara bax</UiButton>
-      </div>
+      </UiEmpty>
 
       <div v-else class="res-list">
         <article v-for="r in visible" :key="r.id" class="res-card" :class="statusClass(r.status)">
@@ -152,6 +154,7 @@ import {
 import { formatDateFull } from '@/utils/date'
 import WeddingBoard from '@/components/WeddingBoard.vue'
 import UiButton from '@/components/ui/UiButton.vue'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 
 const reservations = ref([])
 const isLoading = ref(false)
@@ -620,30 +623,6 @@ onMounted(load)
   background: #c0392b;
   border-color: #c0392b;
   color: #fff;
-}
-
-/* Boş vəziyyət */
-.no-result {
-  text-align: center;
-  padding: 54px 20px;
-  background: white;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.empty-icon {
-  font-size: 2.6rem;
-  margin-bottom: 10px;
-}
-
-.no-result h3 {
-  color: #333;
-  margin: 0 0 8px;
-}
-
-.no-result p {
-  color: #666;
-  margin: 0 0 20px;
 }
 
 @media (max-width: 760px) {
