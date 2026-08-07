@@ -37,7 +37,8 @@
         </button>
       </div>
 
-      <AuditLogView v-if="section === 'audit'" />
+      <AdminChatsView v-if="section === 'chats'" />
+      <AuditLogView v-else-if="section === 'audit'" />
       <VisitorsView v-else-if="section === 'visitors'" />
       <ReviewsView v-else-if="section === 'reviews'" />
       <ReservationsView v-else-if="section === 'bookings'" />
@@ -140,6 +141,7 @@ const VenuesView = defineAsyncComponent(() => import('@/components/VenuesView.vu
 const DataView = defineAsyncComponent(() => import('@/components/DataView.vue'))
 const VenueReview = defineAsyncComponent(() => import('@/components/VenueReview.vue'))
 const AdminUserManager = defineAsyncComponent(() => import('@/components/AdminUserManager.vue'))
+const AdminChatsView = defineAsyncComponent(() => import('@/components/AdminChatsView.vue'))
 import { getPlatformStats, getPendingVenues, approveVenue } from '@/services/adminService'
 
 const auth = useAuthStore()
@@ -182,6 +184,7 @@ const tabs = computed(() => [
   { value: 'bookings', label: 'Rezervlər', icon: '📅', badge: stats.value.pendingReservations || 0 },
   { value: 'reviews', label: 'Rəylər', icon: '⭐' },
   { value: 'visitors', label: 'Ziyarətçilər', icon: '👣' },
+  { value: 'chats', label: 'Yazışmalar', icon: '💬' },
   { value: 'notify', label: 'Bildiriş göndər', icon: '📣' },
   { value: 'audit', label: 'Jurnal', icon: '📜' },
   { value: 'settings', label: 'Parametrlər', icon: '⚙️' },
