@@ -123,9 +123,10 @@
 
               <span v-if="holdLeft(r)" class="hold-tag">⏱ Cavaba {{ holdLeft(r) }} qalıb</span>
 
+              <!-- Cavablanmamış sorğunu geri götürmək sadədir -->
               <el-popconfirm
-                v-if="r.status === 0 || r.status === 1"
-                title="Rezervi ləğv etmək istədiyinizə əminsiniz?"
+                v-if="r.status === 0"
+                title="Sorğunu geri götürmək istədiyinizə əminsiniz?"
                 confirm-button-text="Bəli, ləğv et"
                 cancel-button-text="Xeyr"
                 @confirm="cancel(r)"
@@ -134,6 +135,11 @@
                   <button class="cancel-btn">Ləğv et</button>
                 </template>
               </el-popconfirm>
+
+              <!-- Təsdiqlənmiş tədbirin ləğvi saraya zərər verir — səbəb soruşulur -->
+              <button v-else-if="r.status === 1" class="cancel-btn" @click="cancel(r)">
+                Ləğv et
+              </button>
             </footer>
           </div>
         </article>
@@ -144,6 +150,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { ElMessageBox } from 'element-plus'
 import { toast } from '@/utils/toast'
 import {
   acceptCounterOffer,
@@ -245,10 +252,32 @@ const daysLeftText = (r) => {
   return `${days} gün qaldı`
 }
 
-// Rezervi ləğv edir və siyahını yeniləyir
+// Rezervi ləğv edir və siyahını yeniləyir.
+// Təsdiqlənmiş tədbirdə səbəb məcburidir — saray günü boşaldıb yenidən
+// satmalı olacaq, ona görə nə baş verdiyini bilməlidir.
 const cancel = async (r) => {
+  let reason = null
+
+  if (r.status === 1) {
+    try {
+      const { value } = await ElMessageBox.prompt(
+        'Təsdiqlənmiş tədbiri ləğv edirsiniz. Saray bu tarixi yenidən satmalı olacaq — səbəbi qeyd edin.',
+        'Tədbiri ləğv et',
+        {
+          confirmButtonText: 'Ləğv et',
+          cancelButtonText: 'İmtina',
+          inputPlaceholder: 'Ləğvin səbəbi (məcburi)',
+          inputValidator: (v) => (v?.trim() ? true : 'Səbəbi yazın'),
+        },
+      )
+      reason = value.trim()
+    } catch {
+      return
+    }
+  }
+
   try {
-    const result = await cancelReservation(r.id)
+    const result = await cancelReservation(r.id, reason)
     toast.success(result.message)
     await load()
   } catch (e) {

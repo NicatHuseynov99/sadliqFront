@@ -180,9 +180,10 @@ export const createCounterOffer = async (dto) => {
   return data.message ?? 'Əks-təklif göndərildi.'
 }
 
-// PUT /Reservations/UpdateStatus/{id} — 1 = təsdiqlə, 2 = rədd et
-export const updateReservationStatus = async (id, status) => {
-  const { data } = await api.put(`/Reservations/UpdateStatus/${id}`, { status })
+// PUT /Reservations/UpdateStatus/{id} — 1 = təsdiqlə, 2 = rədd et, 3 = ləğv et.
+// Təsdiqlənmiş tədbir ləğv olunursa səbəb məcburidir.
+export const updateReservationStatus = async (id, status, reason = null) => {
+  const { data } = await api.put(`/Reservations/UpdateStatus/${id}`, { status, reason })
   return data.message ?? 'Status yeniləndi.'
 }
 

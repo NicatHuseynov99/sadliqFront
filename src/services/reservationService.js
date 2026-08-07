@@ -50,9 +50,10 @@ export const getMyReservations = async () => {
   return (data.data ?? []).map(mapReservation).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
 }
 
-// PUT /Reservations/Cancel/{id} — rezervi ləğv edir, günü yenidən boşaldır
-export const cancelReservation = async (id) => {
-  const { data } = await api.put(`/Reservations/Cancel/${id}`)
+// PUT /Reservations/Cancel/{id} — rezervi ləğv edir, günü yenidən boşaldır.
+// Təsdiqlənmiş tədbir ləğv olunursa səbəb məcburidir.
+export const cancelReservation = async (id, reason = null) => {
+  const { data } = await api.put(`/Reservations/Cancel/${id}`, { reason })
   return { message: data.message ?? 'Rezerv ləğv edildi.' }
 }
 

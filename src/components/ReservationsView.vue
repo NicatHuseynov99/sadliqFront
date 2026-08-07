@@ -297,21 +297,31 @@ const restore = async (reservation) => {
 }
 
 // Admin sahibin yerinə qərar verir — səhvən basmamaq üçün təsdiq istəyirik
+// Admin sahibin yerinə qərar verir — kənardan edilən müdaxilə izahsız
+// qalmamalıdır, ona görə səbəb məcburidir və jurnala düşür.
 const changeStatus = async (reservation, status) => {
   const labels = { 0: 'gözləməyə qaytarmaq', 1: 'təsdiqləmək', 2: 'rədd etmək' }
 
+  let reason
   try {
-    await ElMessageBox.confirm(
+    const { value } = await ElMessageBox.prompt(
       `«${reservation.venueName}» üçün ${formatDate(reservation.eventDate)} tarixli rezervi ` +
         `${labels[status]} istəyirsiniz? Müştəriyə bildiriş gedəcək.`,
       'Statusu dəyiş',
-      { confirmButtonText: 'Bəli', cancelButtonText: 'İmtina', type: 'warning' },
+      {
+        confirmButtonText: 'Bəli',
+        cancelButtonText: 'İmtina',
+        type: 'warning',
+        inputPlaceholder: 'Müdaxilənin səbəbi (məcburi)',
+        inputValidator: (v) => (v?.trim() ? true : 'Səbəbi yazın'),
+      },
     )
+    reason = value.trim()
   } catch {
     return
   }
 
-  const result = await updateReservationStatus(reservation.id, status)
+  const result = await updateReservationStatus(reservation.id, status, reason)
   if (!result.success) return toast.error(result.message)
 
   toast.success(result.message)

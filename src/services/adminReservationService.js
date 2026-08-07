@@ -16,8 +16,9 @@ export const searchReservations = async (params) => {
 }
 
 // PUT /AdminReservations/UpdateStatus/{id}
-export const updateReservationStatus = async (reservationId, status) => {
-  const { data } = await api.put(`/AdminReservations/UpdateStatus/${reservationId}`, { status })
+// Admin müdaxiləsində səbəb həmişə məcburidir
+export const updateReservationStatus = async (reservationId, status, reason) => {
+  const { data } = await api.put(`/AdminReservations/UpdateStatus/${reservationId}`, { status, reason })
   return data
 }
 
