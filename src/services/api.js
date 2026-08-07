@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 
 const headers = {
   Accept: 'application/json', 'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ const extractMessage = (data) => {
 }
 
 const notifyError = (title, message) => {
-  ElNotification({ type: 'error', zIndex: 99999, title, message })
+  toast.error(message, title)
 }
 
 api.interceptors.response.use((response) => {

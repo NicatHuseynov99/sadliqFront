@@ -284,7 +284,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import AddressLink from '@/components/AddressLink.vue'
 import MiniMap from '@/components/MiniMap.vue'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
@@ -449,23 +449,13 @@ const disabledDate = (date) => {
 // Rezerv dialoqunu açır; giriş olmayanı login-ə yönləndirir
 const openReserve = (hall) => {
   if (!auth.isAuth) {
-    ElNotification({
-      title: 'Giriş tələb olunur',
-      message: 'Rezerv etmək üçün əvvəlcə daxil olun.',
-      type: 'info',
-      zIndex: 99999,
-    })
+    toast.info('Rezerv etmək üçün əvvəlcə daxil olun.', 'Giriş tələb olunur')
     router.push('/login')
     return
   }
 
   if (!auth.isCustomer) {
-    ElNotification({
-      title: 'İcazə yoxdur',
-      message: 'Rezervi yalnız müştəri hesabı ilə etmək olar.',
-      type: 'warning',
-      zIndex: 99999,
-    })
+    toast.warning('Rezervi yalnız müştəri hesabı ilə etmək olar.', 'İcazə yoxdur')
     return
   }
 
@@ -512,12 +502,7 @@ const submitReserve = async () => {
       note: reserveForm.note || null,
     })
     reserveVisible.value = false
-    ElNotification({
-      title: 'Uğurlu',
-      message: result.message,
-      type: 'success',
-      zIndex: 99999,
-    })
+    toast.success(result.message)
     // Yeni rezerv edilən gün dərhal dolu kimi görünsün
     await loadVenue()
   } catch (e) {

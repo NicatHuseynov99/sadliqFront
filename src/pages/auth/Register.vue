@@ -80,7 +80,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -104,7 +104,7 @@ const register = async () => {
   errorMessage.value = ''
   try {
     await auth.register(form)
-    ElNotification({ type: 'success', title: 'Uğurlu', message: 'Qeydiyyat tamamlandı, daxil ola bilərsiniz' })
+    toast.success('Qeydiyyat tamamlandı, daxil ola bilərsiniz')
     await router.push({ name: 'login' })
   } catch (e) {
     // Backend-dən gələn xəta mesajını formanın altında göstəririk
