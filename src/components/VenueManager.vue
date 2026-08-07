@@ -7,7 +7,7 @@
           {{ canEdit ? 'Saraylarım' : 'Zallarım' }}
           <em v-if="venues.length">{{ venues.length }}</em>
         </h2>
-        <button v-if="canEdit" class="confirm-btn" @click="openVenueForm(null)">+ Yeni saray</button>
+        <UiButton v-if="canEdit" size="sm" @click="openVenueForm(null)">+ Yeni saray</UiButton>
       </div>
 
       <p v-if="!canEdit" class="vm-note">
@@ -116,9 +116,7 @@
 
       <template #footer>
         <el-button @click="venueDialog = false">İmtina</el-button>
-        <button class="confirm-btn" :disabled="isSaving" @click="saveVenue">
-          {{ isSaving ? 'Saxlanılır...' : 'Yadda saxla' }}
-        </button>
+        <UiButton :is-loading="isSaving" @click="saveVenue">Yadda saxla</UiButton>
       </template>
     </el-dialog>
 
@@ -126,7 +124,7 @@
     <el-dialog v-model="hallDialog" :title="`${activeVenue?.name} — zallar`" width="760px">
       <div class="hall-head">
         <span class="hall-count">{{ halls.length }} zal</span>
-        <button v-if="canEdit && isActiveApproved" class="confirm-btn" @click="openHallForm(null)">+ Yeni zal</button>
+        <UiButton v-if="canEdit && isActiveApproved" size="sm" @click="openHallForm(null)">+ Yeni zal</UiButton>
       </div>
 
       <!-- Təsdiqə qədər zallar yalnız baxış üçündür -->
@@ -218,9 +216,9 @@
 
       <template #footer>
         <el-button @click="closeHallForm">İmtina</el-button>
-        <button class="confirm-btn" :disabled="isSaving" @click="saveHall">
-          {{ isSaving ? 'Saxlanılır...' : hallForm.id ? 'Yadda saxla' : 'Zal əlavə et' }}
-        </button>
+        <UiButton :is-loading="isSaving" @click="saveHall">
+          {{ hallForm.id ? 'Yadda saxla' : 'Zal əlavə et' }}
+        </UiButton>
       </template>
     </el-dialog>
 
@@ -279,9 +277,9 @@
         <p v-if="formError" class="form-error">{{ formError }}</p>
 
         <div class="sub-form-foot">
-          <button class="confirm-btn" :disabled="isSaving" @click="saveMenu">
+          <UiButton size="sm" :is-loading="isSaving" @click="saveMenu">
             {{ menuForm.id ? 'Yenilə' : 'Menyu əlavə et' }}
-          </button>
+          </UiButton>
           <button v-if="menuForm.id" class="mini-btn" @click="resetMenuForm">İmtina</button>
         </div>
       </div>
@@ -293,6 +291,7 @@
 import { computed, reactive, ref } from 'vue'
 import { toast } from '@/utils/toast'
 import HallCalendarEditor from '@/components/HallCalendarEditor.vue'
+import UiButton from '@/components/ui/UiButton.vue'
 import {
   createVenue,
   updateVenue,
@@ -752,26 +751,6 @@ const onImgError = (e) => {
 .mini-btn.danger:hover {
   border-color: #c0392b;
   color: #c0392b;
-}
-
-.confirm-btn {
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  padding: 9px 20px;
-  border-radius: 8px;
-  font-size: 0.87rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.confirm-btn:hover {
-  background: var(--brand-dark);
-}
-
-.confirm-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .form-row {
