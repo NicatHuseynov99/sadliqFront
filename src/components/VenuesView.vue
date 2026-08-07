@@ -134,8 +134,8 @@
       </div>
 
       <template #footer>
-        <a class="ghost-btn" :href="`/venue/${previewTarget?.id}`" target="_blank">Saytda aç ↗</a>
-        <button class="ghost-btn" @click="previewOpen = false">Bağla</button>
+        <UiButton variant="ghost" :href="`/venue/${previewTarget?.id}`" target="_blank">Saytda aç ↗</UiButton>
+        <UiButton variant="ghost" @click="previewOpen = false">Bağla</UiButton>
       </template>
     </el-dialog>
 
@@ -173,8 +173,8 @@
       </div>
 
       <template #footer>
-        <a class="ghost-btn" href="/panel" target="_blank">Sahib panelində aç ↗</a>
-        <button class="ghost-btn" @click="contentOpen = false">Bağla</button>
+        <UiButton variant="ghost" href="/panel" target="_blank">Sahib panelində aç ↗</UiButton>
+        <UiButton variant="ghost" @click="contentOpen = false">Bağla</UiButton>
       </template>
     </el-dialog>
 
@@ -236,8 +236,8 @@
       </div>
 
       <template #footer>
-        <button class="ghost-btn" @click="editOpen = false">İmtina</button>
-        <button class="primary-btn" :disabled="!form.name.trim()" @click="submitEdit">Yadda saxla</button>
+        <UiButton variant="ghost" @click="editOpen = false">İmtina</UiButton>
+        <UiButton :disabled="!form.name.trim()" @click="submitEdit">Yadda saxla</UiButton>
       </template>
     </el-dialog>
 
@@ -274,8 +274,8 @@
       </ul>
 
       <template #footer>
-        <button class="ghost-btn" @click="ownerOpen = false">İmtina</button>
-        <button class="primary-btn" :disabled="!newOwnerId" @click="submitOwner">Keçir</button>
+        <UiButton variant="ghost" @click="ownerOpen = false">İmtina</UiButton>
+        <UiButton :disabled="!newOwnerId" @click="submitOwner">Keçir</UiButton>
       </template>
     </el-dialog>
 
@@ -288,7 +288,7 @@
       </div>
 
       <template #footer>
-        <button class="ghost-btn" @click="confirmOpen = false">İmtina</button>
+        <UiButton variant="ghost" @click="confirmOpen = false">İmtina</UiButton>
         <button class="primary-btn" :class="confirm.tone" @click="runConfirm">{{ confirm.action }}</button>
       </template>
     </el-dialog>
@@ -300,6 +300,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
 import DialogHead from '@/components/DialogHead.vue'
 import CoordinatePicker from '@/components/CoordinatePicker.vue'
+import UiButton from '@/components/ui/UiButton.vue'
 import { toast } from '@/utils/toast'
 import {
   searchVenues,
@@ -1301,7 +1302,6 @@ onMounted(async () => {
 }
 
 /* Pəncərə düymələri */
-.ghost-btn,
 .primary-btn {
   padding: 9px 18px;
   border-radius: 10px;
@@ -1311,20 +1311,6 @@ onMounted(async () => {
   transition: all 0.15s;
   text-decoration: none;
   display: inline-block;
-}
-
-.ghost-btn {
-  background: #fff;
-  border: 1px solid #ece5e8;
-  color: var(--ink-2);
-}
-
-.ghost-btn:hover {
-  border-color: var(--gold);
-  color: var(--brand);
-}
-
-.primary-btn {
   background: var(--brand);
   border: 1px solid var(--brand);
   color: #fff;
