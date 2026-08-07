@@ -125,7 +125,7 @@
 <script setup>
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useCountUp } from '@/composables/useCountUp'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import { useAuthStore } from '@/store/auth'
 
 // Bölmələr tənbəl yüklənir: admin bir anda tək bölməyə baxır, qalan 8-i
@@ -213,15 +213,10 @@ const loadStats = async () => {
 const approve = async (venue) => {
   try {
     const message = await approveVenue(venue.id)
-    ElNotification({ title: 'Təsdiqləndi', message, type: 'success', zIndex: 99999 })
+    toast.success(message, 'Təsdiqləndi')
     await load()
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 

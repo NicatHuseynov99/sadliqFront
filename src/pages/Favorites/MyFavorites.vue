@@ -66,7 +66,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import VenueCard from '@/components/VenueCard.vue'
 import VenueCompare from '@/components/VenueCompare.vue'
 import UiButton from '@/components/ui/UiButton.vue'
@@ -94,12 +94,7 @@ const toggleCompare = (venue) => {
   }
 
   if (compareMap.size >= 3) {
-    ElNotification({
-      title: 'Diqqət',
-      message: 'Eyni anda ən çox 3 sarayı müqayisə etmək olar.',
-      type: 'warning',
-      zIndex: 99999,
-    })
+    toast.warning('Eyni anda ən çox 3 sarayı müqayisə etmək olar.')
     return
   }
 
@@ -168,19 +163,9 @@ const onRemove = async (venue) => {
     await toggleFavorite(venue.id)
     venues.value = venues.value.filter((v) => v.id !== venue.id)
     compareMap.delete(venue.id)
-    ElNotification({
-      title: 'Silindi',
-      message: `${venue.name} seçilmişlərdən çıxarıldı.`,
-      type: 'success',
-      zIndex: 99999,
-    })
+    toast.success(`${venue.name} seçilmişlərdən çıxarıldı.`, 'Silindi')
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 

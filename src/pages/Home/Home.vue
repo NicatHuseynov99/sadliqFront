@@ -313,7 +313,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElNotification } from 'element-plus'
 import { toast } from '@/utils/toast'
 import VenueCard from '@/components/VenueCard.vue'
 import VenueMap from '@/components/VenueMap.vue'
@@ -624,12 +623,7 @@ const resetFilters = () => {
 // Ürəyə basanda: giriş yoxdursa login-ə yönləndirir, varsa backend-də əlavə edir/silir
 const onToggleFavorite = async (venue) => {
   if (!auth.isAuth) {
-    ElNotification({
-      title: 'Giriş tələb olunur',
-      message: 'Seçilmişlərə əlavə etmək üçün daxil olun.',
-      type: 'info',
-      zIndex: 99999,
-    })
+    toast.info('Seçilmişlərə əlavə etmək üçün daxil olun.', 'Giriş tələb olunur')
     router.push('/login')
     return
   }
@@ -640,12 +634,7 @@ const onToggleFavorite = async (venue) => {
     isFavorite ? updated.add(venue.id) : updated.delete(venue.id)
     favoriteIds.value = updated
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
