@@ -31,13 +31,14 @@
               :disabled="!canEdit"
             />
             <span v-if="SETTING_UNITS[s.key]" class="unit">{{ SETTING_UNITS[s.key] }}</span>
-            <button
+            <UiButton
               class="save-btn"
+              size="sm"
               :disabled="!canEdit || String(drafts[s.key]) === s.value"
               @click="save(s)"
             >
               Yadda saxla
-            </button>
+            </UiButton>
           </div>
 
           <span v-if="s.updatedAt" class="setting-foot">
@@ -150,6 +151,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import { toast } from '@/utils/toast'
 import { useAuthStore } from '@/store/auth'
+import UiButton from '@/components/ui/UiButton.vue'
 import {
   getSettings,
   updateSetting,
@@ -451,25 +453,6 @@ onMounted(loadAll)
 
 .save-btn {
   margin-left: auto;
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 9px;
-  font-size: 0.76rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, opacity 0.15s;
-}
-
-.save-btn:hover:not(:disabled) {
-  background: #5c1029;
-}
-
-.save-btn:disabled {
-  background: #ece5e8;
-  color: #b8a3ab;
-  cursor: not-allowed;
 }
 
 .setting-foot {
