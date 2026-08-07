@@ -202,7 +202,7 @@
 <script setup>
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useCountUp } from '@/composables/useCountUp'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import { useAuthStore } from '@/store/auth'
 import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
 
@@ -364,14 +364,9 @@ const setStatus = async (reservation, status) => {
     const message = await updateReservationStatus(reservation.id, status)
     allReservations.value[selectedVenueId.value] = await getVenueReservations(selectedVenueId.value)
     reservations.value = allReservations.value[selectedVenueId.value]
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   } finally {
     isLoadingReservations.value = false
   }

@@ -114,7 +114,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import { useAuthStore } from '@/store/auth'
 import { formatDateFull } from '@/utils/date'
 import { getPreferences, updatePreferences } from '@/services/notificationService'
@@ -180,7 +180,7 @@ const saveProfile = async () => {
       lastName: profileForm.lastName.trim(),
       phone: profileForm.phone.trim(),
     })
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
   } catch (e) {
     profileError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
@@ -205,7 +205,7 @@ const savePassword = async () => {
     passwordForm.currentPassword = ''
     passwordForm.newPassword = ''
     passwordForm.repeatPassword = ''
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
   } catch (e) {
     passwordError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
   } finally {
@@ -220,14 +220,9 @@ const prefs = reactive({ allowAnnouncements: true, allowEmail: true, allowSms: t
 const savePrefs = async () => {
   try {
     const result = await updatePreferences({ ...prefs })
-    ElNotification({ title: 'Uğurlu', message: result.message, type: 'success', zIndex: 99999 })
+    toast.success(result.message)
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Seçim saxlanmadı',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Seçim saxlanmadı')
   }
 }
 

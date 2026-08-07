@@ -142,7 +142,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { ElNotification } from 'element-plus'
+import { toast } from '@/utils/toast'
 import {
   acceptCounterOffer,
   cancelReservation,
@@ -246,15 +246,10 @@ const daysLeftText = (r) => {
 const cancel = async (r) => {
   try {
     const result = await cancelReservation(r.id)
-    ElNotification({ title: 'Uğurlu', message: result.message, type: 'success', zIndex: 99999 })
+    toast.success(result.message)
     await load()
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
@@ -262,15 +257,10 @@ const cancel = async (r) => {
 const respondToOffer = async (reservation, action) => {
   try {
     const message = await action(reservation.counterOffer.id)
-    ElNotification({ title: 'Uğurlu', message, type: 'success', zIndex: 99999 })
+    toast.success(message)
     await load()
   } catch (e) {
-    ElNotification({
-      title: 'Xəta',
-      message: e?.userMessage ?? e?.message ?? 'Xəta baş verdi',
-      type: 'error',
-      zIndex: 99999,
-    })
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
 }
 
