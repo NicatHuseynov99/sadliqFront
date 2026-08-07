@@ -76,6 +76,45 @@
 
         <p class="review-text">{{ r.text }}</p>
 
+        <!-- Sarayın açıq cavabı: rəyi cavabsız qoymaq sarayın özünə ziyandır -->
+        <div v-if="r.ownerReply && replyingId !== r.id" class="owner-reply">
+          <div class="or-head">
+            <b>🏛 Sarayın cavabı</b>
+            <span v-if="r.ownerRepliedAt">{{ formatDateFull(r.ownerRepliedAt.slice(0, 10)) }}</span>
+          </div>
+          <p>{{ r.ownerReply }}</p>
+
+          <div v-if="canReply" class="or-actions">
+            <button class="link-btn" @click="startReply(r)">Dəyiş</button>
+            <el-popconfirm
+              title="Cavabı silmək istəyirsiniz?"
+              confirm-button-text="Bəli, sil"
+              cancel-button-text="Xeyr"
+              @confirm="removeReply(r)"
+            >
+              <template #reference>
+                <button class="link-btn danger">Sil</button>
+              </template>
+            </el-popconfirm>
+          </div>
+        </div>
+
+        <!-- Cavab yazma qutusu -->
+        <div v-if="canReply && replyingId === r.id" class="reply-box">
+          <textarea
+            v-model="replyDraft"
+            rows="3"
+            maxlength="1000"
+            placeholder="Rəyə cavabınız — bunu bütün ziyarətçilər görəcək…"
+          ></textarea>
+          <div class="reply-foot">
+            <UiButton size="sm" :is-loading="isSavingReply" @click="submitReply(r)">
+              {{ r.ownerReply ? 'Cavabı yenilə' : 'Cavab yaz' }}
+            </UiButton>
+            <button class="link-btn" @click="cancelReply">İmtina</button>
+          </div>
+        </div>
+
         <div class="review-foot">
           <span class="review-date">{{ formatDateFull(r.date) }}</span>
 
@@ -96,6 +135,15 @@
           <!-- Başqasının rəyi uyğunsuzdursa moderatora bildirmək olar -->
           <button v-else-if="auth.isAuth" class="report-btn" @click="openReport(r)">
             Şikayət et
+          </button>
+
+          <!-- Saray hələ cavab yazmayıbsa -->
+          <button
+            v-if="canReply && !r.ownerReply && replyingId !== r.id"
+            class="report-btn"
+            @click="startReply(r)"
+          >
+            Cavab yaz
           </button>
         </div>
       </div>
@@ -143,6 +191,8 @@ import {
   updateReview,
   deleteReview,
   canReviewVenue,
+  replyToReview,
+  deleteReviewReply,
 } from '@/services/reviewService'
 import { reportReview, REPORT_REASONS } from '@/services/reviewModerationService'
 import { formatDateFull } from '@/utils/date'
@@ -186,6 +236,58 @@ const loadEligibility = async () => {
 
 // Rəy cari istifadəçiyə aiddirmi — redaktə/silmə ikonları buna görə göstərilir
 const isMine = (review) => Boolean(review.customerId) && review.customerId === auth.user?.id
+
+// ————— sarayın cavabı —————
+
+// Cavab yaza bilən: sarayın sahibi və platforma işçiləri.
+// Saray administratoru (VenueAdmin) backend-də icazəlidir, amma frontend
+// hansı saraylara təyin olunduğunu bilmir — ona görə düymə göstərilmir.
+const canReply = computed(() => {
+  if (!auth.isAuth) return false
+  if (auth.isSuperAdmin || auth.isSupport) return true
+  return props.venue.ownerId != null && props.venue.ownerId === auth.user?.id
+})
+
+const replyingId = ref(null)
+const replyDraft = ref('')
+const isSavingReply = ref(false)
+
+const startReply = (review) => {
+  replyingId.value = review.id
+  replyDraft.value = review.ownerReply ?? ''
+}
+
+const cancelReply = () => {
+  replyingId.value = null
+  replyDraft.value = ''
+}
+
+const submitReply = async (review) => {
+  const text = replyDraft.value.trim()
+  if (!text) return toast.error('Cavab mətni boş ola bilməz.')
+
+  isSavingReply.value = true
+  try {
+    const message = await replyToReview(review.id, text)
+    toast.success(message)
+    cancelReply()
+    await loadReviews()
+  } catch (e) {
+    toast.error(e?.userMessage ?? e?.message ?? 'Cavab yazılmadı')
+  } finally {
+    isSavingReply.value = false
+  }
+}
+
+const removeReply = async (review) => {
+  try {
+    const message = await deleteReviewReply(review.id)
+    toast.success(message)
+    await loadReviews()
+  } catch (e) {
+    toast.error(e?.userMessage ?? e?.message ?? 'Cavab silinmədi')
+  }
+}
 
 const averageRating = computed(() => {
   if (!reviews.value.length) return 0
@@ -516,6 +618,78 @@ onMounted(() => {
 .review-date {
   font-size: 0.75rem;
   color: #adb5bd;
+}
+
+/* Sarayın cavabı — rəydən içəri girintili, ayrıca blok kimi görünür */
+.owner-reply {
+  margin: 8px 0 10px 14px;
+  padding: 10px 13px;
+  background: var(--brand-soft);
+  border-left: 3px solid var(--brand);
+  border-radius: 0 var(--r) var(--r) 0;
+}
+
+.or-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.or-head b {
+  font-size: 0.79rem;
+  color: var(--brand);
+}
+
+.or-head span {
+  font-size: 0.7rem;
+  color: var(--muted-2);
+}
+
+.owner-reply p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+  white-space: pre-line;
+}
+
+.or-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 7px;
+}
+
+.link-btn.danger {
+  color: var(--danger);
+}
+
+/* Cavab yazma qutusu */
+.reply-box {
+  margin: 8px 0 10px 14px;
+}
+
+.reply-box textarea {
+  width: 100%;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+}
+
+.reply-box textarea:focus {
+  border-color: var(--gold);
+}
+
+.reply-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 7px;
 }
 
 /* Şikayət düyməsi — gözə soxulmasın deyə sönük saxlanılır */

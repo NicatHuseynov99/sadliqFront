@@ -26,6 +26,10 @@ export const mapVenue = (v) => {
     text: r.comment,
     date: (r.createdAt ?? '').slice(0, 10),
     isVerifiedGuest: r.isVerifiedGuest ?? false,
+
+    // Sarayın açıq cavabı
+    ownerReply: r.ownerReply ?? null,
+    ownerRepliedAt: r.ownerRepliedAt ?? null,
   }))
 
   const rating = reviews.length

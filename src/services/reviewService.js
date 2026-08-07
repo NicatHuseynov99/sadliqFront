@@ -6,11 +6,16 @@ import api from '@/services/api'
 // Backend rəyini səhifənin gözlədiyi formaya çevirir
 const mapReview = (r) => ({
   id: r.id,
+  venueId: r.venueId,
   customerId: r.customerId,
   author: r.authorName,
   rating: r.rating,
   text: r.comment,
   date: (r.createdAt ?? '').slice(0, 10),
+
+  // Sarayın açıq cavabı
+  ownerReply: r.ownerReply ?? null,
+  ownerRepliedAt: r.ownerRepliedAt ?? null,
 })
 
 // GET /Reviews/GetByVenue/{venueId}
@@ -35,6 +40,18 @@ export const updateReview = async (id, rating, comment) => {
 export const deleteReview = async (id) => {
   const { data } = await api.delete(`/Reviews/Delete/${id}`)
   return { message: data.message ?? 'Rəy silindi.' }
+}
+
+// PUT /Reviews/Reply/{id} — sarayın rəyə açıq cavabı (təkrar çağırış əvəz edir)
+export const replyToReview = async (id, reply) => {
+  const { data } = await api.put(`/Reviews/Reply/${id}`, { reply })
+  return data.message ?? 'Cavab yazıldı.'
+}
+
+// DELETE /Reviews/DeleteReply/{id} — saray öz cavabını götürür
+export const deleteReviewReply = async (id) => {
+  const { data } = await api.delete(`/Reviews/DeleteReply/${id}`)
+  return data.message ?? 'Cavab silindi.'
 }
 
 // GET /Reviews/CanReview/{venueId} — forma göstərilməzdən əvvəl yoxlanılır
