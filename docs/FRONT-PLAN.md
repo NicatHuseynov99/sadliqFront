@@ -15,6 +15,9 @@ Mobil tətbiq mövzusu kənara qoyulub — bütün güc **web** üzərinədir.
 | C1 | Təkliflər sıralana bilir, yığcam sətir görünüşü |
 | C2 | Elan yazma qutusu + canlı önizləmə |
 | — | Bütün səhifələrdə responsivlik (bu sessiyada) |
+| G | **Bitdi** — qalereya lightbox, «Təkliflər gözlənilir» boş hal, mikro-hərəkətlər (say animasiyası), klaviatura/fokus/aria keçidi |
+| F | **Bitdi** — `VenueDetail.vue` (2307→1312 sətir, `VenueGallery.vue`+`VenueReviews.vue` ayrıldı), `OwnerPanel.vue` (1750→907, `OwnerStaffManager.vue`), `AdminPanel.vue` (1330→598, `AdminUserManager.vue`) |
+| E (qismən) | Rənglər → tokens.css: 44 fayl bitdi. UiButton köçürməsi: 7 fayl bitdi (MyProfile, VenueReviews, MyFavorites, SettingsView, MyReservations və s.). Qalan fayllar (VenueManager, VenuesView, OwnerPanel, VenueRegister, VenueDetail, OwnerStaffManager) davam edir — çoxlu dialoq/formada təkrarlanan düymə klasları var, diqqətli miqrasiya tələb edir. Auth səhifələri (Login/Register/ForgotPassword/ResetPassword) bilərəkdən toxunulmayıb — özəl qızılı brend rəngi var. |
 
 ---
 
@@ -112,6 +115,15 @@ dəyişməsi, yeni bildiriş gələndə zəngin titrəməsi.
   və ya router-level lazy import) — indi hamısı ilkin bundle-a düşür
 - Şəkillərdə ölçü nisbəti (`aspect-ratio`) — səhifə yüklənərkən sıçrayış olmasın
 - Uzun siyahılarda (jurnal, ziyarətçilər) səhifələmə/virtual sürüşmə yoxlanışı
+
+---
+
+## 6.1 Qalan iş (yenilənmiş, aşağıdan-yuxarı icra sırası)
+
+- **E-nin qalanı**: UiButton köçürməsini bitir (E1), boş hallar → `UiEmpty` (E3), kartlar → `UiCard` (E4)
+- **Toast vahidliyi** (əvvəlki G3): `ElMessage`/`ElNotification` qarışıqlığı hələ var
+- **`store/auth.js`**: logout `window.location.href` əvəzinə router-based ediləcək
+- **H**: performans (lazy-load, aspect-ratio, pagination/virtual scroll) — hələ toxunulmayıb
 
 ---
 
