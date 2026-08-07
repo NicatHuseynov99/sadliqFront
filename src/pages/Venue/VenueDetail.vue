@@ -94,7 +94,7 @@
               <button class="calendar-toggle" @click="toggleCalendar(h.id)">
                 {{ openCalendars.has(h.id) ? '▲ Təqvimi gizlət' : '📅 Bütün ayı gör' }}
               </button>
-              <button class="reserve-btn" @click="openReserve(h)">Rezerv et</button>
+              <UiButton size="sm" @click="openReserve(h)">Rezerv et</UiButton>
             </div>
 
             <div v-if="openCalendars.has(h.id)" class="hall-calendar">
@@ -134,7 +134,7 @@
                   </div>
                 </div>
 
-                <button class="reserve-btn wide" @click="openReserve(h)">Bu zalı rezerv et</button>
+                <UiButton block @click="openReserve(h)">Bu zalı rezerv et</UiButton>
               </aside>
             </div>
           </div>
@@ -273,9 +273,7 @@
 
       <template #footer>
         <el-button @click="reserveVisible = false">İmtina</el-button>
-        <button class="reserve-btn submit-btn" :disabled="isSubmitting" @click="submitReserve">
-          {{ isSubmitting ? 'Göndərilir...' : 'Sorğu göndər' }}
-        </button>
+        <UiButton :is-loading="isSubmitting" @click="submitReserve">Sorğu göndər</UiButton>
       </template>
     </el-dialog>
   </div>
@@ -290,6 +288,7 @@ import MiniMap from '@/components/MiniMap.vue'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
 import VenueGallery from '@/components/VenueGallery.vue'
 import VenueReviews from '@/components/VenueReviews.vue'
+import UiButton from '@/components/ui/UiButton.vue'
 import { getVenueById, toDateKey } from '@/services/venueService'
 import { formatDate, weekdayShort, MONTHS } from '@/utils/date'
 import { createReservation } from '@/services/reservationService'
@@ -978,14 +977,6 @@ onMounted(async () => {
   line-height: 1.3;
 }
 
-.reserve-btn.wide {
-  width: 100%;
-  padding: 11px;
-  font-size: 0.92rem;
-  border-radius: 10px;
-  box-shadow: 0 6px 16px rgba(114, 20, 56, 0.2);
-}
-
 @media (max-width: 820px) {
   .hall-calendar {
     grid-template-columns: 1fr;
@@ -1207,31 +1198,6 @@ onMounted(async () => {
   color: var(--brand);
   font-weight: 700;
   font-size: 0.95rem;
-}
-
-.reserve-btn {
-  background: var(--brand);
-  color: white;
-  border: none;
-  padding: 8px 18px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.87rem;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.reserve-btn:hover {
-  background: var(--brand-dark);
-}
-
-.reserve-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.submit-btn {
-  margin-left: 10px;
 }
 
 .field-hint {
