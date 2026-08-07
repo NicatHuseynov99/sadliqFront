@@ -35,7 +35,7 @@
         <div class="empty-icon">🤍</div>
         <h3>Hələ seçilmiş sarayınız yoxdur.</h3>
         <p>Bəyəndiyiniz sarayın şəklindəki ürək düyməsinə klikləyin — burada toplanacaq.</p>
-        <router-link to="/"><button class="primary-btn">Saraylara bax</button></router-link>
+        <UiButton to="/">Saraylara bax</UiButton>
       </div>
 
       <div v-else class="venues-grid">
@@ -69,6 +69,7 @@ import { useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
 import VenueCard from '@/components/VenueCard.vue'
 import VenueCompare from '@/components/VenueCompare.vue'
+import UiButton from '@/components/ui/UiButton.vue'
 import { getMyFavorites, toggleFavorite } from '@/services/favoriteService'
 import { getNearestFreeDate } from '@/services/venueService'
 
@@ -321,20 +322,6 @@ onMounted(load)
 .no-result p {
   color: #666;
   margin: 0 0 20px;
-}
-
-.primary-btn {
-  background: var(--brand);
-  color: white;
-  border: none;
-  padding: 9px 22px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.primary-btn:hover {
-  background: var(--brand-dark);
 }
 
 @media (max-width: 700px) {
