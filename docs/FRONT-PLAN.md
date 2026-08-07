@@ -17,7 +17,7 @@ Mobil tətbiq mövzusu kənara qoyulub — bütün güc **web** üzərinədir.
 | — | Bütün səhifələrdə responsivlik (bu sessiyada) |
 | G | **Bitdi** — qalereya lightbox, «Təkliflər gözlənilir» boş hal, mikro-hərəkətlər (say animasiyası), klaviatura/fokus/aria keçidi |
 | F | **Bitdi** — `VenueDetail.vue` (2307→1312 sətir, `VenueGallery.vue`+`VenueReviews.vue` ayrıldı), `OwnerPanel.vue` (1750→907, `OwnerStaffManager.vue`), `AdminPanel.vue` (1330→598, `AdminUserManager.vue`) |
-| E (qismən) | Rənglər → tokens.css: 44 fayl bitdi. UiButton köçürməsi: 7 fayl bitdi (MyProfile, VenueReviews, MyFavorites, SettingsView, MyReservations və s.). Qalan fayllar (VenueManager, VenuesView, OwnerPanel, VenueRegister, VenueDetail, OwnerStaffManager) davam edir — çoxlu dialoq/formada təkrarlanan düymə klasları var, diqqətli miqrasiya tələb edir. Auth səhifələri (Login/Register/ForgotPassword/ResetPassword) bilərəkdən toxunulmayıb — özəl qızılı brend rəngi var. |
+| E (qismən) | Rənglər → tokens.css: 44 fayl bitdi. **E1 (düymələr) demək olar bitdi** — VenueManager, VenuesView, VenueRegister, VenueDetail, OwnerStaffManager, MyFavorites, SettingsView, MyReservations, MyProfile, VenueReviews və s. daxil olmaqla. **E3 (boş hallar → UiEmpty) bitdi** — MyFavorites, MyReservations, OwnerPanel, Home. **E4 (kartlar → UiCard) qismən** — MyProfile bitdi (sadə title/sub struktur uyğun gəldi); staff-card/venue-block/MyRequests kartları bilərəkdən toxunulmadı (mürəkkəb daxili struktur, UiCard-a birbaşa uyğun gəlmir). Auth səhifələri (Login/Register/ForgotPassword/ResetPassword) bilərəkdən toxunulmayıb — özəl qızılı brend rəngi var. |
 
 ---
 
@@ -123,7 +123,8 @@ dəyişməsi, yeni bildiriş gələndə zəngin titrəməsi.
 - **Toast vahidliyi** (əvvəlki G3): **Bitdi** — bütün xam `ElNotification` çağırışları (17 fayl) `src/utils/toast.js` vahid utilinə keçirildi. `ElMessageBox.confirm` (təsdiq dialoqları) toxunulmadı — o toast deyil.
 - **`store/auth.js`**: **Bitdi** — logout `window.location.href` əvəzinə router-based (`router.push('/login')`) edildi
 - **E1 (düymələr)**: **Demək olar bitdi** — VenueManager, VenuesView, VenueRegister, VenueDetail, OwnerStaffManager da daxil olmaqla bütün fayllar UiButton-a keçirildi. Qəsdən toxunulmayanlar: auth səhifələri (özəl qızılı brend), OwnerPanel-də yaşıl "Təsdiqlə" düyməsi, VenuesView-də dinamik ton (danger/warn) təsdiq düyməsi — bunların rəngi UiButton-un mövcud variantlarına uyğun gəlmir.
-- **E-nin qalanı**: boş hallar → `UiEmpty` (E3), kartlar → `UiCard` (E4)
+- **E3 (boş hallar)**: **Bitdi** — MyFavorites, MyReservations, OwnerPanel, Home `UiEmpty`-ə keçirildi. Kiçik inline `.empty-box` mesajları (dialoq/panel daxilində) bilərəkdən toxunulmadı — böyük empty-state bloku kimi göstərmək vizual həddən artıq olardı.
+- **E4 (kartlar)**: **Qismən** — MyProfile bitdi. Qalan `staff-card`/`venue-block`/MyRequests kartları qərarla toxunulmadı (istifadəçi qərarı, 2026-08-07): daxili struktur (avatar, header, aksiya düymələri) `UiCard`-ın sadə title/sub modelinə uyğun gəlmir, məcburi köçürmə struktur pozardı.
 - **H**: performans (lazy-load, aspect-ratio, pagination/virtual scroll) — hələ toxunulmayıb
 
 ---
