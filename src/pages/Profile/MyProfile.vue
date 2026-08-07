@@ -26,10 +26,7 @@
 
         <div class="forms">
           <!-- Şəxsi məlumatlar -->
-          <section class="form-card">
-            <h2 class="card-title">Şəxsi məlumatlar</h2>
-            <p class="card-sub">E-poçt ünvanı dəyişdirilə bilmir — o, hesabınızın açarıdır.</p>
-
+          <UiCard title="Şəxsi məlumatlar" sub="E-poçt ünvanı dəyişdirilə bilmir — o, hesabınızın açarıdır.">
             <el-form label-position="top" @submit.prevent>
               <div class="name-row">
                 <el-form-item label="Ad">
@@ -57,13 +54,10 @@
                 <button v-if="profileChanged" class="link-btn" @click="resetProfileForm">İmtina</button>
               </div>
             </el-form>
-          </section>
+          </UiCard>
 
           <!-- Parol dəyişmə -->
-          <section class="form-card">
-            <h2 class="card-title">Parolun dəyişdirilməsi</h2>
-            <p class="card-sub">Yeni parol ən azı 6 simvol olmalıdır.</p>
-
+          <UiCard title="Parolun dəyişdirilməsi" sub="Yeni parol ən azı 6 simvol olmalıdır.">
             <el-form label-position="top" @submit.prevent>
               <el-form-item label="Cari parol">
                 <el-input v-model="passwordForm.currentPassword" type="password" show-password placeholder="Cari parolunuz" />
@@ -83,16 +77,13 @@
                 <UiButton :is-loading="isSavingPassword" @click="savePassword">Parolu dəyiş</UiButton>
               </div>
             </el-form>
-          </section>
+          </UiCard>
 
           <!-- Bildiriş seçimləri -->
-          <section class="form-card">
-            <h2 class="card-title">Bildirişlər</h2>
-            <p class="card-sub">
-              Rezervinizlə bağlı bildirişlər həmişə gəlir — onlar xidmətin bir hissəsidir.
-              Söndürə biləcəyiniz yalnız elanlardır.
-            </p>
-
+          <UiCard
+            title="Bildirişlər"
+            sub="Rezervinizlə bağlı bildirişlər həmişə gəlir — onlar xidmətin bir hissəsidir. Söndürə biləcəyiniz yalnız elanlardır."
+          >
             <label class="switch-row">
               <div>
                 <b>Elanlar və kampaniyalar</b>
@@ -105,7 +96,7 @@
               <b>Həmişə gələnlər:</b> rezervin təsdiqi və rəddi, sarayın əks-təklifi,
               tarixin bağlanması, sorğunuza gələn təkliflər və yazışma mesajları.
             </div>
-          </section>
+          </UiCard>
         </div>
       </div>
     </div>
@@ -119,6 +110,7 @@ import { useAuthStore } from '@/store/auth'
 import { formatDateFull } from '@/utils/date'
 import { getPreferences, updatePreferences } from '@/services/notificationService'
 import UiButton from '@/components/ui/UiButton.vue'
+import UiCard from '@/components/ui/UiCard.vue'
 
 const auth = useAuthStore()
 
@@ -353,20 +345,6 @@ onMounted(async () => {
   gap: 20px;
 }
 
-.form-card {
-  background: #fff;
-  border: 1px solid #eaeaea;
-  border-radius: 16px;
-  padding: 22px 24px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.card-title {
-  margin: 0 0 4px;
-  font-size: 1.15rem;
-  color: var(--ink);
-}
-
 /* Bildiriş seçimi sətri */
 .switch-row {
   display: flex;
@@ -401,12 +379,6 @@ onMounted(async () => {
 
 .prefs-note b {
   color: var(--ink-2);
-}
-
-.card-sub {
-  margin: 0 0 16px;
-  font-size: 0.85rem;
-  color: var(--muted);
 }
 
 .form-foot {
