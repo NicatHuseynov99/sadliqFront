@@ -117,15 +117,34 @@ const send = async () => {
 }
 </script>
 
-<style scoped>
-:deep(.dc-dialog) {
+<!-- EP-nin daxili sinifləri: scoped deyil, yalnız .dc-dialog ilə məhdud.
+     .el-dialog-un padding: 16px-i sıfırlanır ki, başlıq tam enə yayılsın. -->
+<style>
+.dc-dialog {
+  padding: 0;
   border-radius: 16px;
+  overflow: hidden;
 }
 
-:deep(.dc-dialog .el-dialog__header) {
+.dc-dialog .el-dialog__header {
   padding: 0;
   margin: 0;
 }
+
+.dc-dialog .el-dialog__body {
+  padding: 18px 20px 6px;
+}
+
+.dc-dialog .el-dialog__footer {
+  padding: 8px 20px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+</style>
+
+<style scoped>
 
 .dc-head {
   display: flex;

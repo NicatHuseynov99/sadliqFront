@@ -95,22 +95,38 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
-:deep(.rd-dialog) {
+<!-- Element Plus-un öz qutusu: scoped deyil, çünki bu siniflər bizim
+     şablonumuzda deyil — EP-nin daxilindədir. Yalnız öz .rd-dialog
+     sinfimizlə məhdudlaşdırılıb, başqa pəncərələrə toxunmur.
+
+     .el-dialog-un öz padding: 16px-i var — qradiyentli başlığın tam enə
+     yayılması üçün onu sıfırlayıb boşluğu özümüz veririk. -->
+<style>
+.rd-dialog {
+  padding: 0;
   border-radius: 16px;
+  overflow: hidden;
 }
 
-:deep(.rd-dialog .el-dialog__header) {
+.rd-dialog .el-dialog__header {
   padding: 0;
   margin: 0;
 }
 
-:deep(.rd-dialog .el-dialog__body) {
-  padding: 18px 20px 4px;
+.rd-dialog .el-dialog__body {
+  padding: 18px 20px 6px;
 }
 
-/* Footer-in düzəni style.css-dədir: dialoq body-yə teleport olunduğu
-   üçün buradakı :deep() ora çatmır. */
+.rd-dialog .el-dialog__footer {
+  padding: 8px 20px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+</style>
+
+<style scoped>
 
 .rd-head {
   display: flex;
