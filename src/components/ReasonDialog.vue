@@ -52,6 +52,7 @@
 
 <script setup>
 import { computed, nextTick, onMounted, ref } from 'vue'
+import UiButton from '@/components/ui/UiButton.vue'
 
 const props = defineProps({
   caption: { type: String, default: 'Səbəb' },
