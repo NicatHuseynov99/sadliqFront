@@ -124,16 +124,31 @@
         />
       </div>
     </div>
+
+    <!-- Mesajın gizlədilməsi: silinmir, yalnız tərəflərdən gizlədilir -->
+    <ReasonDialog
+      v-if="hideTarget"
+      caption="Moderasiya"
+      title="Mesajı gizlət"
+      text="Bu mesaj müştəriyə və saraya görünməyəcək. Mesajın özü silinmir — siz onu səbəbi ilə birlikdə görməkdə davam edəcəksiniz."
+      label="Gizlətmə səbəbi"
+      placeholder="Məsələn: təhqiredici məzmun."
+      confirm-text="Gizlət"
+      tone="danger"
+      :is-sending="isHiding"
+      @close="hideTarget = null"
+      @submit="(reason) => applyHide(hideTarget, true, reason)"
+    />
   </section>
 </template>
 
 <script setup>
 import { onBeforeUnmount, ref } from 'vue'
-import { ElMessageBox } from 'element-plus'
 import { toast } from '@/utils/toast'
 import { formatDateFull } from '@/utils/date'
 import Pager from '@/components/Pager.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
+import ReasonDialog from '@/components/ReasonDialog.vue'
 import { searchChats, getChat, setMessageHidden } from '@/services/adminChatService'
 
 const chats = ref([])
@@ -196,33 +211,27 @@ const open = async (offerId) => {
 
 // Gizlədəndə səbəb məcburidir — nəyə görə çıxarıldığı qeyd olunmalıdır.
 // Yenidən göstərəndə səbəb soruşulmur.
+const hideTarget = ref(null)
+const isHiding = ref(false)
+
+// Gizlətmək üçün səbəb soruşulur; yenidən göstərmək üçün soruşulmur
 const askHide = async (message) => {
-  let reason = null
+  if (message.isHidden) return applyHide(message, false, null)
 
-  if (!message.isHidden) {
-    try {
-      const { value } = await ElMessageBox.prompt(
-        'Bu mesaj müştəriyə və saraya görünməyəcək. Mesajın özü silinmir — siz onu görməkdə davam edəcəksiniz.',
-        'Mesajı gizlət',
-        {
-          confirmButtonText: 'Gizlət',
-          cancelButtonText: 'İmtina',
-          inputPlaceholder: 'Səbəb (məcburi)',
-          inputValidator: (v) => (v?.trim() ? true : 'Səbəbi yazın'),
-        },
-      )
-      reason = value.trim()
-    } catch {
-      return
-    }
-  }
+  hideTarget.value = message
+}
 
+const applyHide = async (message, isHidden, reason) => {
+  isHiding.value = true
   try {
-    const text = await setMessageHidden(message.id, !message.isHidden, reason)
+    const text = await setMessageHidden(message.id, isHidden, reason)
     toast.success(text)
+    hideTarget.value = null
     await open(activeId.value)
   } catch (e) {
     toast.error(e?.userMessage ?? e?.message ?? 'Əməliyyat alınmadı')
+  } finally {
+    isHiding.value = false
   }
 }
 

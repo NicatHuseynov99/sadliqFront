@@ -165,13 +165,28 @@
       Statusu dəyişəndə zalın təqvimi də yenilənir və müştəriyə bildiriş gedir —
       sahibin özü dəyişəndə olduğu kimi.
     </p>
+
+    <!-- Admin müdaxiləsi izahsız qalmamalıdır -->
+    <ReasonDialog
+      v-if="statusTarget"
+      caption="Admin müdaxiləsi"
+      title="Statusu dəyiş"
+      :text="statusDialogText"
+      label="Müdaxilənin səbəbi"
+      placeholder="Nəyə görə sahibin yerinə qərar verirsiniz?"
+      confirm-text="Bəli, dəyiş"
+      tone="danger"
+      :is-sending="isChangingStatus"
+      @close="statusTarget = null"
+      @submit="submitStatusChange"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
-import { ElMessageBox } from 'element-plus'
+import ReasonDialog from '@/components/ReasonDialog.vue'
 import { toast } from '@/utils/toast'
 import {
   getReservationStats,
@@ -299,33 +314,40 @@ const restore = async (reservation) => {
 // Admin sahibin yerinə qərar verir — səhvən basmamaq üçün təsdiq istəyirik
 // Admin sahibin yerinə qərar verir — kənardan edilən müdaxilə izahsız
 // qalmamalıdır, ona görə səbəb məcburidir və jurnala düşür.
-const changeStatus = async (reservation, status) => {
-  const labels = { 0: 'gözləməyə qaytarmaq', 1: 'təsdiqləmək', 2: 'rədd etmək' }
+const STATUS_LABELS = { 0: 'gözləməyə qaytarmaq', 1: 'təsdiqləmək', 2: 'rədd etmək' }
 
-  let reason
+// Admin sahibin yerinə qərar verir — səbəb məcburidir və jurnala düşür
+const statusTarget = ref(null)
+const isChangingStatus = ref(false)
+
+const changeStatus = (reservation, status) => {
+  statusTarget.value = { reservation, status }
+}
+
+const statusDialogText = computed(() => {
+  if (!statusTarget.value) return ''
+
+  const { reservation, status } = statusTarget.value
+  return (
+    `«${reservation.venueName}» üçün ${formatDate(reservation.eventDate)} tarixli rezervi ` +
+    `${STATUS_LABELS[status]} istəyirsiniz? Müştəriyə bildiriş gedəcək.`
+  )
+})
+
+const submitStatusChange = async (reason) => {
+  const { reservation, status } = statusTarget.value
+
+  isChangingStatus.value = true
   try {
-    const { value } = await ElMessageBox.prompt(
-      `«${reservation.venueName}» üçün ${formatDate(reservation.eventDate)} tarixli rezervi ` +
-        `${labels[status]} istəyirsiniz? Müştəriyə bildiriş gedəcək.`,
-      'Statusu dəyiş',
-      {
-        confirmButtonText: 'Bəli',
-        cancelButtonText: 'İmtina',
-        type: 'warning',
-        inputPlaceholder: 'Müdaxilənin səbəbi (məcburi)',
-        inputValidator: (v) => (v?.trim() ? true : 'Səbəbi yazın'),
-      },
-    )
-    reason = value.trim()
-  } catch {
-    return
+    const result = await updateReservationStatus(reservation.id, status, reason)
+    if (!result.success) return toast.error(result.message)
+
+    toast.success(result.message)
+    statusTarget.value = null
+    await refresh()
+  } finally {
+    isChangingStatus.value = false
   }
-
-  const result = await updateReservationStatus(reservation.id, status, reason)
-  if (!result.success) return toast.error(result.message)
-
-  toast.success(result.message)
-  await refresh()
 }
 
 onMounted(refresh)

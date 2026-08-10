@@ -152,7 +152,7 @@
                 title="Sorğunu geri götürmək istədiyinizə əminsiniz?"
                 confirm-button-text="Bəli, ləğv et"
                 cancel-button-text="Xeyr"
-                @confirm="cancel(r)"
+                @confirm="cancelPending(r)"
               >
                 <template #reference>
                   <button class="cancel-btn">Ləğv et</button>
@@ -181,6 +181,21 @@
       @sent="load"
     />
 
+    <!-- Təsdiqlənmiş tədbirin ləğvi: səbəb məcburidir -->
+    <ReasonDialog
+      v-if="cancelTarget"
+      caption="Ləğv"
+      title="Tədbiri ləğv et"
+      :text="`${cancelTarget.venueName} — ${formatDateFull(cancelTarget.eventDate?.slice(0, 10))}. Saray bu tarixi yenidən satmalı olacaq, ona görə səbəbi bilməlidir.`"
+      label="Ləğvin səbəbi"
+      placeholder="Məsələn: Tədbir başqa tarixə keçdi."
+      confirm-text="Bəli, ləğv et"
+      tone="danger"
+      :is-sending="isCancelling"
+      @close="cancelTarget = null"
+      @submit="submitCancel"
+    />
+
     <!-- Şikayət: dəstək xidmətinə müraciət -->
     <DisputeCreateDialog
       v-if="disputeTarget"
@@ -195,7 +210,6 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { ElMessageBox } from 'element-plus'
 import { toast } from '@/utils/toast'
 import {
   acceptCounterOffer,
@@ -207,6 +221,7 @@ import { formatDateFull } from '@/utils/date'
 import WeddingBoard from '@/components/WeddingBoard.vue'
 import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
 import DisputeCreateDialog from '@/components/DisputeCreateDialog.vue'
+import ReasonDialog from '@/components/ReasonDialog.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
 
@@ -308,29 +323,33 @@ const daysLeftText = (r) => {
 // Rezervi ləğv edir və siyahını yeniləyir.
 // Təsdiqlənmiş tədbirdə səbəb məcburidir — saray günü boşaldıb yenidən
 // satmalı olacaq, ona görə nə baş verdiyini bilməlidir.
-const cancel = async (r) => {
-  let reason = null
+// Təsdiqlənmiş tədbir üçün səbəb soruşulur — saray tarixi yenidən
+// satmalı olacaq. Cavablanmamış sorğuda sadə təsdiq kifayətdir.
+const cancelTarget = ref(null)
+const isCancelling = ref(false)
 
-  if (r.status === 1) {
-    try {
-      const { value } = await ElMessageBox.prompt(
-        'Təsdiqlənmiş tədbiri ləğv edirsiniz. Saray bu tarixi yenidən satmalı olacaq — səbəbi qeyd edin.',
-        'Tədbiri ləğv et',
-        {
-          confirmButtonText: 'Ləğv et',
-          cancelButtonText: 'İmtina',
-          inputPlaceholder: 'Ləğvin səbəbi (məcburi)',
-          inputValidator: (v) => (v?.trim() ? true : 'Səbəbi yazın'),
-        },
-      )
-      reason = value.trim()
-    } catch {
-      return
-    }
-  }
+const cancel = (r) => {
+  cancelTarget.value = r
+}
 
+const submitCancel = async (reason) => {
+  isCancelling.value = true
   try {
-    const result = await cancelReservation(r.id, reason)
+    const result = await cancelReservation(cancelTarget.value.id, reason)
+    toast.success(result.message)
+    cancelTarget.value = null
+    await load()
+  } catch (e) {
+    toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
+  } finally {
+    isCancelling.value = false
+  }
+}
+
+// Cavablanmamış sorğu — səbəbsiz, sadə təsdiqlə
+const cancelPending = async (r) => {
+  try {
+    const result = await cancelReservation(r.id, null)
     toast.success(result.message)
     await load()
   } catch (e) {

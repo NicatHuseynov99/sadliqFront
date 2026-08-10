@@ -102,15 +102,33 @@
       title="İş seçin"
       text="Siyahıdan bir şikayət seçin — tam yazışma burada görünəcək."
     />
+
+    <!-- Qərar: izah hər iki tərəfə gedir -->
+    <ReasonDialog
+      v-if="resolveStatus !== null"
+      :caption="resolveStatus === 2 ? 'Qərar' : 'Bağlanma'"
+      :title="resolveStatus === 2 ? 'Qərar ver və bağla' : 'İşi əsassız say'"
+      :text="resolveStatus === 2
+        ? 'Qərarınızı yazın. Hər iki tərəf bunu görəcək və bildiriş alacaq.'
+        : 'İşi nəyə görə əsassız sayırsınız? Tərəflər izahı görəcək.'"
+      :label="resolveStatus === 2 ? 'Qərarın izahı' : 'Bağlanma səbəbi'"
+      placeholder="Nə qərara gəldiniz və nəyə əsasən?"
+      :confirm-text="resolveStatus === 2 ? 'Qərarı təsdiqlə' : 'Bağla'"
+      :tone="resolveStatus === 2 ? 'brand' : 'danger'"
+      :max-length="1000"
+      :is-sending="isResolving"
+      @close="resolveStatus = null"
+      @submit="submitResolve"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { ElMessageBox } from 'element-plus'
 import { toast } from '@/utils/toast'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
+import ReasonDialog from '@/components/ReasonDialog.vue'
 import {
   getDispute,
   sendDisputeMessage,
@@ -188,36 +206,25 @@ const assign = async () => {
 }
 
 // Qərarın izahı məcburidir — tərəflər onu görəcək
-const askResolve = async (status) => {
-  const isResolve = status === 2
+const resolveStatus = ref(null)
+const isResolving = ref(false)
 
-  let resolution
-  try {
-    const { value } = await ElMessageBox.prompt(
-      isResolve
-        ? 'Qərarınızı yazın. Hər iki tərəf bunu görəcək və bildiriş alacaq.'
-        : 'İşi nəyə görə əsassız sayırsınız? Tərəflər izahı görəcək.',
-      isResolve ? 'Qərar ver' : 'İşi bağla',
-      {
-        confirmButtonText: isResolve ? 'Qərarı təsdiqlə' : 'Bağla',
-        cancelButtonText: 'İmtina',
-        inputType: 'textarea',
-        inputPlaceholder: 'İzah (məcburi)',
-        inputValidator: (v) => (v?.trim() ? true : 'İzahı yazın'),
-      },
-    )
-    resolution = value.trim()
-  } catch {
-    return
-  }
+const askResolve = (status) => {
+  resolveStatus.value = status
+}
 
+const submitResolve = async (resolution) => {
+  isResolving.value = true
   try {
-    const message = await resolveDispute(props.disputeId, status, resolution)
+    const message = await resolveDispute(props.disputeId, resolveStatus.value, resolution)
     toast.success(message)
+    resolveStatus.value = null
     await load()
     emit('changed')
   } catch (e) {
     toast.error(e?.userMessage ?? e?.message ?? 'Əməliyyat alınmadı')
+  } finally {
+    isResolving.value = false
   }
 }
 

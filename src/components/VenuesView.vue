@@ -292,16 +292,31 @@
         <button class="primary-btn" :class="confirm.tone" @click="runConfirm">{{ confirm.action }}</button>
       </template>
     </el-dialog>
+
+    <!-- Təsdiqin geri alınması: səbəb sahibkara gedir -->
+    <ReasonDialog
+      v-if="unapproveTarget"
+      caption="Təsdiqi geri al"
+      :title="unapproveTarget.name"
+      text="Saray saytdan yığışdırılacaq. Səbəbi sahibkar görəcək və düzəlişdən sonra yenidən yoxlamağa göndərə biləcək."
+      label="Rədd səbəbi"
+      placeholder="Məsələn: Şəkillər keyfiyyətsizdir, zal məlumatları natamamdır."
+      confirm-text="Geri al"
+      tone="danger"
+      :is-sending="isUnapproving"
+      @close="unapproveTarget = null"
+      @submit="submitUnapprove"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
+import ReasonDialog from '@/components/ReasonDialog.vue'
 import DialogHead from '@/components/DialogHead.vue'
 import CoordinatePicker from '@/components/CoordinatePicker.vue'
 import UiButton from '@/components/ui/UiButton.vue'
-import { ElMessageBox } from 'element-plus'
 import { toast } from '@/utils/toast'
 import {
   searchVenues,
@@ -519,32 +534,25 @@ const toggleApproved = async (venue) => {
   askUnapprove(venue)
 }
 
-const askUnapprove = async (venue) => {
-  let reason
+const unapproveTarget = ref(null)
+const isUnapproving = ref(false)
+
+const askUnapprove = (venue) => {
+  unapproveTarget.value = venue
+}
+
+const submitUnapprove = async (reason) => {
+  isUnapproving.value = true
   try {
-    const { value } = await ElMessageBox.prompt(
-      `«${venue.name}» saytdan yığışdırılacaq. Səbəbi yazın — sahibkar bunu görəcək və ` +
-        'düzəlişdən sonra yenidən yoxlamağa göndərə biləcək.',
-      'Təsdiqi geri al',
-      {
-        confirmButtonText: 'Geri al',
-        cancelButtonText: 'İmtina',
-        type: 'warning',
-        inputType: 'textarea',
-        inputPlaceholder: 'Səbəb (məcburi)',
-        inputValidator: (v) => (v?.trim() ? true : 'Səbəbi yazın'),
-      },
-    )
-    reason = value.trim()
-  } catch {
-    return
+    const result = await setVenueApproved(unapproveTarget.value.id, false, reason)
+    if (!result.success) return toast.error(result.message)
+
+    toast.success(result.message)
+    unapproveTarget.value = null
+    await refresh()
+  } finally {
+    isUnapproving.value = false
   }
-
-  const result = await setVenueApproved(venue.id, false, reason)
-  if (!result.success) return toast.error(result.message)
-
-  toast.success(result.message)
-  await refresh()
 }
 
 const openEdit = (venue) => {
