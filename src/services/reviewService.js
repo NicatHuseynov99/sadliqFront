@@ -42,6 +42,24 @@ export const deleteReview = async (id) => {
   return { message: data.message ?? 'Rəy silindi.' }
 }
 
+// GET /Reviews/GetForOwner — saray tərəfinin bütün rəyləri, cavabsızlar yuxarıda
+export const getOwnerReviews = async () => {
+  const { data } = await api.get('/Reviews/GetForOwner')
+
+  return (data.data ?? []).map((r) => ({
+    id: r.id,
+    venueId: r.venueId,
+    venueName: r.venueName,
+    author: r.authorName,
+    rating: r.rating,
+    text: r.comment,
+    date: (r.createdAt ?? '').slice(0, 10),
+    isVerifiedGuest: r.isVerifiedGuest ?? false,
+    ownerReply: r.ownerReply ?? null,
+    ownerRepliedAt: r.ownerRepliedAt ?? null,
+  }))
+}
+
 // PUT /Reviews/Reply/{id} — sarayın rəyə açıq cavabı (təkrar çağırış əvəz edir)
 export const replyToReview = async (id, reply) => {
   const { data } = await api.put(`/Reviews/Reply/${id}`, { reply })
