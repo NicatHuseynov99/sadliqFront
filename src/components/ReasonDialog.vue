@@ -40,7 +40,7 @@
     <template #footer>
       <UiButton variant="ghost" @click="$emit('close')">İmtina</UiButton>
       <UiButton
-        :variant="tone === 'danger' ? 'danger' : 'primary'"
+        :variant="tone === 'danger' ? 'danger-solid' : 'primary'"
         :is-loading="isSending"
         @click="submit"
       >

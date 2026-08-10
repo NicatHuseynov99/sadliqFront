@@ -18,7 +18,13 @@ import { computed } from 'vue'
 // Bütün düymələr bir yerdən idarə olunur: variant və ölçü seçilir,
 // qalan hər şey (rəng, kölgə, fokus) nişanlardan gəlir.
 const props = defineProps({
-  variant: { type: String, default: 'primary' }, // primary | ghost | soft | danger | gold
+  // primary | ghost | soft | danger | danger-solid | gold
+  //
+  // danger — ağ fonlu, nazik çərçivəli: siyahı içindəki «Sil» kimi
+  //   ikinci dərəcəli yerlər üçün.
+  // danger-solid — dolu qırmızı: pəncərədə əsas təsdiq düyməsi ağ fon
+  //   üzərində kontur qalsa görünmür.
+  variant: { type: String, default: 'primary' },
   size: { type: String, default: 'md' }, // sm | md | lg
   block: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
@@ -92,14 +98,17 @@ const tag = computed(() => {
   background: linear-gradient(135deg, var(--brand-dark), var(--brand));
 }
 
+/* Çərçivə --line-2-dən (#f0eaec) götürülürdü — ağ fon üzərində
+   demək olar görünmürdü və düymə mətn kimi oxunurdu */
 .ghost {
   background: var(--surface);
-  border-color: var(--line-2);
+  border-color: #ddccd3;
   color: var(--brand);
 }
 
 .ghost:hover:not(:disabled) {
   border-color: var(--gold);
+  background: var(--brand-soft);
 }
 
 .soft {
@@ -113,12 +122,24 @@ const tag = computed(() => {
 
 .danger {
   background: var(--surface);
-  border-color: #f3dbe1;
+  border-color: #e8bfc9;
   color: var(--danger);
 }
 
 .danger:hover:not(:disabled) {
   background: var(--danger-soft);
+}
+
+/* Geri alınmayan əməliyyatın əsas düyməsi — dolu, gözdən qaçmasın */
+.danger-solid {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.danger-solid:hover:not(:disabled) {
+  background: #86243d;
+  border-color: #86243d;
 }
 
 .gold {
