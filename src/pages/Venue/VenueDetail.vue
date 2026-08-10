@@ -36,6 +36,9 @@
 
       <p class="venue-desc">{{ venue.description }}</p>
 
+      <!-- Sorğu göndərməzdən əvvəl sarayın necə davrandığını bilmək -->
+      <VenueTrust :venue-id="venue.id" />
+
       <!-- Məzmun sekmələrə bölünür: hamısı alt-alta olanda səhifə 3-4 ekran çəkirdi -->
       <nav class="tabs" role="tablist">
         <button
@@ -287,6 +290,7 @@ import AddressLink from '@/components/AddressLink.vue'
 import MiniMap from '@/components/MiniMap.vue'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar.vue'
 import VenueGallery from '@/components/VenueGallery.vue'
+import VenueTrust from '@/components/VenueTrust.vue'
 import VenueReviews from '@/components/VenueReviews.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import { getVenueById, toDateKey } from '@/services/venueService'

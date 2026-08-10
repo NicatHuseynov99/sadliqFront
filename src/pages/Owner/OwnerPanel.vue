@@ -169,6 +169,11 @@
 
             <p class="res-note" v-if="r.note">💬 {{ r.note }}</p>
 
+            <!-- Ləğv səbəbi: tarix boşalıbsa niyə boşaldığını bilmək lazımdır -->
+            <p class="cancel-note" v-if="r.cancellationReason">
+              🚫 Ləğv səbəbi: {{ r.cancellationReason }}
+            </p>
+
             <!-- Göndərilmiş, cavab gözləyən əks-təklif -->
             <div v-if="r.counterOffer" class="offer-box">
               <b>Əks-təklif göndərilib — müştəri cavab verməyib</b>
@@ -939,6 +944,16 @@ onMounted(load)
   gap: 8px;
   justify-content: flex-end;
   margin-top: 10px;
+}
+
+.cancel-note {
+  margin: 0 0 10px;
+  padding: 8px 11px;
+  background: var(--danger-soft);
+  border-radius: var(--r-sm);
+  font-size: 0.78rem;
+  color: var(--danger);
+  line-height: 1.5;
 }
 
 /* Şikayət — sönük saxlanılır, son çarədir */

@@ -102,6 +102,22 @@ export const getVenueById = async (id) => {
   return mapVenue(data.data)
 }
 
+// GET /Venues/GetTrust/{id} — sarayın davranış göstəriciləri.
+// Ayrıca sorğudur ki, saray siyahısını ağırlaşdırmasın.
+export const getVenueTrust = async (id) => {
+  const { data } = await api.get(`/Venues/GetTrust/${id}`)
+  const t = data.data ?? {}
+
+  return {
+    averageResponseHours: t.averageResponseHours ?? null,
+    confirmPercent: t.confirmPercent ?? null,
+    expiredCount: t.expiredCount ?? 0,
+    cancelledAfterConfirmCount: t.cancelledAfterConfirmCount ?? 0,
+    basedOnRequests: t.basedOnRequests ?? 0,
+    hasEnoughData: t.hasEnoughData ?? false,
+  }
+}
+
 // Yüklənmiş saraylardan { hallId: Set(dolu tarixlər) } xəritəsi qurur (sorğu göndərmir)
 export const buildBusyMap = (venues) => {
   const map = {}

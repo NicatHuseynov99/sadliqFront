@@ -33,6 +33,10 @@ const mapReservation = (r) => ({
   hallId: r.hallId,
   menuId: r.menuId,
 
+  // Ləğvin izi — sahib nəyə görə ləğv olunduğunu bilməlidir
+  cancelledAt: r.cancelledAt ?? null,
+  cancellationReason: r.cancellationReason ?? null,
+
   // Bizim göndərdiyimiz, müştərinin cavabını gözləyən təklif
   counterOffer:
     (r.counterOffers ?? []).find((o) => o.status === 0 && !o.isFromCustomer) ?? null,

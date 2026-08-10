@@ -26,6 +26,11 @@ const mapReservation = (r) => ({
   seenAt: r.seenAt,
   holdExpiresAt: r.holdExpiresAt,
 
+  // Ləğvin izi — kim, nə vaxt, niyə
+  cancelledAt: r.cancelledAt ?? null,
+  cancelledByUserId: r.cancelledByUserId ?? null,
+  cancellationReason: r.cancellationReason ?? null,
+
   // Sarayın göndərdiyi, cavabımı gözləyən təklif
   counterOffer:
     (r.counterOffers ?? []).find((o) => o.status === 0 && !o.isFromCustomer) ?? null,

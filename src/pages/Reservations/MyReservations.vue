@@ -76,6 +76,11 @@
 
             <p class="res-note" v-if="r.note">💬 {{ r.note }}</p>
 
+            <!-- Ləğv səbəbi: müştəri niyə ləğv olunduğunu bilməlidir -->
+            <p class="cancel-note" v-if="r.cancellationReason">
+              🚫 Ləğv səbəbi: {{ r.cancellationReason }}
+            </p>
+
             <!-- Sahibin göndərdiyi əks-təklif -->
             <div v-if="r.counterOffer" class="offer-box">
               <b>Saray başqa şərt təklif edir</b>
@@ -565,6 +570,16 @@ onMounted(load)
 .waiting-tag {
   font-size: 0.74rem;
   color: var(--info);
+}
+
+.cancel-note {
+  margin: 0 0 10px;
+  padding: 8px 11px;
+  background: var(--danger-soft);
+  border-radius: var(--r-sm);
+  font-size: 0.78rem;
+  color: var(--danger);
+  line-height: 1.5;
 }
 
 /* Şikayət — sönük saxlanılır, son çarədir */
