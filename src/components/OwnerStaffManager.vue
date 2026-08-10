@@ -102,6 +102,40 @@
           </div>
         </div>
 
+        <!-- Səlahiyyətlər: rəhbər «görsün, amma cavabı mən verim» deyə bilər -->
+        <div class="sc-perms">
+          <span class="sc-label">Səlahiyyətlər</span>
+          <div class="perm-list">
+            <label class="perm">
+              <input
+                type="checkbox"
+                :checked="s.canConfirmReservations"
+                @change="savePermissions(s, 'canConfirmReservations', $event.target.checked)"
+              />
+              Rezervi təsdiqləyə bilər
+            </label>
+            <label class="perm">
+              <input
+                type="checkbox"
+                :checked="s.canEditCalendar"
+                @change="savePermissions(s, 'canEditCalendar', $event.target.checked)"
+              />
+              Təqvimi dəyişə bilər
+            </label>
+            <label class="perm">
+              <input
+                type="checkbox"
+                :checked="s.canSendOffers"
+                @change="savePermissions(s, 'canSendOffers', $event.target.checked)"
+              />
+              Təklif göndərə bilər
+            </label>
+          </div>
+          <p v-if="!s.canConfirmReservations && !s.canEditCalendar && !s.canSendOffers" class="perm-note">
+            Bu administrator yalnız sorğuları görəcək — cavabı siz verəcəksiniz.
+          </p>
+        </div>
+
         <footer class="sc-actions">
           <button class="act-btn" @click="editStaff(s)">
             <span>✏️</span> Redaktə
@@ -231,6 +265,7 @@ import {
   setStaffHalls,
   resetStaffPassword,
   getVenueHalls,
+  setStaffPermissions,
 } from '@/services/ownerService'
 import UiButton from '@/components/ui/UiButton.vue'
 
@@ -380,6 +415,27 @@ const removeStaff = async (member) => {
 }
 
 // Administratorun girişini bağlayır və ya yenidən açır
+// Səlahiyyət dəyişdirilir. Üçü də birlikdə göndərilir — backend tam
+// dəsti gözləyir, ona görə dəyişəni əvəz edib qalanını olduğu kimi ötürürük.
+const savePermissions = async (member, key, value) => {
+  const payload = {
+    canConfirmReservations: member.canConfirmReservations,
+    canEditCalendar: member.canEditCalendar,
+    canSendOffers: member.canSendOffers,
+    [key]: value,
+  }
+
+  try {
+    const message = await setStaffPermissions(member.id, payload)
+    toast.success(message)
+    await loadStaff()
+  } catch (e) {
+    toast.error(e?.userMessage ?? e?.message ?? 'Səlahiyyət dəyişdirilmədi')
+    // Server qəbul etmədisə siyahını geri qaytarırıq ki, checkbox yalan göstərməsin
+    await loadStaff()
+  }
+}
+
 const toggleStaff = async (member) => {
   try {
     const message = await setStaffActive(member.id, !member.isActive)
@@ -553,6 +609,43 @@ onMounted(() => {
 /* Zal çipləri */
 .sc-halls {
   padding: 10px 0 12px;
+}
+
+/* Səlahiyyətlər */
+.sc-perms {
+  padding: 0 0 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 11px;
+}
+
+.perm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.perm {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.perm input {
+  cursor: pointer;
+}
+
+.perm-note {
+  margin: 8px 0 0;
+  font-size: 0.73rem;
+  color: var(--warn);
+  background: var(--warn-soft);
+  border-radius: var(--r-sm);
+  padding: 6px 9px;
+  line-height: 1.5;
 }
 
 .hall-chips {

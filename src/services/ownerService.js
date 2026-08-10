@@ -156,6 +156,32 @@ export const setStaffHalls = async (id, hallIds) => {
   return data.message
 }
 
+// PUT /VenueStaff/SetPermissions/{id} — administratorun səlahiyyətləri.
+// Hamısı söndürülsə administrator yalnız sorğuları görür.
+export const setStaffPermissions = async (id, permissions) => {
+  const { data } = await api.put(`/VenueStaff/SetPermissions/${id}`, permissions)
+  return data.message
+}
+
+// GET /OwnerStats/ActivityLog — sahibin öz sarayları üzrə fəaliyyət jurnalı
+export const getOwnerActivityLog = async (params) => {
+  const { data } = await api.get('/OwnerStats/ActivityLog', { params })
+  const paged = data.data ?? {}
+
+  return {
+    items: (paged.items ?? []).map((a) => ({
+      id: a.id,
+      userName: a.userFullName,
+      action: a.action,
+      description: a.description,
+      createdAt: a.createdAt,
+      isSuccess: a.isSuccess,
+    })),
+    totalCount: paged.totalCount ?? 0,
+    page: paged.page ?? 1,
+  }
+}
+
 // DELETE /VenueStaff/Delete/{id} — təyinatı siyahıdan silir
 export const deleteStaff = async (id) => {
   const { data } = await api.delete(`/VenueStaff/Delete/${id}`)

@@ -55,6 +55,16 @@
         >
           Administratorlar
         </button>
+        <!-- Jurnal yalnız sahibə görünür: administrator öz üzərindəki
+             nəzarəti görməməlidir -->
+        <button
+          v-if="auth.canEditVenues"
+          class="section-tab"
+          :class="{ active: section === 'activity' }"
+          @click="section = 'activity'"
+        >
+          Jurnal
+        </button>
       </div>
 
       <UiEmpty
@@ -83,6 +93,7 @@
 
       <!-- Administratorlar bölməsi -->
       <OwnerStaffManager v-else-if="section === 'staff'" :venues="venues" />
+      <OwnerActivityLog v-else-if="section === 'activity'" />
 
       <div v-else class="panel-body">
         <!-- Saray seçimi -->
@@ -260,6 +271,7 @@ const OpenRequests = defineAsyncComponent(() => import('@/components/OpenRequest
 const MyOffers = defineAsyncComponent(() => import('@/components/MyOffers.vue'))
 const OwnerStats = defineAsyncComponent(() => import('@/components/OwnerStats.vue'))
 const OwnerStaffManager = defineAsyncComponent(() => import('@/components/OwnerStaffManager.vue'))
+const OwnerActivityLog = defineAsyncComponent(() => import('@/components/OwnerActivityLog.vue'))
 import {
   getMyVenues,
   getOwnerReservations,
