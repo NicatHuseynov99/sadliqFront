@@ -200,6 +200,9 @@
             <footer class="res-foot">
               <span class="res-date">Sorğu tarixi: {{ formatDateFull(r.createdAt.slice(0, 10)) }}</span>
 
+              <!-- Problemli müştəri barədə platformaya bildirmək -->
+              <button class="complain-btn" @click="disputeTarget = r">Şikayət et</button>
+
               <div class="res-actions" v-if="r.status === 0 || r.status === 5">
                 <el-popconfirm
                   title="Bu sorğunu rədd etmək istəyirsiniz?"
@@ -230,6 +233,16 @@
     @close="offerReservation = null"
     @sent="onOfferSent"
   />
+
+  <!-- Şikayət: problemli müştəri barədə platformaya müraciət -->
+  <DisputeCreateDialog
+    v-if="disputeTarget"
+    :reservation-id="disputeTarget.id"
+    :context-label="`${disputeTarget.customerName} — ${formatDateFull(disputeTarget.eventDate?.slice(0, 10))}`"
+    :is-customer="false"
+    @close="disputeTarget = null"
+    @created="$router.push('/sikayetlerim')"
+  />
 </template>
 
 <script setup>
@@ -239,6 +252,7 @@ import { toast } from '@/utils/toast'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
 import { useAuthStore } from '@/store/auth'
 import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
+import DisputeCreateDialog from '@/components/DisputeCreateDialog.vue'
 
 // Bölmələr tənbəl yüklənir: sahib bir anda tək bölməyə baxır
 const VenueManager = defineAsyncComponent(() => import('@/components/VenueManager.vue'))
@@ -359,6 +373,9 @@ const statusClass = (s) =>
 // ————— əks-təklif —————
 
 const offerReservation = ref(null)
+
+// Barəsində şikayət açılan rezerv
+const disputeTarget = ref(null)
 
 const openOffer = async (reservation) => {
   offerReservation.value = reservation
@@ -910,6 +927,22 @@ onMounted(load)
   gap: 8px;
   justify-content: flex-end;
   margin-top: 10px;
+}
+
+/* Şikayət — sönük saxlanılır, son çarədir */
+.complain-btn {
+  background: none;
+  border: none;
+  color: var(--muted-2);
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin-left: 12px;
+}
+
+.complain-btn:hover {
+  color: var(--danger);
 }
 
 .confirm-btn {

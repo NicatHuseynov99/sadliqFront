@@ -62,6 +62,14 @@ const routes = [
     meta: { requiresAuth: true, roles: ['Customer'], track: 'requests' },
   },
   {
+    // Şikayətlər həm müştəriyə, həm saray tərəfinə lazımdır —
+    // rol məhdudiyyəti qoyulmur, siyahını backend özü filtrləyir
+    path: '/sikayetlerim',
+    name: 'my-disputes',
+    component: () => import('@/pages/Disputes/MyDisputes.vue'),
+    meta: { requiresAuth: true, track: 'disputes' },
+  },
+  {
     // Sahibkar müraciəti — giriş tələb olunmur, hesab elə burada açılır
     path: '/saray-elave-et',
     name: 'venue-register',

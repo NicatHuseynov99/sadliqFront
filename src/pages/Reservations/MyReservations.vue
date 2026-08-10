@@ -158,6 +158,9 @@
               <button v-else-if="r.status === 1" class="cancel-btn" @click="cancel(r)">
                 Ləğv et
               </button>
+
+              <!-- Problem yaranarsa platformanın dəstəyinə müraciət -->
+              <button class="complain-btn" @click="disputeTarget = r">Şikayət et</button>
             </footer>
           </div>
         </article>
@@ -171,6 +174,16 @@
       :reservation="offerTarget"
       @close="offerTarget = null"
       @sent="load"
+    />
+
+    <!-- Şikayət: dəstək xidmətinə müraciət -->
+    <DisputeCreateDialog
+      v-if="disputeTarget"
+      :reservation-id="disputeTarget.id"
+      :context-label="`${disputeTarget.venueName} — ${formatDateFull(disputeTarget.eventDate?.slice(0, 10))}`"
+      is-customer
+      @close="disputeTarget = null"
+      @created="$router.push('/sikayetlerim')"
     />
   </div>
 </template>
@@ -188,6 +201,7 @@ import {
 import { formatDateFull } from '@/utils/date'
 import WeddingBoard from '@/components/WeddingBoard.vue'
 import CounterOfferDialog from '@/components/CounterOfferDialog.vue'
+import DisputeCreateDialog from '@/components/DisputeCreateDialog.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
 
@@ -196,6 +210,9 @@ const isLoading = ref(false)
 
 // Öz şərtini təklif etdiyi rezerv
 const offerTarget = ref(null)
+
+// Şikayət açdığı rezerv
+const disputeTarget = ref(null)
 const activeTab = ref('all')
 
 const tabs = [
@@ -548,6 +565,21 @@ onMounted(load)
 .waiting-tag {
   font-size: 0.74rem;
   color: var(--info);
+}
+
+/* Şikayət — sönük saxlanılır, son çarədir */
+.complain-btn {
+  background: none;
+  border: none;
+  color: var(--muted-2);
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.complain-btn:hover {
+  color: var(--danger);
 }
 
 /* «Baxıldı» nişanı */

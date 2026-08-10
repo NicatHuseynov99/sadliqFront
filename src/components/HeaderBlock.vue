@@ -16,6 +16,7 @@
 
       <!-- Menyu açılanda hesab əməliyyatları da burada olsun -->
       <div class="nav-account" v-if="auth.isAuth">
+        <router-link to="/sikayetlerim">⚖️ Şikayətlərim</router-link>
         <router-link to="/profile">👤 {{ auth.user?.fullName }}</router-link>
         <button class="ghost-btn" @click="auth.logout()">Çıxış</button>
       </div>
