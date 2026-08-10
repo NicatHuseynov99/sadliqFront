@@ -47,6 +47,23 @@ select:focus-visible,
   padding: 0 6px;
 }
 
+/* Pəncərə düymələri.
+   Element Plus dialoqu <teleport> ilə body-yə köçür, ona görə komponentin
+   scoped :deep() qaydaları ora çatmır — düzən qlobal olmalıdır.
+   Öz UiButton-larımız inline-flex-dir və EP-nin el-button boşluqlarını
+   almır: gap olmasa düymələr bir-birinə yapışır. */
+.el-dialog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Bəzi pəncərələrdə solda köməkçi mətn olur — o, düymələri sağa itələsin */
+.el-dialog__footer > .footer-spacer {
+  margin-right: auto;
+}
+
 /* ————— Mobil üçün ümumi qaydalar ————— */
 
 /* Pəncərələr telefonda ekrana sığsın: sabit piksel enləri kənara çıxırdı */

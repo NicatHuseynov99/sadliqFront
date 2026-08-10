@@ -109,12 +109,8 @@ onMounted(async () => {
   padding: 18px 20px 4px;
 }
 
-:deep(.rd-dialog .el-dialog__footer) {
-  padding: 12px 20px 18px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
+/* Footer-in düzəni style.css-dədir: dialoq body-yə teleport olunduğu
+   üçün buradakı :deep() ora çatmır. */
 
 .rd-head {
   display: flex;

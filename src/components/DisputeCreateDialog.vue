@@ -51,7 +51,9 @@
 
     <template #footer>
       <UiButton variant="ghost" @click="$emit('close')">İmtina</UiButton>
-      <UiButton :is-loading="isSending" :disabled="!canSend" @click="send">Şikayəti göndər</UiButton>
+      <UiButton :is-loading="isSending" :disabled="!canSend" @click="send">
+        Şikayəti göndər
+      </UiButton>
     </template>
   </el-dialog>
 </template>
