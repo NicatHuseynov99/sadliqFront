@@ -30,14 +30,29 @@
           <span>📍 {{ v.city }} · {{ v.address }}</span>
           <em>{{ v.halls?.length ?? 0 }} zal · {{ v.menus?.length ?? 0 }} menyu</em>
 
-          <!-- Təsdiqə qədər saray dondurulur: sahibkar görür, amma dəyişə bilmir -->
-          <span v-if="!v.isApproved" class="wait-note">
+          <!-- Rədd edilib: səbəb göstərilir və düzəliş açılır -->
+          <span v-if="isRejected(v)" class="reject-note">
+            <b>Saray saytda görünmür</b>
+            {{ v.rejectionReason }}
+            <em>Düzəlişi edin və yenidən yoxlamağa göndərin.</em>
+          </span>
+
+          <!-- Yoxlama gedir: bu müddətdə data dondurulur -->
+          <span v-else-if="!v.isApproved" class="wait-note">
             Müraciətiniz yoxlanılır. Bu müddətdə məlumatlar dəyişdirilə bilmir və
             saray müştərilərə görünmür.
           </span>
         </div>
 
-        <div v-if="!v.isApproved" class="vm-actions">
+        <!-- Rədd edilmiş sarayda redaktə açıqdır — düzəlmək üçün lazımdır -->
+        <div v-if="isRejected(v)" class="vm-actions">
+          <button v-if="canEdit" class="mini-btn" @click="openVenueForm(v)">Redaktə</button>
+          <button class="mini-btn" @click="openHalls(v)">Zallar</button>
+          <UiButton size="sm" :is-loading="isResubmitting === v.id" @click="resubmit(v)">
+            Yenidən göndər
+          </UiButton>
+        </div>
+        <div v-else-if="!v.isApproved" class="vm-actions">
           <button class="mini-btn" @click="openHalls(v)">Zallara bax</button>
         </div>
         <div v-else class="vm-actions">
@@ -304,6 +319,7 @@ import {
   createMenu,
   updateMenu,
   deleteMenu,
+  resubmitVenue,
 } from '@/services/ownerService'
 
 const props = defineProps({
@@ -349,6 +365,24 @@ const hallForm = reactive({ id: null, name: '', capacity: 200, minPrice: 40, des
 const menuForm = reactive({ id: null, name: '', pricePerPerson: 50, description: '', imageUrl: '', items: [] })
 
 const notify = (message, type = 'success') => toast[type](message)
+
+// Rədd edilib və hələ yenidən göndərilməyib — bu halda redaktə açıqdır
+const isRejected = (venue) => !venue.isApproved && !!venue.rejectionReason && !venue.resubmittedAt
+
+const isResubmitting = ref(null)
+
+const resubmit = async (venue) => {
+  isResubmitting.value = venue.id
+  try {
+    const message = await resubmitVenue(venue.id)
+    notify(message)
+    await load()
+  } catch (e) {
+    notify(e?.userMessage ?? e?.message ?? 'Göndərilmədi', 'error')
+  } finally {
+    isResubmitting.value = null
+  }
+}
 
 const handleError = (e) => {
   formError.value = e?.userMessage ?? e?.message ?? 'Xəta baş verdi'
@@ -685,6 +719,34 @@ const onImgError = (e) => {
   color: var(--warn) !important;
   line-height: 1.5;
   margin-top: 4px;
+}
+
+/* Rədd səbəbi — sahibkarın ilk oxuyacağı şey olmalıdır */
+.reject-note {
+  display: block !important;
+  margin-top: 7px;
+  padding: 9px 12px;
+  background: var(--danger-soft);
+  border-left: 3px solid var(--danger);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  font-size: 0.78rem !important;
+  color: var(--ink-2) !important;
+  line-height: 1.55;
+}
+
+.reject-note b {
+  display: block;
+  color: var(--danger);
+  font-size: 0.78rem;
+  margin-bottom: 2px;
+}
+
+.reject-note em {
+  display: block;
+  font-style: normal;
+  color: var(--muted);
+  font-size: 0.73rem;
+  margin-top: 5px;
 }
 
 .wait-strip {

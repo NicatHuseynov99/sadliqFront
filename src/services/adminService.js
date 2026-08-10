@@ -81,8 +81,9 @@ export const searchVenues = async (params) => {
 }
 
 // PUT /AdminVenues/SetApproved/{venueId} — təsdiqi vermək və ya geri almaq
-export const setVenueApproved = async (venueId, isApproved) => {
-  const { data } = await api.put(`/AdminVenues/SetApproved/${venueId}`, { isApproved })
+// Təsdiq geri alınırsa səbəb məcburidir — sahibkar bunu görəcək
+export const setVenueApproved = async (venueId, isApproved, reason = null) => {
+  const { data } = await api.put(`/AdminVenues/SetApproved/${venueId}`, { isApproved, reason })
   return data
 }
 

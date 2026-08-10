@@ -160,6 +160,12 @@ export const setStaffHalls = async (id, hallIds) => {
   return data.message
 }
 
+// PUT /Venues/Resubmit/{id} — rədd edilmiş saray düzəldilib yenidən yoxlamağa göndərilir
+export const resubmitVenue = async (venueId) => {
+  const { data } = await api.put(`/Venues/Resubmit/${venueId}`)
+  return data.message ?? 'Saray yenidən yoxlamağa göndərildi.'
+}
+
 // PUT /VenueStaff/SetPermissions/{id} — administratorun səlahiyyətləri.
 // Hamısı söndürülsə administrator yalnız sorğuları görür.
 export const setStaffPermissions = async (id, permissions) => {

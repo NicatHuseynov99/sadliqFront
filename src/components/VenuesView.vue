@@ -301,6 +301,7 @@ import Pager from '@/components/Pager.vue'
 import DialogHead from '@/components/DialogHead.vue'
 import CoordinatePicker from '@/components/CoordinatePicker.vue'
 import UiButton from '@/components/ui/UiButton.vue'
+import { ElMessageBox } from 'element-plus'
 import { toast } from '@/utils/toast'
 import {
   searchVenues,
@@ -513,19 +514,37 @@ const toggleApproved = async (venue) => {
     return refresh()
   }
 
-  askConfirm({
-    title: 'Təsdiqi geri al',
-    text: `«${venue.name}» saytdan yığışdırılacaq: axtarışda görünməyəcək və yeni rezerv qəbul etməyəcək. İstənilən vaxt yenidən təsdiqləmək olar.`,
-    action: 'Geri al',
-    tone: 'warn',
-    run: async () => {
-      const result = await setVenueApproved(venue.id, false)
-      if (!result.success) return toast.error(result.message)
+  // Səbəb məcburidir: sahibkar nəyi düzəldəcəyini bilməlidir.
+  // Əvvəl ona «səbəbi öyrənmək üçün bizimlə əlaqə saxlayın» yazılırdı.
+  askUnapprove(venue)
+}
 
-      toast.success(result.message)
-      await refresh()
-    },
-  })
+const askUnapprove = async (venue) => {
+  let reason
+  try {
+    const { value } = await ElMessageBox.prompt(
+      `«${venue.name}» saytdan yığışdırılacaq. Səbəbi yazın — sahibkar bunu görəcək və ` +
+        'düzəlişdən sonra yenidən yoxlamağa göndərə biləcək.',
+      'Təsdiqi geri al',
+      {
+        confirmButtonText: 'Geri al',
+        cancelButtonText: 'İmtina',
+        type: 'warning',
+        inputType: 'textarea',
+        inputPlaceholder: 'Səbəb (məcburi)',
+        inputValidator: (v) => (v?.trim() ? true : 'Səbəbi yazın'),
+      },
+    )
+    reason = value.trim()
+  } catch {
+    return
+  }
+
+  const result = await setVenueApproved(venue.id, false, reason)
+  if (!result.success) return toast.error(result.message)
+
+  toast.success(result.message)
+  await refresh()
 }
 
 const openEdit = (venue) => {
