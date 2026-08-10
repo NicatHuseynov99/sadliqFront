@@ -129,6 +129,36 @@ dəyişməsi, yeni bildiriş gələndə zəngin titrəməsi.
 
 ---
 
+## 6.2 Rol əlaqələri üzrə iş (2026-08-10)
+
+Mobil tətbiq gələcəyi üçün əvvəlcə **domen və API** düzəldildi — sonra
+dəyişiklik üç müştəriyə birdən toxunacaqdı.
+
+| İş | Vəziyyət |
+|---|---|
+| Admin yazışma görünüşü + mesaj moderasiyası | Bitdi |
+| Rezerv status keçid qoruması + ləğv izi | Bitdi |
+| Sahibin rəyə açıq cavabı | Bitdi |
+| İki tərəfli danışıq (müştəri də əks-təklif göndərir) | Bitdi |
+| Şikayət sistemi + admin↔istifadəçi yazışma + Support rolu | Bitdi |
+| Administrator icazə bayraqları + sahib üçün fəaliyyət jurnalı | Bitdi |
+| Etibar siqnalları (cavab müddəti, təsdiq faizi, ləğv sayı) | Bitdi |
+| Saray rədd səbəbi + yenidən müraciət | Bitdi |
+| **Beh (depozit)** | **Qərar verilmədi** — biznes modelindən asılıdır, indi domendə yoxdur |
+
+### Yoxlama borcu ⚠️
+
+Bu işlərin çoxu **brauzerdə əl ilə sınanmayıb**. Yoxlanan səviyyə: build
+təmiz, endpoint qeydiyyatda, 401 qaytarır, miqrasiya tətbiq olunur.
+Yeganə uçdan-uca sınanan `Venues/GetTrust` oldu (ictimai endpoint).
+
+Ən riskli sınanmalı axınlar: danışıq (rədd→Pending, təklif qəbulu),
+status keçid qoruması, şikayət axını, administrator icazələri.
+
+Hər iki repoda avtomatlaşdırılmış test yoxdur.
+
+---
+
 ## 7. Təklif olunan sıra
 
 ```
