@@ -37,6 +37,13 @@ const mapReservation = (r) => ({
   cancelledAt: r.cancelledAt ?? null,
   cancellationReason: r.cancellationReason ?? null,
 
+  // Cavabı saray tərəfindən kim verdi. Sarayda bir neçə administrator
+  // işləyəndə sahib bunu rezervin özündə görməlidir.
+  respondedAt: r.respondedAt ?? null,
+  respondedByName: r.respondedBy
+    ? `${r.respondedBy.firstName ?? ''} ${r.respondedBy.lastName ?? ''}`.trim()
+    : null,
+
   // Bizim göndərdiyimiz, müştərinin cavabını gözləyən təklif
   counterOffer:
     (r.counterOffers ?? []).find((o) => o.status === 0 && !o.isFromCustomer) ?? null,

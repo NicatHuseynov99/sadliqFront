@@ -183,6 +183,12 @@
               🚫 Ləğv səbəbi: {{ r.cancellationReason }}
             </p>
 
+            <!-- Cavabı kim verdi: sarayda bir neçə administrator işləyə bilər -->
+            <p class="answered-by" v-if="r.respondedByName">
+              ✍️ Cavabı verdi: <b>{{ r.respondedByName }}</b>
+              <span v-if="r.respondedAt"> · {{ formatDateFull(r.respondedAt.slice(0, 10)) }}</span>
+            </p>
+
             <!-- Göndərilmiş, cavab gözləyən əks-təklif -->
             <div v-if="r.counterOffer" class="offer-box">
               <b>Əks-təklif göndərilib — müştəri cavab verməyib</b>
@@ -964,6 +970,18 @@ onMounted(load)
   font-size: 0.78rem;
   color: var(--danger);
   line-height: 1.5;
+}
+
+/* Məlumat sətridir, xəbərdarlıq deyil — ona görə solğun saxlanılır */
+.answered-by {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.answered-by b {
+  color: var(--ink-2);
+  font-weight: 600;
 }
 
 /* Şikayət — sönük saxlanılır, son çarədir */
