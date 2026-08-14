@@ -24,17 +24,21 @@
       <div class="chat-list" v-loading="isLoading">
         <button
           v-for="c in chats"
-          :key="c.offerId"
+          :key="rowKey(c)"
           class="chat-row"
-          :class="{ active: activeId === c.offerId }"
-          @click="open(c.offerId)"
+          :class="{ active: activeId === rowKey(c) }"
+          @click="open(c)"
         >
           <div class="cr-top">
             <b class="cr-venue">{{ c.venueName }}</b>
             <span class="cr-time">{{ shortTime(c.lastMessageAt ?? c.chatOpenedAt) }}</span>
           </div>
 
-          <span class="cr-customer">{{ c.customerName }}</span>
+          <span class="cr-customer">
+            {{ c.customerName }}
+            <!-- Lentin kökü: təklifsiz, birbaşa edilmiş rezerv ayrıca işarələnir -->
+            <em v-if="c.threadKind === 'Reservation'" class="cr-kind">birbaşa rezerv</em>
+          </span>
 
           <p class="cr-preview">
             <span v-if="c.lastMessagePreview" class="cr-who">
@@ -160,6 +164,10 @@ const search = ref('')
 const isLoading = ref(false)
 
 const activeId = ref(null)
+
+// Açıq lentin özü saxlanılır: gizlətmədən sonra onu yenidən yükləmək üçün
+// həm nömrə, həm də növ lazımdır — tək nömrə kifayət etmir.
+const activeChat = ref(null)
 const detail = ref(null)
 const isLoadingDetail = ref(false)
 
@@ -195,14 +203,20 @@ const goPage = (value) => {
   load()
 }
 
-const open = async (offerId) => {
-  activeId.value = offerId
+// Təklif və rezerv nömrələri ayrı-ayrı sıralardır — 31 nömrəli təklif ilə
+// 31 nömrəli rezerv toqquşmasın deyə açar növlə birlikdə qurulur.
+const rowKey = (c) => `${c.threadKind}:${c.threadId}`
+
+const open = async (chat) => {
+  activeId.value = rowKey(chat)
+  activeChat.value = chat
   isLoadingDetail.value = true
   try {
-    detail.value = await getChat(offerId)
+    detail.value = await getChat(chat.threadId, chat.threadKind)
   } catch (e) {
     detail.value = null
     activeId.value = null
+    activeChat.value = null
     toast.error(e?.userMessage ?? e?.message ?? 'Yazışma açılmadı')
   } finally {
     isLoadingDetail.value = false
@@ -227,7 +241,7 @@ const applyHide = async (message, isHidden, reason) => {
     const text = await setMessageHidden(message.id, isHidden, reason)
     toast.success(text)
     hideTarget.value = null
-    await open(activeId.value)
+    if (activeChat.value) await open(activeChat.value)
   } catch (e) {
     toast.error(e?.userMessage ?? e?.message ?? 'Əməliyyat alınmadı')
   } finally {
@@ -363,6 +377,17 @@ load()
   font-size: 0.75rem;
   color: var(--muted);
   margin-top: 1px;
+}
+
+/* Lentin kökünü ayırd etmək üçün — sakit işarədir, xəbərdarlıq deyil */
+.cr-kind {
+  font-style: normal;
+  font-size: 0.63rem;
+  color: var(--info);
+  background: var(--info-soft);
+  border-radius: var(--r-pill);
+  padding: 1px 7px;
+  margin-left: 5px;
 }
 
 .cr-preview {

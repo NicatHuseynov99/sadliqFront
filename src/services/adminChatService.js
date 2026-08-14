@@ -4,7 +4,13 @@
 import api from '@/services/api'
 
 const mapSummary = (c) => ({
+  // Lentin kökü: təklif axını, yoxsa birbaşa rezerv. Açarkən hansı
+  // endpoint-ə gedəcəyimizi bu müəyyən edir.
+  threadKind: c.threadKind ?? 'Offer',
+  threadId: c.threadKind === 'Reservation' ? c.reservationId : c.offerId,
+
   offerId: c.offerId,
+  reservationId: c.reservationId,
   requestId: c.requestId,
   venueId: c.venueId,
   venueName: c.venueName,
@@ -44,13 +50,24 @@ export const searchChats = async (params) => {
   }
 }
 
-// GET /AdminChats/Get/{offerId}
-export const getChat = async (offerId) => {
-  const { data } = await api.get(`/AdminChats/Get/${offerId}`)
+// GET /AdminChats/Get/{offerId} — təklif lenti
+// GET /AdminChats/GetReservation/{reservationId} — birbaşa rezerv lenti
+//
+// Rezerv lentində offerId null olur, ona görə köhnə kimi hər şeyi Get-ə
+// göndərmək olmaz: URL «Get/null» şəklinə düşür və server onu rədd edir.
+export const getChat = async (threadId, threadKind = 'Offer') => {
+  const path =
+    threadKind === 'Reservation'
+      ? `/AdminChats/GetReservation/${threadId}`
+      : `/AdminChats/Get/${threadId}`
+
+  const { data } = await api.get(path)
   const chat = data.data ?? {}
 
   return {
+    threadKind: chat.threadKind ?? 'Offer',
     offerId: chat.offerId,
+    reservationId: chat.reservationId,
     requestId: chat.requestId,
     venueName: chat.venueName,
     ownerName: chat.ownerName,
