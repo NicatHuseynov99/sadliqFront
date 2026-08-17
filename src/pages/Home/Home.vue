@@ -861,11 +861,16 @@ const selectVenue = (venue) => {
 }
 
 .hero-section {
-  /* Fon layihənin öz faylındandır. Əvvəl unsplash.com-dan çəkilirdi:
-     ana səhifənin ilk göründüyü an kənar saytın sürətindən asılı idi,
-     sayt əlçatmaz olanda isə hero boş qaralırdı. */
-  background: linear-gradient(rgba(26, 17, 24, 0.75), rgba(26, 17, 24, 0.75)),
-    url('@/assets/hero.png') center/cover;
+  /* Fon tamamilə CSS-dir — şəkil sorğusu yoxdur.
+     Əvvəl unsplash.com-dan çəkilirdi: ana səhifənin ilk göründüyü an
+     kənar saytın sürətindən asılı idi. Layihədəki hero.png isə şablondan
+     qalma bənövşəyi qrafikadır, toy məkanı ilə əlaqəsi yoxdur.
+     Brend rəngləri üzərində qurulan yumşaq işıq ləkələri həm dərhal
+     görünür, həm başlığın oxunmasına mane olmur. */
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(223, 177, 91, 0.18), transparent 60%),
+    radial-gradient(ellipse 70% 70% at 85% 30%, rgba(160, 44, 74, 0.35), transparent 65%),
+    linear-gradient(160deg, #2a1420 0%, var(--brand-dark) 45%, #1a1118 100%);
   padding: 60px 20px;
   text-align: center;
   color: white;

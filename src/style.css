@@ -16,6 +16,66 @@ body {
   color: var(--ink);
 }
 
+/* ————— Element Plus brend rənginə kökləndi —————
+   Kitabxananın öz göy rəngi (#409eff) saytın şərab palitrasının yanında
+   yad qalırdı: açar/söndür düymələri, seçilmiş sətirlər, fokus halqaları
+   hamısı göy idi. Dəyişənlər kökdə əvəz olunur, ona görə teleport ilə
+   body-yə köçən pəncərələr də bunu alır. */
+:root {
+  --el-color-primary: var(--brand);
+  --el-color-primary-light-3: var(--accent);
+  --el-color-primary-light-5: #b8657f;
+  --el-color-primary-light-7: #d9a3b3;
+  --el-color-primary-light-8: #e8c6d1;
+  --el-color-primary-light-9: var(--brand-soft);
+  --el-color-primary-dark-2: var(--brand-dark);
+
+  --el-border-radius-base: var(--r);
+  --el-font-family: var(--font);
+}
+
+/* ————— Xam <select> saytın qalan sahələri kimi görünsün —————
+   18 yerdə brauzerin öz açılan siyahısı işlədilir. Yanındakı sahələr
+   Element Plus olduğuna görə yan-yana iki fərqli dünya çıxırdı.
+   Hamısını komponentə çevirmək əvəzinə xam elementin özü geyindirilir:
+   davranış brauzerdən qalır (telefonda doğma siyahı açılır), görkəm isə
+   sahələrlə eyniləşir. */
+select {
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--ink);
+  background-color: var(--surface);
+  border: 1px solid #dcdfe6;
+  border-radius: var(--r);
+  padding: 8px 11px;
+  /* Sabit hündürlük yox, ən azı: bəzi səhifələrdə select-in öz doldurması
+     daha genişdir və sabit hündürlükdə mətn aşağıdan kəsilirdi. */
+  min-height: 36px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: border-color var(--t-fast);
+
+  /* Brauzerin öz oxu saxlanılır. Onu gizlədib əvəzinə şəkil qoymaq
+     olardı, amma bəzi komponentlər select-in fonunu «background»
+     qısayolu ilə təyin edir və şəkli silir — nəticədə heç bir ox
+     qalmır. Doğma ox hər halda görünür. */
+}
+
+select:hover {
+  border-color: #c0c4cc;
+}
+
+select:focus {
+  border-color: var(--brand);
+  outline: none;
+}
+
+select:disabled {
+  background-color: #f5f7fa;
+  color: var(--muted-2);
+  cursor: not-allowed;
+}
+
 /* Klaviatura ilə naviqasiya edən istifadəçi hara olduğunu görsün.
    Yalnız klaviatura fokusunda (siçan klikində yox) görünür. */
 button:focus-visible,
