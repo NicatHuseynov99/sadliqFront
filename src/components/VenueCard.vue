@@ -449,4 +449,77 @@ const minPrice = computed(() => {
 .detail-btn:hover {
   background: var(--brand-dark);
 }
+
+/* ————— Telefonda iki sütun —————
+   Kart bir sütun üçün qurulmuşdu: 390px ekranda iki sütuna keçəndə
+   hər karta ~170px düşür və məzmun sığmır — ad üç sətrə düşür,
+   «Seç / Bax» kənara çıxır, menyu çipləri kəsilir.
+   Bu enin öz ölçüləri var. */
+@media (max-width: 600px) {
+  .venue-info {
+    padding: 11px;
+  }
+
+  .title-row {
+    /* Ad və reytinq yan-yana sığmır: reytinq adın altına düşür */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .title-row h3 {
+    font-size: 0.95rem;
+    line-height: 1.25;
+    /* Uzun adlar kartın hündürlüyünü dartmasın */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Təsvir bu enə sığmır və qərar üçün ən az lazım olan hissədir —
+     saray səhifəsində onsuz da tam görünür */
+  .description {
+    display: none;
+  }
+
+  /* Zal siyahısı ikinci dərəcəlidir: aşağıdakı «2 zal · 2 menyu»
+     sətri eyni məlumatı onsuz da verir */
+  .halls-preview {
+    display: none;
+  }
+
+  .card-price-tag {
+    bottom: 8px;
+    left: 8px;
+    padding: 4px 8px;
+  }
+
+  .card-price-tag strong {
+    font-size: 0.85rem;
+  }
+
+  .card-price-tag span {
+    font-size: 0.58rem;
+  }
+
+  .menu-chips {
+    gap: 6px;
+  }
+
+  /* Alt sətir: rəqəm üstdə, düymə tam enində — yan-yana qoyanda
+     düymə kartdan kənara çıxırdı */
+  .venue-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding-top: 10px;
+  }
+
+  .detail-btn {
+    width: 100%;
+    padding: 9px 10px;
+    font-size: 0.83rem;
+  }
+}
 </style>

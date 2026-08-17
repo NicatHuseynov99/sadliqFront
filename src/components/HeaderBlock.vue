@@ -269,6 +269,29 @@ watch(
   }
 }
 
+/* Ən dar telefonlarda (320–400px) başlıq sığmırdı: loqo + «Qeydiyyat» +
+   «Daxil ol» + menyu düyməsi yan-yana ekrandan kənara çıxırdı və
+   «Daxil ol» sağdan kəsilirdi. */
+@media (max-width: 420px) {
+  .app-header {
+    padding: 12px 14px;
+  }
+
+  .logo {
+    font-size: 1.05rem;
+  }
+
+  /* «Qeydiyyat» gizlənir — giriş səhifəsində «Hesabınız yoxdur?
+     Qeydiyyatdan keçin» keçidi onsuz da var, ona görə yol itmir. */
+  .user-box .ghost-btn {
+    display: none;
+  }
+
+  .user-box {
+    gap: 8px;
+  }
+}
+
 @media (max-width: 700px) {
   .bottom-nav {
     position: fixed;

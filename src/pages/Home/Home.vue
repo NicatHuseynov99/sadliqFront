@@ -1806,11 +1806,15 @@ const selectVenue = (venue) => {
   .search-grid {
     grid-template-columns: 1fr;
   }
+  /* Telefonda iki sütun — turbo.az-dakı kimi. Tək sütunda ekranda cəmi
+     bir saray görünürdü və 43 məkanı gəzmək uzun sürüşməyə çevrilirdi.
+     İki sütunda bir baxışda dörd variant düşür. */
   .venues-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
   .venues-container {
-    padding: 0 16px;
+    padding: 0 12px;
   }
 }
 </style>

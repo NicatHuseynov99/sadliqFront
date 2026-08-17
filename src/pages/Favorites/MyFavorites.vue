@@ -308,8 +308,15 @@ onMounted(load)
   .page-head {
     flex-direction: column;
   }
+}
+
+/* Ana səhifə ilə eyni: telefonda iki sütun. Eyni kart komponentidir,
+   bir siyahıda iki, digərində bir sütun olsa görkəm parçalanardı.
+   Sərhəd 600px-dir — kartın yığcam ölçüləri də orada işə düşür. */
+@media (max-width: 600px) {
   .venues-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 }
 </style>
