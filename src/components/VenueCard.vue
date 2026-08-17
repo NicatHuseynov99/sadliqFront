@@ -458,10 +458,19 @@ const minPrice = computed(() => {
 @media (max-width: 600px) {
   /* Şəkil kartın enindən hündür idi (176px enə 220px hündürlük) və tək
      başına ekranın dörddə birini yeyirdi. 4:3 nisbəti kartı yığcamlaşdırır,
-     şəklin özü isə tanınacaq qədər qalır. */
+     şəklin özü isə tanınacaq qədər qalır.
+     Şəkil mütləq yerləşdirilir: qabın hündürlüyü «auto», şəklinki isə
+     «100%» olanda ölçü dövrəyə düşür və brauzer hündürlüyü şəklin öz
+     nisbətindən götürür — portret şəkil (900×1200) qabı 132px əvəzinə
+     239px-ə dartırdı və o kart qonşularından hündür görünürdü. */
   .image-wrapper {
     height: auto;
     aspect-ratio: 4 / 3;
+  }
+
+  .venue-img {
+    position: absolute;
+    inset: 0;
   }
 
   .venue-info {

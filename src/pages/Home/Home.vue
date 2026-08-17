@@ -1836,11 +1836,14 @@ const selectVenue = (venue) => {
     padding: 12px 12px 14px;
   }
 
-  .venues-container {
+  /* Elan bloku siyahının ÜSTÜNDƏ qalır: aşağı qoysaq, saray sayı
+     artdıqca ora çatan olmayacaq. Amma əvvəlki 456px-lik divar da
+     olmur — aşağıda nazik zolağa çevrilir. */
+  .reverse-banner {
     order: 2;
   }
 
-  .reverse-banner {
+  .venues-container {
     order: 3;
   }
 
@@ -1936,14 +1939,46 @@ const selectVenue = (venue) => {
     width: 100%;
   }
 
-  /* Banner siyahıdan sonra gəlir — addımlar siyahısı orada da uzundur,
-     əsas mesaj başlıq və düymədədir. */
+  /* Nazik zolaq: başlıq, bir sətir izah və düymə. İzahın uzun mətni,
+     dörd addımlıq siyahı və alt qeyd telefonda 456px yer tuturdu —
+     siyahıya çatmağa mane olurdu. Mesaj isə başlıq və düymədə qalır. */
   .reverse-banner {
-    margin: 22px 12px 0;
+    margin: 12px 0 0;
+    padding: 0 12px;
   }
 
-  .rb-steps {
+  .rb-inner {
+    padding: 14px 16px;
+    gap: 12px;
+    border-radius: var(--r-lg);
+  }
+
+  .rb-text h2 {
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
+  .rb-badge {
+    margin-bottom: 6px;
+  }
+
+  .rb-text p,
+  .rb-steps,
+  .rb-note {
     display: none;
+  }
+
+  .rb-action {
+    width: 100%;
+  }
+
+  .rb-action a {
+    display: block;
+    width: 100%;
+  }
+
+  .rb-btn {
+    width: 100%;
   }
 }
 </style>

@@ -102,8 +102,38 @@
 }
 
 @media (max-width: 700px) {
+  /* Telefonda dörd sütunun hamısını iki yarıya bölmək dağınıq çıxırdı:
+     brend adı iki sətrə qırılır, uzun izah mətni 170px-lik sütunda
+     yırtıq görünür, e-poçt ünvanı isə sığmırdı.
+     İndi uzun məzmunlu bloklar tam eni tutur, yalnız qısa keçid
+     siyahıları yan-yana qalır. */
+  .app-footer {
+    padding: 28px 16px 0;
+  }
+
   .footer-grid {
     grid-template-columns: 1fr 1fr;
+    gap: 22px 16px;
+    padding-bottom: 22px;
+  }
+
+  /* Brend bloku və əlaqə — tam en */
+  .footer-col:first-child,
+  .footer-col:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .footer-about {
+    max-width: none;
+  }
+
+  /* Uzun e-poçt ünvanı kənara çıxmasın */
+  .footer-col span {
+    overflow-wrap: anywhere;
+  }
+
+  .footer-col h5 {
+    margin-bottom: 9px;
   }
 }
 </style>
