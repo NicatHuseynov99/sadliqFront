@@ -27,6 +27,7 @@ import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { searchOnMap, getMyLocation, DEFAULT_CENTER, DEFAULT_ZOOM } from '@/services/mapService'
+import { toast } from '@/utils/toast'
 import { FALLBACK_IMAGE } from '@/utils/imageFallback'
 
 const props = defineProps({
@@ -138,8 +139,13 @@ const showMe = (position) => {
 const goToMe = async () => {
   isLocating.value = true
   try {
-    const position = await getMyLocation()
-    if (position) showMe(position)
+    const { coords, error } = await getMyLocation()
+
+    // Səssiz uğursuzluq ən pis haldır: düymə basılır, heç nə olmur və
+    // istifadəçi saytı xarab sayır. Səbəb açıq deyilir.
+    if (error) return toast.info(error)
+
+    showMe(coords)
   } finally {
     isLocating.value = false
   }
@@ -395,5 +401,26 @@ watch(
 
 .pin-btn:hover {
   background: #5c1029;
+}
+
+/* Telefonda nişanlar xəritənin böyük hissəsini örtürdü: ad 150px-ə
+   qədər uzanır, yan-yana düşən iki nişan bir-birini gizlədirdi.
+   Kiçildilir və ad qısaldılır — nişana toxunanda tam adı onsuz da
+   açılan pəncərədə görünür. */
+@media (max-width: 600px) {
+  .venue-pin {
+    padding: 3px 8px;
+    gap: 4px;
+    border-width: 1.5px;
+  }
+
+  .venue-pin b {
+    font-size: 0.66rem;
+    max-width: 96px;
+  }
+
+  .venue-pin i {
+    font-size: 0.62rem;
+  }
 }
 </style>

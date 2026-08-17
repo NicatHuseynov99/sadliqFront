@@ -441,12 +441,14 @@ const onCoordinates = ({ latitude, longitude }) => {
 const useMyLocation = async () => {
   isLocating.value = true
   try {
-    const position = await getMyLocation()
-    if (position) {
-      onCoordinates({ latitude: position[0], longitude: position[1] })
+    const { coords, error: locationError } = await getMyLocation()
+    if (coords) {
+      onCoordinates({ latitude: coords[0], longitude: coords[1] })
       askLocation.value = true
     } else {
-      error.value = 'Yeriniz tapılmadı — nişanı xəritədə əl ilə yerləşdirin.'
+      // Səbəb artıq dəqiq bilinir (icazə, siqnal, HTTPS) — quru
+      // «tapılmadı» əvəzinə onu göstəririk
+      error.value = `${locationError} Nişanı xəritədə əl ilə də yerləşdirə bilərsiniz.`
     }
   } finally {
     isLocating.value = false

@@ -1,5 +1,9 @@
 <template>
-  <div class="venue-card">
+  <!-- Bütün kart klik sahəsidir: telefonda kiçik «Seç / Bax» düyməsini
+       nişan almaq əziyyətdir, adamın gözü isə şəklə və ada dəyir.
+       Ürək və müqayisə düymələri @click.stop işlədir, ona görə onlara
+       toxunanda saray açılmır. -->
+  <div class="venue-card" @click="$emit('select', venue)">
     <div class="image-wrapper">
       <img
         :src="venue.coverImageUrl || FALLBACK_IMAGE"
@@ -92,7 +96,8 @@
         <div class="menus-summary">
           <small>{{ venue.halls.length }} zal · {{ venue.menus.length }} menyu</small>
         </div>
-        <button @click="$emit('select', venue)" class="detail-btn">Seç / Bax</button>
+        <!-- .stop: kart onsuz da eyni hadisəni göndərir, ikiqat olmasın -->
+        <button @click.stop="$emit('select', venue)" class="detail-btn">Seç / Bax</button>
       </div>
     </div>
   </div>
@@ -133,6 +138,7 @@ const minPrice = computed(() => {
   flex-direction: column;
   border: 1px solid #eaeaea;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  cursor: pointer;
 }
 
 .venue-card:hover {

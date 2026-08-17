@@ -1893,6 +1893,15 @@ const selectVenue = (venue) => {
     /* Bannerin öz üst boşluğu var — ikisi toplananda siyahı ilə banner
        arasında yüz pikseldən çox boş yer qalırdı */
     margin-bottom: 0;
+
+    /* Yan «auto» boşluqlar sıfırlanır: .site-wrapper flex konteynerə
+       çevrildiyi üçün «margin: 0 auto» elementi mərkəzə çəkib məzmuna
+       görə daraldırdı. Siyahı rejimində torun eni bunu gizlədirdi,
+       xəritə rejimində isə xəritənin öz eni olmadığına görə qab 390px
+       ekranda 205px-ə yığılırdı — yanlarda geniş boş zolaq qalırdı. */
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   /* Nəticə başlığı: ad bir sətir, alətlər bir sətir. Əvvəl üç sətrə
@@ -1921,8 +1930,18 @@ const selectVenue = (venue) => {
     gap: 8px;
   }
 
+  /* Açar sola yığılır və kiçilir ki, sıralamada «Reytinq — ən yüksək»
+     kəsilmədən yerləşsin */
   .view-switch {
     flex: 0 0 auto;
+    padding: 2px;
+    border-radius: 8px;
+  }
+
+  .view-switch button {
+    padding: 6px 9px;
+    font-size: 0.76rem;
+    border-radius: 6px;
   }
 
   .sort-box {
@@ -1937,6 +1956,8 @@ const selectVenue = (venue) => {
 
   .sort-box select {
     width: 100%;
+    font-size: 0.78rem;
+    padding-left: 8px;
   }
 
   /* Nazik zolaq: başlıq, bir sətir izah və düymə. İzahın uzun mətni,
