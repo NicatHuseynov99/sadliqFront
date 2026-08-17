@@ -50,17 +50,11 @@
 <script setup>
 import { computed } from 'vue'
 import { formatDateFull } from '@/utils/date'
+import { onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   reservation: { type: Object, required: true },
 })
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=60'
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
-}
 
 const daysLeft = computed(() => {
   const today = new Date()

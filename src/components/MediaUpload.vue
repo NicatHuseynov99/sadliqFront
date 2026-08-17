@@ -33,6 +33,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { uploadFile } from '@/services/fileService'
+import { onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
@@ -58,13 +59,6 @@ const hint = computed(() =>
 
 // Video linki YouTube ola bilər — onda <video> yox, önizləmə şəkli göstərilməlidir
 const isVideo = computed(() => /\.(mp4|webm|mov)$/i.test(props.modelValue))
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=60'
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
-}
 
 const send = async (file) => {
   if (!file) return

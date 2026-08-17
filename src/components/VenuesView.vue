@@ -328,9 +328,7 @@ import {
 } from '@/services/adminService'
 import { updateVenue, getVenueHalls, getVenueMenus } from '@/services/ownerService'
 import { getCities } from '@/services/platformService'
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=60'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const STATUS_FILTERS = [
   { value: '', label: 'Hamısı' },
@@ -469,10 +467,6 @@ const filteredOwners = computed(() => {
 
 const roleLabel = (role) =>
   ({ Customer: 'Müştəri', Owner: 'Sahib', VenueAdmin: 'Administrator' })[role] ?? role
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
-}
 
 const loadRows = async () => {
   const result = await searchVenues({

@@ -188,6 +188,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import { toast } from '@/utils/toast'
+import { onImgError } from '@/utils/imageFallback'
 import {
   getReservationStats,
   searchReservations,
@@ -197,13 +198,6 @@ import {
   RESERVATION_STATUS,
   statusClass,
 } from '@/services/adminReservationService'
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=60'
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
-}
 
 const isLoading = ref(false)
 const stats = ref({})

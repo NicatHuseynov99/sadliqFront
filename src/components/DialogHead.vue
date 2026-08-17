@@ -20,6 +20,7 @@
 </template>
 
 <script setup>
+import { onImgError } from '@/utils/imageFallback'
 defineProps({
   venue: { type: Object, required: true },
   caption: { type: String, default: '' },
@@ -27,12 +28,6 @@ defineProps({
 
 defineEmits(['close'])
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=60'
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
-}
 </script>
 
 <style scoped>

@@ -303,6 +303,7 @@ import {
   declineCustomerOffer,
 } from '@/services/ownerService'
 import { formatDateFull } from '@/utils/date'
+import { onImgError } from '@/utils/imageFallback'
 
 const auth = useAuthStore()
 
@@ -475,10 +476,6 @@ const setStatus = async (reservation, status) => {
   } finally {
     isLoadingReservations.value = false
   }
-}
-
-const onImgError = (e) => {
-  e.target.src = 'https://picsum.photos/seed/sadliq/200/200'
 }
 
 onMounted(load)

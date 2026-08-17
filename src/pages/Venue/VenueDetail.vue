@@ -297,6 +297,7 @@ import { getVenueById, toDateKey } from '@/services/venueService'
 import { formatDate, weekdayShort, MONTHS } from '@/utils/date'
 import { createReservation } from '@/services/reservationService'
 import { useAuthStore } from '@/store/auth'
+import { onImgError } from '@/utils/imageFallback'
 
 const route = useRoute()
 const router = useRouter()
@@ -516,10 +517,6 @@ const submitReserve = async () => {
 }
 
 // Şəkil yüklənməsə ehtiyat şəkil qoyur
-const onImgError = (e) => {
-  e.target.src = 'https://picsum.photos/seed/sadliq/900/600'
-}
-
 onMounted(async () => {
   await loadVenue()
   await loadEligibility()

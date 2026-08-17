@@ -145,6 +145,7 @@ const AdminUserManager = defineAsyncComponent(() => import('@/components/AdminUs
 const AdminChatsView = defineAsyncComponent(() => import('@/components/AdminChatsView.vue'))
 const DisputesView = defineAsyncComponent(() => import('@/components/DisputesView.vue'))
 import { getPlatformStats, getPendingVenues, approveVenue } from '@/services/adminService'
+import { onImgError } from '@/utils/imageFallback'
 
 const auth = useAuthStore()
 
@@ -224,10 +225,6 @@ const approve = async (venue) => {
   } catch (e) {
     toast.error(e?.userMessage ?? e?.message ?? 'Xəta baş verdi')
   }
-}
-
-const onImgError = (e) => {
-  e.target.src = 'https://picsum.photos/seed/sadliq/200/200'
 }
 
 onMounted(load)

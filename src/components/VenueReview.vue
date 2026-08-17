@@ -172,6 +172,7 @@ import { getVenueById } from '@/services/venueService'
 import { updateVenue } from '@/services/ownerService'
 import { setVenueApproved } from '@/services/adminService'
 import { getFeatures } from '@/services/platformService'
+import { onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   venue: { type: Object, required: true },
@@ -200,13 +201,6 @@ const featureOptions = ref([])
 const toggleFeature = (name) => {
   const index = form.features.indexOf(name)
   index === -1 ? form.features.push(name) : form.features.splice(index, 1)
-}
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=60'
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
 }
 
 const form = reactive({

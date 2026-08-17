@@ -265,6 +265,7 @@ import {
   HIDE_REASONS,
 } from '@/services/reviewModerationService'
 import { useAuthStore } from '@/store/auth'
+import { onImgError } from '@/utils/imageFallback'
 
 const auth = useAuthStore()
 
@@ -283,14 +284,7 @@ const filters = reactive({
 
 const lastPage = computed(() => Math.max(1, Math.ceil(total.value / filters.pageSize)))
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=400&q=60'
-
 const RATING_WORDS = { 1: 'Çox pis', 2: 'Pis', 3: 'Normal', 4: 'Yaxşı', 5: 'Əla' }
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
-}
 
 // Dəyişiklik nişanı və tarixçəsi yalnız platforma sahibinə göstərilir —
 // server də eyni yoxlamanı aparır, interfeys tək qoruma deyil.

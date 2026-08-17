@@ -239,6 +239,7 @@ import {
 } from '@/services/venueRequestService'
 import { getCities } from '@/services/platformService'
 import OfferChat from '@/components/OfferChat.vue'
+import { onImgError } from '@/utils/imageFallback'
 
 const isLoading = ref(false)
 const isSending = ref(false)
@@ -262,13 +263,6 @@ const hasOpenRequest = computed(() => requests.value.some((r) => r.status === RE
 const isValid = computed(
   () => form.city && form.guestCount >= 10 && (form.isDateFlexible || form.eventDate),
 )
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=60'
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
-}
 
 const formatDate = (value) => {
   if (!value) return '—'

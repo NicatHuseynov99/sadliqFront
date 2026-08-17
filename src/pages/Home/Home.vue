@@ -332,6 +332,7 @@ import VenueCompare from "@/components/VenueCompare.vue"
 import UiCardSkeleton from "@/components/ui/UiCardSkeleton.vue"
 import UiEmpty from '@/components/ui/UiEmpty.vue'
 import UiButton from '@/components/ui/UiButton.vue'
+import { onImgError } from '@/utils/imageFallback'
 
 const PAGE_SIZE = 12
 
@@ -429,13 +430,6 @@ const budgetHint = computed(() => {
 // Axtarış təklifləri
 const suggestions = ref([])
 const suggestOpen = ref(false)
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=200&q=60'
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
-}
 
 // Hər hərfdə sorğu getməsin deyə yazmaq bitəndən sonra soruşuruq
 let suggestTimer = null
@@ -867,7 +861,11 @@ const selectVenue = (venue) => {
 }
 
 .hero-section {
-  background: linear-gradient(rgba(26, 17, 24, 0.75), rgba(26, 17, 24, 0.75)), url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80') center/cover;
+  /* Fon layihənin öz faylındandır. Əvvəl unsplash.com-dan çəkilirdi:
+     ana səhifənin ilk göründüyü an kənar saytın sürətindən asılı idi,
+     sayt əlçatmaz olanda isə hero boş qaralırdı. */
+  background: linear-gradient(rgba(26, 17, 24, 0.75), rgba(26, 17, 24, 0.75)),
+    url('@/assets/hero.png') center/cover;
   padding: 60px 20px;
   text-align: center;
   color: white;

@@ -224,6 +224,7 @@ import DisputeCreateDialog from '@/components/DisputeCreateDialog.vue'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
+import { onImgError } from '@/utils/imageFallback'
 
 const reservations = ref([])
 const isLoading = ref(false)
@@ -370,10 +371,6 @@ const respondToOffer = async (reservation, action) => {
 
 const acceptOffer = (r) => respondToOffer(r, acceptCounterOffer)
 const declineOffer = (r) => respondToOffer(r, declineCounterOffer)
-
-const onImgError = (e) => {
-  e.target.src = 'https://picsum.photos/seed/sadliq/600/400'
-}
 
 onMounted(load)
 </script>

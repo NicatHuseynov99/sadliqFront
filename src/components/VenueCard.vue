@@ -102,6 +102,7 @@
 import { computed } from 'vue'
 import AddressLink from '@/components/AddressLink.vue'
 import { formatDate } from '@/utils/date'
+import { onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   venue: { type: Object, required: true },
@@ -119,9 +120,6 @@ const minPrice = computed(() => {
 })
 
 // Şəkil yüklənməsə ehtiyat şəkil qoyur ki, kart boş görünməsin
-const onImgError = (e) => {
-  e.target.src = 'https://picsum.photos/seed/sadliq/900/600'
-}
 </script>
 
 <style scoped>

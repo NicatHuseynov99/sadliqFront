@@ -60,19 +60,13 @@
 
 <script setup>
 import { computed } from 'vue'
+import { onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   venues: { type: Array, required: true },
 })
 
 defineEmits(['close', 'remove', 'open'])
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=60'
-
-const onImgError = (event) => {
-  event.target.src = FALLBACK_IMAGE
-}
 
 const minPrice = (v) => {
   const menus = v.menus ?? []

@@ -76,6 +76,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   venue: { type: Object, required: true },
@@ -166,10 +167,6 @@ const embedUrl = computed(() => {
 })
 
 // Şəkil yüklənməsə ehtiyat şəkil qoyur
-const onImgError = (e) => {
-  e.target.src = 'https://picsum.photos/seed/sadliq/900/600'
-}
-
 onMounted(() => {
   document.addEventListener('keydown', onLightboxKeydown)
 })

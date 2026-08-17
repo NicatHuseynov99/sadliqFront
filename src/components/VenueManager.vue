@@ -307,6 +307,7 @@ import { computed, reactive, ref } from 'vue'
 import { toast } from '@/utils/toast'
 import HallCalendarEditor from '@/components/HallCalendarEditor.vue'
 import UiButton from '@/components/ui/UiButton.vue'
+import { onImgError } from '@/utils/imageFallback'
 import {
   createVenue,
   updateVenue,
@@ -613,9 +614,6 @@ const removeMenu = async (menu) => {
   }
 }
 
-const onImgError = (e) => {
-  e.target.src = 'https://picsum.photos/seed/sadliq/200/200'
-}
 </script>
 
 <style scoped>

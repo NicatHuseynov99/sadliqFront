@@ -27,6 +27,7 @@ import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { searchOnMap, getMyLocation, DEFAULT_CENTER, DEFAULT_ZOOM } from '@/services/mapService'
+import { FALLBACK_IMAGE } from '@/utils/imageFallback'
 
 const props = defineProps({
   // Ana səhifədəki süzgəclər — xəritə eyni şərtlərlə axtarır
@@ -44,9 +45,6 @@ const items = ref([])
 const withoutCoordinates = ref(0)
 const isLoading = ref(false)
 const isLocating = ref(false)
-
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=400&q=60'
 
 // Markerdə əsas yeri sarayın adı tutur, qiymət isə yanında kiçik yazılır —
 // müştəri əvvəlcə məkanı tanıyır, sonra qiymətə baxır
