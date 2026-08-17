@@ -45,6 +45,9 @@ const mapMessage = (m) => ({
   id: m.id,
   senderName: m.senderName,
   isFromStaff: m.isFromStaff,
+  // Mesaj baxanın özününküdürmü — söhbətin hansı tərəfə düzüləcəyini
+  // bu müəyyən edir
+  isMine: m.isMine ?? false,
   isInternalNote: m.isInternalNote,
   body: m.body,
   createdAt: m.createdAt,

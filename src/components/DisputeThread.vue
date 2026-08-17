@@ -46,10 +46,11 @@
           v-for="m in dispute.messages"
           :key="m.id"
           class="msg"
-          :class="{ staff: m.isFromStaff, note: m.isInternalNote }"
+          :class="{ mine: m.isMine, staff: m.isFromStaff, note: m.isInternalNote }"
         >
           <span class="who">
-            {{ m.senderName }}
+            <!-- Öz mesajında adı təkrarlamağın mənası yoxdur -->
+            {{ m.isMine ? 'Siz' : m.senderName }}
             <em v-if="m.isFromStaff">dəstək</em>
             <em v-if="m.isInternalNote" class="note-tag">daxili qeyd</em>
           </span>
@@ -380,8 +381,11 @@ const shortTime = (value) => {
   max-width: 76%;
 }
 
-/* Dəstəyin mesajı sağda — tərəflərinkindən fərqlənsin */
-.msg.staff {
+/* Söhbət baxanın gözü ilə düzülür: öz mesajın sağda, qarşı tərəfinki
+   solda. Əvvəl meyar «dəstəkdən gəlibmi» idi — nəticədə müştəri öz
+   şikayətini açanda öz sözləri solda, boz qutuda görünürdü və yazışma
+   yazışmaya oxşamırdı. */
+.msg.mine {
   align-self: flex-end;
   align-items: flex-end;
 }
@@ -413,8 +417,20 @@ const shortTime = (value) => {
   padding: 8px 12px;
 }
 
-.msg.staff .bubble {
+.msg.mine .bubble {
   border-radius: 12px 12px 4px 12px;
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+.msg.mine .bubble p,
+.msg.mine .bubble .time {
+  color: #fff;
+}
+
+/* Dəstəyin cavabı ağ deyil, açıq brend fonundadır: qarşı tərəfin
+   platformanın işçisi olduğu bir baxışda görünsün. */
+.msg.staff:not(.mine) .bubble {
   background: var(--brand-soft);
   border-color: #f0dde4;
 }
@@ -424,6 +440,16 @@ const shortTime = (value) => {
   background: var(--warn-soft);
   border-color: #f0dfba;
   border-style: dashed;
+}
+
+/* Daxili qeydi yazan işçinin özü baxanda qeyd həm «mənim», həm «qeyd»
+   olur. Fon açıq qalır, ona görə mətn ağ qalsa oxunmazdı. */
+.msg.note .bubble p {
+  color: var(--ink);
+}
+
+.msg.note .bubble .time {
+  color: var(--muted-2);
 }
 
 .bubble p {
@@ -449,7 +475,11 @@ const shortTime = (value) => {
 }
 
 .th-reply textarea {
+  /* Bir-iki cümlə üçün 1000px enində sahə lazım deyil — göz sətrin
+     sonunu itirir. */
   width: 100%;
+  max-width: 700px;
+  display: block;
   border: 1px solid var(--line-2);
   border-radius: var(--r);
   padding: 9px 12px;
