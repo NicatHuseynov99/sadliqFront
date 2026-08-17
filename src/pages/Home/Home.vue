@@ -735,7 +735,7 @@ const selectVenue = (venue) => {
 
 /* Tərs axtarış banneri */
 .reverse-banner {
-  max-width: 1240px;
+  max-width: var(--page-w);
   margin: 26px auto 0;
   padding: 0 20px;
 }
@@ -1430,7 +1430,7 @@ const selectVenue = (venue) => {
 }
 
 .venues-container {
-  max-width: 1360px;
+  max-width: var(--page-w);
   margin: 40px auto;
   padding: 0 40px;
   min-height: 200px;

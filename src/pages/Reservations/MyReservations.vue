@@ -387,7 +387,7 @@ onMounted(load)
 }
 
 .res-inner {
-  max-width: 1100px;
+  max-width: var(--page-w);
   margin: 0 auto;
 }
 

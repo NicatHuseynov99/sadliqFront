@@ -232,7 +232,7 @@ onMounted(async () => {
 }
 
 .profile-inner {
-  max-width: 1100px;
+  max-width: var(--page-w);
   margin: 0 auto;
 }
 
@@ -252,11 +252,15 @@ onMounted(async () => {
   font-size: 0.92rem;
 }
 
+/* Səhifə qabı geniş olsa da forma sütunu genişlənmir: ad, telefon,
+   parol sahələri 700px-dən uzun olanda oxunmur, sahə ilə məzmun
+   arasındakı nisbət pozulur. */
 .profile-grid {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 300px minmax(0, 700px);
   gap: 22px;
   align-items: start;
+  justify-content: start;
 }
 
 /* Sol hesab kartı */

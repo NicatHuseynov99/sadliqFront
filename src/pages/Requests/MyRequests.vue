@@ -465,7 +465,7 @@ onMounted(async () => {
 }
 
 .req-inner {
-  max-width: 1120px;
+  max-width: var(--page-w);
   margin: 0 auto;
 }
 

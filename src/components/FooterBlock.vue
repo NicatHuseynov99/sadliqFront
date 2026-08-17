@@ -49,7 +49,7 @@
 }
 
 .footer-grid {
-  max-width: 1360px;
+  max-width: var(--page-w);
   margin: 0 auto;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.3fr;

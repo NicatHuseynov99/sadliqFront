@@ -188,7 +188,7 @@ onMounted(load)
 }
 
 .fav-inner {
-  max-width: 1360px;
+  max-width: var(--page-w);
   margin: 0 auto;
 }
 

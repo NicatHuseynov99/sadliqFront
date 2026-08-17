@@ -242,7 +242,7 @@ onMounted(load)
 }
 
 .admin-inner {
-  max-width: 1360px;
+  max-width: var(--page-w);
   margin: 0 auto;
 }
 

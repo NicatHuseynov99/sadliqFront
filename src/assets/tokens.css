@@ -63,6 +63,11 @@
 
   /* Yapışıq başlığın hündürlüyü — yapışıq panellər buna görə hesablanır */
   --header-h: 61px;
+
+  /* Səhifə qabının eni. Bütün səhifələr eyni sərhəddən başlasın deyə
+     buradan idarə olunur: əvvəllər hər səhifə öz enini seçirdi (1100,
+     1120, 1240, 1360) və bölmələr arasında keçəndə məzmun yana sıçrayırdı. */
+  --page-w: 1360px;
 }
 
 /* Skeleton parıltısı: yüklənən sahə «donmuş» görünməsin */
