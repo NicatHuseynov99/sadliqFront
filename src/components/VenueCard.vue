@@ -456,6 +456,14 @@ const minPrice = computed(() => {
    «Seç / Bax» kənara çıxır, menyu çipləri kəsilir.
    Bu enin öz ölçüləri var. */
 @media (max-width: 600px) {
+  /* Şəkil kartın enindən hündür idi (176px enə 220px hündürlük) və tək
+     başına ekranın dörddə birini yeyirdi. 4:3 nisbəti kartı yığcamlaşdırır,
+     şəklin özü isə tanınacaq qədər qalır. */
+  .image-wrapper {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
   .venue-info {
     padding: 11px;
   }
@@ -503,8 +511,41 @@ const minPrice = computed(() => {
     font-size: 0.58rem;
   }
 
-  .menu-chips {
-    gap: 6px;
+  /* Menyu lenti bu enə sığmır: 154px sahədə 233px məzmun qalırdı və
+     kartın içində üfüqi sürüşdürücü zolaq yaranırdı — barmaqla siyahını
+     aşağı sürüşdürəndə təsadüfən yana çəkilirdi.
+     Ən aşağı menyu qiyməti onsuz da şəklin üstündəki «Min. 35 ₼»
+     nişanındadır, menyu sayı isə aşağıdakı «2 zal · 2 menyu» sətrində. */
+  .menu-preview {
+    display: none;
+  }
+
+  /* Ünvan sətri bu enə üç şeyi birdən yığmağa çalışırdı: ünvan, rəy sayı
+     və parkinq nişanı. Nəticədə ünvan üç sətrə qırılır, parkinq nişanı
+     isə kartdan kənara çıxıb kəsilirdi.
+     İndi yalnız ünvan qalır — bir sətir, sığmayan hissə üç nöqtə ilə.
+     Rəy sayı və parkinq sarayın öz səhifəsində tam görünür. */
+  .address-row {
+    flex-wrap: nowrap;
+    overflow: hidden;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+  }
+
+  .address-row :deep(*) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rev-count,
+  .parking-tag {
+    display: none;
+  }
+
+  .avail-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
   }
 
   /* Alt sətir: rəqəm üstdə, düymə tam enində — yan-yana qoyanda
