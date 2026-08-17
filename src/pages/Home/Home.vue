@@ -1816,5 +1816,134 @@ const selectVenue = (venue) => {
   .venues-container {
     padding: 0 12px;
   }
+
+  /* ————— Telefonda ilk ekran siyahıya aiddir —————
+     Əvvəl ilk saraya çatmaq üçün 1346px sürüşmək lazım idi: hero 551px,
+     elan banneri 456px, nəticə başlığı 210px. 844px-lik ekranda bu, bir
+     yarım ekran boş yol deməkdir. Saray axtaran adam saytı elan oxumaq
+     üçün açmır.
+
+     Bölmələrin sırası CSS ilə dəyişdirilir — şablona toxunmadan.
+     Elan banneri siyahının altına keçir: orada hələ də görünür, amma
+     axtarışın qarşısını kəsmir. */
+  .site-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero-section {
+    order: 1;
+    padding: 12px 12px 14px;
+  }
+
+  .venues-container {
+    order: 2;
+  }
+
+  .reverse-banner {
+    order: 3;
+  }
+
+  /* Marketinq mətni telefonda yer tutmaqdan başqa iş görmür: brend adı
+     onsuz da başlıqdadır, məkan sayı isə siyahının üstündə yazılır. */
+  .hero-content h1,
+  .hero-content p,
+  .badge-top {
+    display: none;
+  }
+
+  .search-box {
+    margin-top: 0;
+    padding: 10px;
+    box-shadow: var(--shadow-1);
+  }
+
+  /* Şəhər və qonaq sayı yan-yana, süzgəc düyməsi altda tam enində.
+     Əvvəl hamısı alt-alta düzülüb dörd sətir tuturdu. */
+  .search-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .search-row .field label {
+    font-size: 0.66rem;
+  }
+
+  .filter-btn {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .clear-link {
+    grid-column: 1 / -1;
+  }
+
+  /* Sürətli seçim düymələri (150/250/400/600) ayrıca sətir tuturdu —
+     qonaq sayı onsuz da yanındakı sahədə yazılır. */
+  .mini-chips {
+    display: none;
+  }
+
+  .venues-container {
+    margin-top: 14px;
+    /* Bannerin öz üst boşluğu var — ikisi toplananda siyahı ilə banner
+       arasında yüz pikseldən çox boş yer qalırdı */
+    margin-bottom: 0;
+  }
+
+  /* Nəticə başlığı: ad bir sətir, alətlər bir sətir. Əvvəl üç sətrə
+     düşürdü.
+     Sıralama açıq göstərilir: .results-header-in əsas qaydası faylda
+     bu media sorğusundan əvvəl deyil, sonra gəlir, ona görə oradakı
+     «align-items: center» 700px bloкunu üstələyirdi və başlıq mərkəzdə
+     qalırdı. */
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+
+  .results-header h2 {
+    font-size: 1.15rem;
+    margin: 0;
+  }
+
+  /* Görünüş açarı və sıralama bir sətirdə: yan-yana 466px tuturdular,
+     sahə isə 366px idi — sıra qırılırdı. */
+  .header-tools {
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .view-switch {
+    flex: 0 0 auto;
+  }
+
+  .sort-box {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* «Sıralama:» sözü yer tutur, seçilmiş dəyər onsuz da özünü izah edir */
+  .sort-box label {
+    display: none;
+  }
+
+  .sort-box select {
+    width: 100%;
+  }
+
+  /* Banner siyahıdan sonra gəlir — addımlar siyahısı orada da uzundur,
+     əsas mesaj başlıq və düymədədir. */
+  .reverse-banner {
+    margin: 22px 12px 0;
+  }
+
+  .rb-steps {
+    display: none;
+  }
 }
 </style>
