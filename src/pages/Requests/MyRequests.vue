@@ -207,9 +207,12 @@
         </template>
       </section>
 
-      <div v-if="!isLoading && !requests.length && hasOpenRequest === false" class="empty-box">
-        Hələ sorğu göndərməmisiniz.
-      </div>
+      <UiEmpty
+        v-if="!isLoading && !requests.length && hasOpenRequest === false"
+        icon="📣"
+        title="Hələ sorğu göndərməmisiniz."
+        text="Şərtlərinizi bir dəfə yazın — uyğun saraylar özləri təklif göndərsin. Zəng etmək lazım deyil."
+      />
     </div>
 
     <OfferChat
@@ -239,6 +242,7 @@ import {
 } from '@/services/venueRequestService'
 import { getCities } from '@/services/platformService'
 import OfferChat from '@/components/OfferChat.vue'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import { onImgError } from '@/utils/imageFallback'
 
 const isLoading = ref(false)

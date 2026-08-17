@@ -17,18 +17,37 @@ defineProps({
 </script>
 
 <style scoped>
+/* Boş vəziyyət səhifəni doldurur. Əvvəl yuxarıda alçaq bir zolaq idi və
+   altında yüzlərlə piksel boş ekran qalırdı — səhifə bitmiş yox, yarımçıq
+   görünürdü. İndi qalan yerin ortasına oturur. */
 .ui-empty {
   background: var(--surface);
   border: 1px dashed #eadfe3;
   border-radius: var(--r-lg);
-  padding: 44px 24px;
+  padding: 56px 24px;
   text-align: center;
+
+  /* 42vh seçilib: səhifə boş qalanda ekranı doldurmağa bəs edir, amma
+     panelin içindəki kiçik siyahılarda da yersiz uzun görünmür. */
+  min-height: 42vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
+/* İşarə brend rəngli dairənin içindədir: emoji tək qalanda səhifəyə
+   düşmüş kimi görünür, çərçivə onu tərtibatın bir hissəsi edir. */
 .ui-empty-icon {
-  font-size: 2.4rem;
-  display: block;
-  margin-bottom: 10px;
+  font-size: 2.1rem;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  line-height: 1;
 }
 
 .ui-empty h3 {

@@ -8,7 +8,9 @@
             {{ venues.length ? `${venues.length} saray seçilmişlərdədir` : 'Bəyəndiyiniz sarayları burada toplayın' }}
           </p>
         </div>
-        <router-link to="/" class="new-link">Saraylara bax</router-link>
+        <!-- Siyahı boşdursa bu keçid gizlənir: boş vəziyyətin öz düyməsi
+             onsuz da eyni yerə aparır, ikisi yan-yana təkrar olurdu. -->
+        <router-link v-if="venues.length" to="/" class="new-link">Saraylara bax</router-link>
       </header>
 
       <!-- Seçilmişlərin xülasəsi: qərar vermək üçün lazım olan üç rəqəm -->
