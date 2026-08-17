@@ -425,53 +425,77 @@ onMounted(load)
 }
 
 /* Status xülasəsi */
+/* Süzgəc lenti. Əvvəl 6 böyük kart idi: masaüstündə tam sətir, mobil
+   ekranda üç sətir və ~250px yer tuturdu — beşində «0» yazılırdı və
+   istifadəçi ilk rezervini görmək üçün aşağı sürüşdürməli olurdu.
+   İndi hamısı bir sətirdə, sığmayanda üfüqi sürüşür. */
 .summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
-  gap: 12px;
-  margin-bottom: 24px;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.summary::-webkit-scrollbar {
+  display: none;
 }
 
 .summary-card {
+  flex: 0 0 auto;
+  white-space: nowrap;
   background: #fff;
-  border: 1px solid #eaeaea;
-  border-radius: 12px;
-  padding: 14px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  padding: 8px 15px;
   cursor: pointer;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 3px;
-  transition: all 0.2s;
-  border-bottom: 3px solid #eaeaea;
+  gap: 7px;
+  transition: all var(--t-fast);
 }
 
 .summary-card:hover {
-  transform: translateY(-2px);
+  border-color: var(--gold);
 }
 
-.summary-count {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--ink);
-  line-height: 1;
-}
-
+/* Rəqəm sözün yanındadır: «Gözləyir 2» bir baxışda oxunur və alt-alta
+   düzülən iki sətirdən sıxdır. */
 .summary-label {
-  font-size: 0.76rem;
-  color: var(--muted);
+  font-size: 0.83rem;
+  color: var(--ink-2);
   font-weight: 600;
 }
 
-.summary-card.active {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+.summary-count {
+  order: 2;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  background: #f4eff1;
+  border-radius: var(--r-pill);
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
 }
 
-.summary-card.all.active { border-bottom-color: var(--brand); }
-.summary-card.pending.active { border-bottom-color: #b07d2b; }
-.summary-card.confirmed.active { border-bottom-color: #1e7e34; }
-.summary-card.rejected.active { border-bottom-color: #c0392b; }
-.summary-card.cancelled.active { border-bottom-color: var(--muted); }
+.summary-card.active {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+.summary-card.active .summary-label {
+  color: #fff;
+}
+
+.summary-card.active .summary-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
 
 /* Rezerv kartları */
 .res-list {
