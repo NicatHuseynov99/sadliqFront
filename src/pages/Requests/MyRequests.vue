@@ -146,7 +146,7 @@
               class="offer-row"
               :class="{ accepted: o.status === 1, declined: o.status === 2, open: openOfferId === o.id }"
             >
-              <img :src="o.venueImageUrl" :alt="o.venueName" loading="lazy" @error="onImgError" />
+              <img :src="o.venueImageUrl || FALLBACK_IMAGE" :alt="o.venueName" loading="lazy" @error="onImgError" />
 
               <div class="row-main" @click="toggleOffer(o.id)">
                 <div class="row-top">
@@ -243,7 +243,7 @@ import {
 import { getCities } from '@/services/platformService'
 import OfferChat from '@/components/OfferChat.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const isLoading = ref(false)
 const isSending = ref(false)

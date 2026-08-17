@@ -1,7 +1,7 @@
 <template>
   <!-- Pəncərənin başlığı: sarayın şəkli fon kimi, üstündə ad və vəziyyət -->
   <div class="dialog-head">
-    <img :src="venue.coverImageUrl" :alt="venue.name" @error="onImgError" />
+    <img :src="venue.coverImageUrl || FALLBACK_IMAGE" :alt="venue.name" @error="onImgError" />
     <div class="shade"></div>
 
     <button class="close" title="Bağla" @click="$emit('close')">✕</button>
@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 defineProps({
   venue: { type: Object, required: true },
   caption: { type: String, default: '' },

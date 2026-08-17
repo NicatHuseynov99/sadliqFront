@@ -38,7 +38,7 @@
       <div v-else class="res-list">
         <article v-for="r in visible" :key="r.id" class="res-card" :class="statusClass(r.status)">
           <div class="res-thumb">
-            <img :src="r.venueImage" :alt="r.venueName" @error="onImgError" />
+            <img :src="r.venueImage || FALLBACK_IMAGE" :alt="r.venueName" @error="onImgError" />
           </div>
 
           <div class="res-main">
@@ -224,7 +224,7 @@ import DisputeCreateDialog from '@/components/DisputeCreateDialog.vue'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const reservations = ref([])
 const isLoading = ref(false)

@@ -46,7 +46,7 @@
           :class="{ pending: !v.isApproved && !v.isDeleted, removed: v.isDeleted }"
         >
           <div class="cover-wrap">
-            <img class="cover" :src="v.coverImageUrl" :alt="v.name" @error="onImgError" />
+            <img class="cover" :src="v.coverImageUrl || FALLBACK_IMAGE" :alt="v.name" @error="onImgError" />
             <span v-if="v.isDeleted" class="status-badge off">Silinib</span>
             <span v-else class="status-badge" :class="v.isApproved ? 'ok' : 'wait'">
               {{ v.isApproved ? 'Saytda' : 'Təsdiq gözləyir' }}

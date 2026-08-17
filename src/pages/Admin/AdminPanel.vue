@@ -93,7 +93,7 @@
         </div>
         <div class="pending-list">
           <div v-for="v in pendingVenues" :key="v.id" class="pending-card">
-            <img :src="v.coverImageUrl" :alt="v.name" @error="onImgError" />
+            <img :src="v.coverImageUrl || FALLBACK_IMAGE" :alt="v.name" @error="onImgError" />
             <div class="pending-text">
               <b>{{ v.name }}</b>
               <span>{{ v.city }} · {{ v.address }}</span>
@@ -145,7 +145,7 @@ const AdminUserManager = defineAsyncComponent(() => import('@/components/AdminUs
 const AdminChatsView = defineAsyncComponent(() => import('@/components/AdminChatsView.vue'))
 const DisputesView = defineAsyncComponent(() => import('@/components/DisputesView.vue'))
 import { getPlatformStats, getPendingVenues, approveVenue } from '@/services/adminService'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const auth = useAuthStore()
 

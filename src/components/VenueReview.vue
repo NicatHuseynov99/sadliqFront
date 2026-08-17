@@ -10,7 +10,7 @@
   >
     <template #header>
       <div class="rv-head">
-        <img :src="form.coverImageUrl" alt="" @error="onImgError" />
+        <img :src="form.coverImageUrl || FALLBACK_IMAGE" alt="" @error="onImgError" />
         <div class="rv-shade"></div>
         <button class="rv-close" @click="closeDialog">✕</button>
 
@@ -98,7 +98,7 @@
 
         <span class="pane-label">Sahibkarın əlavə etdiyi şəkillər <em>{{ images.length }}</em></span>
         <div v-if="images.length" class="shot-grid">
-          <img v-for="(img, i) in images" :key="i" :src="img.url" alt="" @error="onImgError" />
+          <img v-for="(img, i) in images" :key="i" :src="img.url || FALLBACK_IMAGE" alt="" @error="onImgError" />
         </div>
         <p v-else class="empty">Şəkil əlavə edilməyib.</p>
       </section>
@@ -172,7 +172,7 @@ import { getVenueById } from '@/services/venueService'
 import { updateVenue } from '@/services/ownerService'
 import { setVenueApproved } from '@/services/adminService'
 import { getFeatures } from '@/services/platformService'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   venue: { type: Object, required: true },

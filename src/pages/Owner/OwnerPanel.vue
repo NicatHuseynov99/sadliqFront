@@ -115,7 +115,7 @@
             :class="{ active: v.id === selectedVenueId }"
             @click="selectVenue(v.id)"
           >
-            <img :src="v.coverImageUrl" :alt="v.name" @error="onImgError" />
+            <img :src="v.coverImageUrl || FALLBACK_IMAGE" :alt="v.name" @error="onImgError" />
             <span class="vi-text">
               <b>{{ v.name }}</b>
               <em>{{ v.city }} · {{ v.hallCount }} zal</em>
@@ -303,7 +303,7 @@ import {
   declineCustomerOffer,
 } from '@/services/ownerService'
 import { formatDateFull } from '@/utils/date'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const auth = useAuthStore()
 

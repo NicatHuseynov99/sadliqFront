@@ -64,7 +64,7 @@
         >
           <!-- Rəyin hansı saraya yazıldığı sətrin əvvəlində görünür -->
           <a class="venue-box" :href="`/venue/${r.venueId}`" target="_blank" :title="r.venueName">
-            <img :src="r.venueImageUrl" :alt="r.venueName" @error="onImgError" />
+            <img :src="r.venueImageUrl || FALLBACK_IMAGE" :alt="r.venueName" @error="onImgError" />
             <span class="venue-title">{{ r.venueName }}</span>
             <span class="venue-city">{{ r.venueCity }}</span>
           </a>
@@ -164,7 +164,7 @@
     <!-- Rəyin redaktəsi -->
     <el-dialog v-model="editOpen" title="Rəyi düzəlt" width="480px">
       <div v-if="editTarget" class="edit-venue">
-        <img :src="editTarget.venueImageUrl" :alt="editTarget.venueName" @error="onImgError" />
+        <img :src="editTarget.venueImageUrl || FALLBACK_IMAGE" :alt="editTarget.venueName" @error="onImgError" />
         <div>
           <b>{{ editTarget.venueName }}</b>
           <span>{{ editTarget.venueCity }} · müəllif: {{ editTarget.authorName }}</span>
@@ -265,7 +265,7 @@ import {
   HIDE_REASONS,
 } from '@/services/reviewModerationService'
 import { useAuthStore } from '@/store/auth'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const auth = useAuthStore()
 

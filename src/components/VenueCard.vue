@@ -2,7 +2,7 @@
   <div class="venue-card">
     <div class="image-wrapper">
       <img
-        :src="venue.coverImageUrl"
+        :src="venue.coverImageUrl || FALLBACK_IMAGE"
         :alt="venue.name"
         class="venue-img"
         loading="lazy"
@@ -79,7 +79,7 @@
         <span class="menu-preview-label">Menyular</span>
         <div class="menu-chips">
           <div v-for="m in venue.menus" :key="m.id" class="menu-chip" @click="$emit('select', venue)">
-            <img :src="m.coverImageUrl" :alt="m.name" @error="onImgError" />
+            <img :src="m.coverImageUrl || FALLBACK_IMAGE" :alt="m.name" @error="onImgError" />
             <div class="menu-chip-text">
               <strong>{{ m.name }}</strong>
               <span>{{ m.pricePerPerson }} ₼</span>
@@ -102,7 +102,7 @@
 import { computed } from 'vue'
 import AddressLink from '@/components/AddressLink.vue'
 import { formatDate } from '@/utils/date'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   venue: { type: Object, required: true },

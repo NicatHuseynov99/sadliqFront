@@ -30,7 +30,7 @@
                 @mousedown.prevent="pickSuggestion(s)"
               >
                 <template v-if="s.type === 'venue'">
-                  <img :src="s.imageUrl" alt="" @error="onImgError" />
+                  <img :src="s.imageUrl || FALLBACK_IMAGE" alt="" @error="onImgError" />
                   <span class="sug-text">
                     <b>{{ s.text }}</b>
                     <em>{{ s.city }}</em>
@@ -332,7 +332,7 @@ import VenueCompare from "@/components/VenueCompare.vue"
 import UiCardSkeleton from "@/components/ui/UiCardSkeleton.vue"
 import UiEmpty from '@/components/ui/UiEmpty.vue'
 import UiButton from '@/components/ui/UiButton.vue'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const PAGE_SIZE = 12
 

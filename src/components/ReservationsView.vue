@@ -80,7 +80,7 @@
 
       <ul v-if="rows.length" class="res-list">
         <li v-for="r in rows" :key="r.id" class="res-item" :class="{ past: r.isPast, removed: r.isDeleted }">
-          <img class="venue-cover" :src="r.venueImageUrl" :alt="r.venueName" @error="onImgError" />
+          <img class="venue-cover" :src="r.venueImageUrl || FALLBACK_IMAGE" :alt="r.venueName" @error="onImgError" />
 
           <div class="res-content">
           <div class="res-head">
@@ -188,7 +188,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import { toast } from '@/utils/toast'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 import {
   getReservationStats,
   searchReservations,

@@ -3,7 +3,7 @@
     <!-- Yüklənmiş fayl varsa önizləmə göstərilir -->
     <div v-if="modelValue" class="preview" :class="{ small }">
       <video v-if="isVideo" :src="modelValue" controls></video>
-      <img v-else :src="modelValue" alt="" @error="onImgError" />
+      <img v-else :src="modelValue || FALLBACK_IMAGE" alt="" @error="onImgError" />
 
       <button class="remove" title="Sil" @click="$emit('update:modelValue', '')">✕</button>
     </div>
@@ -33,7 +33,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { uploadFile } from '@/services/fileService'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },

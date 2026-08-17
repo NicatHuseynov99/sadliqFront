@@ -58,7 +58,7 @@
       <!-- Zallar — hər zalın öz boş/dolu günləri ilə (rezervlər zal əsaslıdır) -->
       <div v-show="tab === 'halls'" class="hall-list">
         <div v-for="h in venue.halls" :key="h.id" class="hall-card">
-          <img :src="h.imageUrl" :alt="h.name" class="hall-img" @error="onImgError" />
+          <img :src="h.imageUrl || FALLBACK_IMAGE" :alt="h.name" class="hall-img" @error="onImgError" />
 
           <div class="hall-body">
             <div class="hall-top">
@@ -148,7 +148,7 @@
       <div v-show="tab === 'menus'" class="menu-list">
         <div v-for="m in venue.menus" :key="m.id" class="menu-card">
           <div class="menu-cover" @click="openMenu(m)">
-            <img :src="m.coverImageUrl" :alt="`${m.name} süfrəsi`" @error="onImgError" />
+            <img :src="m.coverImageUrl || FALLBACK_IMAGE" :alt="`${m.name} süfrəsi`" @error="onImgError" />
             <div class="menu-price-badge">
               <strong>{{ m.pricePerPerson }} ₼</strong>
               <span>1 nəfər üçün</span>
@@ -194,7 +194,7 @@
     <el-dialog v-model="menuVisible" :title="selectedMenu?.name" width="620px">
       <div v-if="selectedMenu">
         <div class="dialog-cover">
-          <img :src="selectedMenu.coverImageUrl" :alt="selectedMenu.name" @error="onImgError" />
+          <img :src="selectedMenu.coverImageUrl || FALLBACK_IMAGE" :alt="selectedMenu.name" @error="onImgError" />
           <div class="menu-price-badge">
             <strong>{{ selectedMenu.pricePerPerson }} ₼</strong>
             <span>1 nəfər üçün</span>
@@ -206,7 +206,7 @@
           <h4 class="cat-title">{{ cat }}</h4>
           <div class="dish-grid">
             <div v-for="i in items" :key="i.id" class="dish">
-              <img :src="i.imageUrl" :alt="i.name" @error="onImgError" />
+              <img :src="i.imageUrl || FALLBACK_IMAGE" :alt="i.name" @error="onImgError" />
               <span>{{ i.name }}</span>
             </div>
           </div>
@@ -297,7 +297,7 @@ import { getVenueById, toDateKey } from '@/services/venueService'
 import { formatDate, weekdayShort, MONTHS } from '@/utils/date'
 import { createReservation } from '@/services/reservationService'
 import { useAuthStore } from '@/store/auth'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const route = useRoute()
 const router = useRouter()

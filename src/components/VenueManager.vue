@@ -20,7 +20,7 @@
       </div>
 
       <div v-for="v in venues" :key="v.id" class="vm-card" :class="{ pending: !v.isApproved }">
-        <img :src="v.coverImageUrl" :alt="v.name" @error="onImgError" />
+        <img :src="v.coverImageUrl || FALLBACK_IMAGE" :alt="v.name" @error="onImgError" />
 
         <div class="vm-text">
           <b>
@@ -150,7 +150,7 @@
       <div class="hall-grid">
         <article v-for="h in halls" :key="h.id" class="hall-card">
           <div class="hc-image">
-            <img :src="h.imageUrl" :alt="h.name" @error="onImgError" />
+            <img :src="h.imageUrl || FALLBACK_IMAGE" :alt="h.name" @error="onImgError" />
             <span class="hc-price">{{ h.minPrice }} ₼-dən</span>
           </div>
 
@@ -190,7 +190,7 @@
       <div class="hf-grid">
         <!-- Şəkil önizləməsi -->
         <div class="hf-preview">
-          <img v-if="hallForm.imageUrl" :src="hallForm.imageUrl" alt="" @error="onImgError" />
+          <img v-if="hallForm.imageUrl" :src="hallForm.imageUrl || FALLBACK_IMAGE" alt="" @error="onImgError" />
           <div v-else class="hf-placeholder">🏛<span>Şəkil linki əlavə edin</span></div>
         </div>
 
@@ -246,7 +246,7 @@
     <el-dialog v-model="menuDialog" :title="`${activeVenue?.name} — menyular`" width="720px">
       <div class="sub-list">
         <div v-for="m in menus" :key="m.id" class="sub-card">
-          <img :src="m.imageUrl" :alt="m.name" @error="onImgError" />
+          <img :src="m.imageUrl || FALLBACK_IMAGE" :alt="m.name" @error="onImgError" />
           <div class="sub-text">
             <b>{{ m.name }}</b>
             <span>{{ m.pricePerPerson }} ₼ / nəfər · {{ m.items?.length ?? 0 }} yemək</span>
@@ -307,7 +307,7 @@ import { computed, reactive, ref } from 'vue'
 import { toast } from '@/utils/toast'
 import HallCalendarEditor from '@/components/HallCalendarEditor.vue'
 import UiButton from '@/components/ui/UiButton.vue'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 import {
   createVenue,
   updateVenue,

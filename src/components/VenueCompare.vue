@@ -18,7 +18,7 @@
           <tr>
             <th class="row-label"></th>
             <th v-for="v in venues" :key="v.id">
-              <img :src="v.coverImageUrl" :alt="v.name" @error="onImgError" />
+              <img :src="v.coverImageUrl || FALLBACK_IMAGE" :alt="v.name" @error="onImgError" />
               <b>{{ v.name }}</b>
               <span>{{ v.city }}</span>
               <button class="drop-btn" @click="$emit('remove', v)">Siyahıdan çıxar</button>
@@ -60,7 +60,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   venues: { type: Array, required: true },

@@ -3,7 +3,7 @@
        Təsdiqdən sonra müştəri üçün bir şey qalmırdı — indi qalır. -->
   <section class="board">
     <div class="board-main">
-      <img class="board-bg" :src="reservation.venueImage" alt="" @error="onImgError" />
+      <img class="board-bg" :src="reservation.venueImage || FALLBACK_IMAGE" alt="" @error="onImgError" />
       <div class="board-shade"></div>
 
       <div class="board-text">
@@ -50,7 +50,7 @@
 <script setup>
 import { computed } from 'vue'
 import { formatDateFull } from '@/utils/date'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   reservation: { type: Object, required: true },

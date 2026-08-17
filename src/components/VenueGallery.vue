@@ -15,7 +15,7 @@
 
       <img
         v-else
-        :src="activeImage"
+        :src="activeImage || FALLBACK_IMAGE"
         :alt="venue.name"
         class="zoomable"
         @error="onImgError"
@@ -42,14 +42,14 @@
           :class="{ active: slideIndex === i }"
           @click="slideIndex = i"
         >
-          <img :src="videoPoster" alt="" @error="onImgError" />
+          <img :src="videoPoster || FALLBACK_IMAGE" alt="" @error="onImgError" />
           <span class="play">▶</span>
           <span class="video-label">Video</span>
         </button>
 
         <img
           v-else
-          :src="slide.url"
+          :src="slide.url || FALLBACK_IMAGE"
           :class="{ active: slideIndex === i }"
           @click="slideIndex = i"
           @error="onImgError"
@@ -76,7 +76,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { onImgError } from '@/utils/imageFallback'
+import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
   venue: { type: Object, required: true },
