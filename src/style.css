@@ -148,6 +148,16 @@ select:focus-visible,
   }
 }
 
+/* Telefonda xəritə rejimi tam ekrandır: ana səhifə .map-mode nişanını
+   qoyur, altlıq isə ondan kənarda — App.vue-də — dayanır, ona görə
+   qayda qlobal verilir. Altlıq qalsaydı xəritənin altında sürüşən
+   quyruq olardı və «yalnız xəritə» hissi pozulardı. */
+@media (max-width: 600px) {
+  body:has(.map-mode) .app-footer {
+    display: none;
+  }
+}
+
 /* Cədvəllər telefonda öz içində sürüşsün, səhifəni genişlətməsin */
 .table-scroll {
   overflow-x: auto;

@@ -1,5 +1,7 @@
 <template>
-  <div class="site-wrapper">
+  <!-- map-mode: telefonda xəritə seçiləndə ekranda yalnız xəritə qalır.
+       Masaüstündə heç nə dəyişmir — nişan yalnız CSS-də oxunur. -->
+  <div class="site-wrapper" :class="{ 'map-mode': view === 'map' }">
     <!-- HERO & SEARCH SECTION -->
     <section class="hero-section">
       <div class="hero-content">
@@ -1958,6 +1960,49 @@ const selectVenue = (venue) => {
     width: 100%;
     font-size: 0.78rem;
     padding-left: 8px;
+  }
+
+  /* ————— Xəritə rejimi telefonda tam ekran —————
+     Axtarış paneli və elan zolağı xəritəni yuxarı sıxırdı: 844px
+     ekranda xəritəyə 460px qalırdı və Bakının yarısı görünmürdü.
+     Xəritə seçiləndə onlar gizlənir, xəritə qalan bütün hündürlüyü
+     tutur. Siyahıya qayıtmaq üçün açar yuxarıda qalır. */
+  .map-mode .hero-section,
+  .map-mode .reverse-banner {
+    display: none;
+  }
+
+  /* Səhifənin öz alt boşluğu xəritə rejimində lazım deyil — onunla
+     birlikdə ekrandan 120px artıq çıxırdı və xəritə «tam» olmurdu. */
+  .map-mode {
+    padding-bottom: 0;
+    /* min-height: 100vh başlığın hündürlüyünü saymır: qab tək başına
+       bütün ekran boyu olur, üstünə başlıq və alt boşluq gəlir və
+       səhifə ekrandan 120px uzun çıxırdı. Xəritə rejimində hündürlüyü
+       məzmun təyin edir. */
+    min-height: 0;
+  }
+
+  .map-mode .venues-container {
+    margin-top: 0;
+    padding: 0;
+  }
+
+  .map-mode .results-header {
+    margin: 0;
+    padding: 8px 12px;
+  }
+
+  /* dvh — telefon brauzerlərində ünvan sətri gizlənəndə hündürlük
+     dəyişir; vh sabit qalıb xəritəni ekrandan kənara çıxarırdı.
+     Birinci sətir dvh tanımayan köhnə brauzerlər üçündür. */
+  /* Çıxılan 124px: görünüş açarının sətri (66px) + səhifənin alt
+     naviqasiya üçün saxladığı yer (58px). Müştəri girişində alt lent
+     xəritənin üstünü örtməsin deyə o boşluq saxlanılır. */
+  .map-mode .map-wrap {
+    height: calc(100vh - var(--header-h) - 124px);
+    height: calc(100dvh - var(--header-h) - 124px);
+    border-radius: 0;
   }
 
   /* Nazik zolaq: başlıq, bir sətir izah və düymə. İzahın uzun mətni,
