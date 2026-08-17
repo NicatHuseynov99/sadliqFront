@@ -3,10 +3,14 @@
 }
 
 /* Üfüqi sürüşmə heç bir səhifədə olmamalıdır — yapışıq və üzən
-   elementlər kənara çıxanda sağ-aşağıda zolaq yaranırdı */
+   elementlər kənara çıxanda sağ-aşağıda zolaq yaranırdı.
+   «hidden» yox, «clip»: hidden sürüşmə konteyneri yaradır və içindəki
+   «position: sticky» elementləri sıradan çıxarır — başlıq yapışıq
+   yazılmışdı, amma səhifə sürüşəndə yuxarı qaçırdı. clip eyni işi görür,
+   konteyner yaratmır, ona görə başlıq yerində qalır. */
 html,
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
