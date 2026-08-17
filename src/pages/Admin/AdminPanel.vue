@@ -334,15 +334,33 @@ onMounted(load)
 }
 
 /* Bölmə seçimi */
+/* Bölmə lenti həmişə bir sətirdədir. Əvvəl «flex-wrap: wrap» idi və
+   11 bölmə ekrana sığmadığına görə ikinci sətrə düşürdü — panelin başı
+   iki mərtəbəli olurdu, hansı bölmədə olduğun itirdi. İndi sığmayanda
+   sıra qırılmır, üfüqi sürüşür. Sürüşdürücü zolaq gizlədilib, əvəzinə
+   sağ kənarda solğunlaşma sürüşəcək yer olduğunu bildirir. */
 .section-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Kənar solğunlaşması: lentin sonu kəsilmiş görünməsin */
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  /* Aktiv düymənin kölgəsi kəsilməsin deyə bir az yer buraxılır */
+  padding-bottom: 6px;
+}
+
+.section-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .section-tab {
   position: relative;
+  flex: 0 0 auto;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 7px;

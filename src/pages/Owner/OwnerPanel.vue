@@ -575,14 +575,28 @@ onMounted(load)
   font-weight: 700;
 }
 
-/* Bölmə seçimi */
+/* Bölmə seçimi — admin panelindəki ilə eyni davranış: sığmayanda sıra
+   qırılmır, üfüqi sürüşür. Hazırda 8 bölmə var və rahat sığır, amma
+   yenisi əlavə olunanda düymələr sıxılıb əzilməsin. */
 .section-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  padding-bottom: 6px;
+}
+
+.section-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .section-tab {
+  flex: 0 0 auto;
+  white-space: nowrap;
   background: #fff;
   border: 1px solid var(--line-2);
   color: #6c757d;
