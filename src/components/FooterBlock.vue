@@ -135,5 +135,12 @@
   .footer-col h5 {
     margin-bottom: 9px;
   }
+
+  /* Keçid sətirləri 18px hündürlüyündə idi — barmaqla dəqiq vurmaq
+     çətindir və qonşu sətrə düşür. Yazı ölçüsü eyni, sahə böyüyür. */
+  .footer-col a {
+    padding: 7px 0;
+    margin-bottom: 0;
+  }
 }
 </style>

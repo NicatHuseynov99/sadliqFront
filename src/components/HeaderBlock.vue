@@ -269,6 +269,18 @@ watch(
   }
 }
 
+/* Barmaq üçün toxunma sahəsi. Ölçüldü: loqo 122×22, istifadəçi adı
+   103×20 — barmaq üçün alçaqdır. Yazı ölçüsü eyni qalır, yalnız
+   yuxarı-aşağı boşluq əlavə olunur ki, sahə ~40px olsun. */
+@media (max-width: 960px) {
+  .logo,
+  .user-name {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+}
+
 /* Ən dar telefonlarda (320–400px) başlıq sığmırdı: loqo + «Qeydiyyat» +
    «Daxil ol» + menyu düyməsi yan-yana ekrandan kənara çıxırdı və
    «Daxil ol» sağdan kəsilirdi. */
@@ -313,7 +325,7 @@ watch(
     align-items: center;
     gap: 2px;
     text-decoration: none;
-    font-size: 0.66rem;
+    font-size: 0.72rem;
     color: var(--muted);
   }
 

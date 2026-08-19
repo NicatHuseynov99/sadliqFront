@@ -747,9 +747,22 @@ onMounted(load)
 .tabs {
   display: flex;
   gap: 6px;
+  /* Cipler setri qirmir: «Redd edilmis» iki setre dusende butun
+     cipler onun hundurluyune (44px) uzanirdi ve zolaq eyri gorunurdu.
+     Sigmayanda ufuqi surusur — panelin qalan lentleri ile eyni davranis. */
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 3px;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab {
+  flex: 0 0 auto;
+  white-space: nowrap;
   background: #fff;
   border: 1px solid var(--line-2);
   color: #6c757d;
@@ -1057,6 +1070,15 @@ onMounted(load)
 @media (max-width: 980px) {
   .panel-body {
     grid-template-columns: 1fr;
+  }
+
+  /* Grid sütununun ilkin «min-width: auto» dəyəri sütunun məzmundan
+     kiçilməsinə imkan vermir: saray adları sətri qırmadığına görə
+     sütun 390px ekranda 412px-ə uzanırdı. Səhifə «overflow-x: clip»
+     olduğuna görə bu sürüşmə kimi yox, KƏSİLMƏ kimi çıxırdı —
+     filtr zolağının sonuncu çipi («Hamısı») ekrana heç düşmürdü. */
+  .panel-body > * {
+    min-width: 0;
   }
 
   .section-tabs {

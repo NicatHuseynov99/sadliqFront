@@ -149,4 +149,12 @@ const login = async () => {
 }
 
 
+
+/* Səhifə altındakı keçidlər 17–19px hündürlüyündə idi — barmaqla dəqiq
+   vurmaq çətindir. Yazı ölçüsü eyni qalır, yalnız sahə böyüyür. */
+a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+}
 </style>

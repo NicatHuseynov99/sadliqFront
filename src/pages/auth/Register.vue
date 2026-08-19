@@ -266,4 +266,12 @@ const register = async () => {
   font-weight: 600;
   text-decoration: none;
 }
+
+/* Səhifə altındakı keçidlər 17–19px hündürlüyündə idi — barmaqla dəqiq
+   vurmaq çətindir. Yazı ölçüsü eyni qalır, yalnız sahə böyüyür. */
+a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+}
 </style>

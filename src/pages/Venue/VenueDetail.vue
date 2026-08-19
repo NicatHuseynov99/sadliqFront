@@ -588,7 +588,12 @@ onMounted(async () => {
   border-radius: 20px;
 }
 
+/* Telefon nomresi zeng ucun basilir — 121x20 sahe barmaq ucun
+   alcaqdir. Yazi eyni qalir, sahe boyuyur. */
 .venue-phone a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
   color: #6c757d;
   text-decoration: none;
 }
@@ -788,8 +793,10 @@ onMounted(async () => {
   transition: all 0.15s;
 }
 
+/* 0.62rem = 9.9px — telefonda oxunmurdu. Gün adı qısa olduğuna görə
+   böyüdülməsi zolağın enini dəyişmir. */
 .strip-day .wd {
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
   opacity: 0.8;
 }
