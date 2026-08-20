@@ -313,47 +313,71 @@ const rows = computed(() => [
 }
 
 /* ————— Telefon —————
-   Cədvəl onsuz da yan-yana sürüşürdü (335px sahədə 720px məzmun), amma
-   ekranda cəmi BİR saray görünürdü və sürüşdürmək olacağına dair heç bir
-   işarə yox idi — istifadəçi qalan sarayların itdiyini düşünürdü.
+   Müqayisə ən çox iki saraya icazə verir, ona görə telefonda cədvəli
+   sürüşdürməyə ehtiyaç yoxdur: hər iki sütun ekrana tam sığır və qərar
+   bir baxışda verilir.
 
-   İki dəyişiklik: sütunlar daraldılır ki, iki saray eyni anda görünsün,
-   və sağ kənarda solğunlaşma daha məzmun olduğunu bildirir. */
+   «table-layout: fixed» olmadan sütunların eni məzmuna görə hesablanır —
+   uzun ünvan bir sütunu şişirdib digərini əzirdi. Sabit tərtibatda
+   etiket sütunu 88px, qalan yer iki saray arasında bərabər bölünür. */
 @media (max-width: 600px) {
-  .table-wrap {
-    mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
-  }
-
-  /* Etiket sütunu 190px tuturdu — ekranın yarısı sadəcə sətir adlarına
-     gedirdi. Adlar qısadır, bu en bəs edir. */
-  .row-label {
-    font-size: 0.72rem;
-    padding-left: 10px !important;
-    padding-right: 8px !important;
-    max-width: 112px;
-    white-space: normal;
-  }
-
   .cmp-table {
-    font-size: 0.78rem;
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.76rem;
+  }
+
+  .row-label {
+    width: 88px;
+    font-size: 0.68rem;
+    padding: 9px 6px 9px 10px !important;
+    white-space: normal;
+    line-height: 1.3;
   }
 
   .cmp-table th {
-    min-width: 132px;
-    padding: 10px 8px;
-  }
-
-  .cmp-table th img {
-    height: 66px;
-  }
-
-  .cmp-table th b {
-    font-size: 0.8rem;
+    min-width: 0;
+    padding: 10px 7px;
   }
 
   .cmp-table td {
-    padding: 9px 8px;
+    padding: 9px 7px;
+    word-break: break-word;
+  }
+
+  .cmp-table th img {
+    height: 72px;
+  }
+
+  .cmp-table th b {
+    font-size: 0.78rem;
+    line-height: 1.25;
+  }
+
+  .cmp-table th span {
+    font-size: 0.68rem;
+  }
+
+  /* «Siyahıdan çıxar» və «Ətraflı bax» dar sütunda bir sətrə sığmırdı */
+  .drop-btn {
+    font-size: 0.68rem;
+  }
+
+  .open-btn {
+    width: 100%;
+    padding: 8px 6px;
+    font-size: 0.72rem;
+  }
+
+  /* Özəllik nişanları dar sütunda yan-yana durmur — alt-alta düzülür */
+  .features-cell {
+    gap: 4px;
+  }
+
+  .features-cell span,
+  .mini-chip {
+    font-size: 0.66rem;
+    padding: 2px 7px;
   }
 }
 </style>

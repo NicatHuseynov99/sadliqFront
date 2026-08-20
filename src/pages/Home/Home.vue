@@ -357,9 +357,12 @@ const toggleCompare = (venue) => {
     return
   }
 
-  // Üçdən çox saray yan-yana oxunmur
-  if (compareMap.size >= 3) {
-    toast.warning('Eyni anda ən çox 3 sarayı müqayisə etmək olar.')
+  // İkidən çox saray yan-yana oxunmur. Telefonda üç sütun ekrana
+  // sığmır: ya sütunlar əzilir, ya da cədvəl yana sürüşüb müqayisəni
+  // «bax-yadda saxla-geri qayıt» oyununa çevirir. İki saray isə hər
+  // ekranda yan-yana durur və qərar bir baxışda verilir.
+  if (compareMap.size >= 2) {
+    toast.warning('Eyni anda iki sarayı müqayisə etmək olar. Birini çıxarın.')
     return
   }
 
