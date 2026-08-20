@@ -634,17 +634,45 @@ onBeforeUnmount(() => clearTimeout(timer))
   .filter-row {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
   }
+  /* Əvvəl 5 sahə (vaxt, işarə, nişan, mətn, istifadəçi, ox) tək sütunda
+     alt-alta 5 ayrı sətrə düşürdü — qruplaşma itirdi, oxumaq çətinləşirdi.
+     İndi iki sıra: yuxarıda vaxt + nişan + ox eyni sətirdə, altında
+     mətn və istifadəçi tam enində. */
   .log-main {
-    grid-template-columns: 1fr;
-    gap: 6px;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'time badge toggle'
+      'text text text'
+      'user user user';
+    gap: 4px 10px;
   }
   .avatar {
     display: none;
   }
-  .log-user,
+  .log-time {
+    grid-area: time;
+  }
+  .log-badge {
+    grid-area: badge;
+    justify-self: start;
+  }
+  .log-toggle {
+    grid-area: toggle;
+  }
   .log-text {
+    grid-area: text;
     text-align: left;
     white-space: normal;
+  }
+  .log-user {
+    grid-area: user;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    text-align: left;
+  }
+  .role-tag {
+    margin-left: 0 !important;
   }
 }
 </style>
