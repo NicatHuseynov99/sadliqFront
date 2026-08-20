@@ -156,7 +156,7 @@
           </div>
         </li>
       </ul>
-      <p v-else class="empty">Bu şərtlərə uyğun rezerv tapılmadı.</p>
+      <UiEmpty v-else icon="🔍" title="Bu şərtlərə uyğun rezerv tapılmadı." />
 
       <Pager :page="filters.page" :page-size="filters.pageSize" :total="total" @change="goPage" />
     </section>
@@ -186,6 +186,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import Pager from '@/components/Pager.vue'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import { toast } from '@/utils/toast'
 import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
@@ -527,6 +528,30 @@ onMounted(refresh)
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+/* 8 status çipi (Hamısı/Gözləyir/Təsdiqlənib/Rədd edilib/Ləğv edilib/
+   Vaxtı keçib/Təklif göndərilib/Silinmiş) telefonda wrap ilə 3 sətrə
+   qədər qırılırdı. Panelin qalan lentləri ilə eyni qayda: bir sətir,
+   üfüqi sürüşür. */
+@media (max-width: 640px) {
+  .filter-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  }
+
+  .filter-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-chips .chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
 }
 
 .chip {

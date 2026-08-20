@@ -41,13 +41,19 @@
         </div>
       </div>
 
-      <div v-if="maxDaily" class="chart">
+      <!-- Gün sayı 30-a qədər çıxır, hər sütunun tarix yazısı ("17 avq")
+           "white-space: nowrap" ilə sabitdir -- flex sütunu bundan kiçik
+           ola bilmir və sağ kənardan kəsilirdi. Sürüşən qab + minimum
+           sütun eni ilə bar-lar oxunaqlı qalır, sığmayanda sürüşür. -->
+      <div v-if="maxDaily" class="chart-scroll">
+        <div class="chart">
         <div v-for="d in stats.daily" :key="d.date" class="bar-col">
           <div class="bar-stack" :title="`${d.visitors} ziyarətçi · ${d.views} baxış`">
             <div class="bar views" :style="{ height: barHeight(d.views) }"></div>
             <div class="bar visitors" :style="{ height: barHeight(d.visitors) }"></div>
           </div>
           <span class="bar-label">{{ shortDay(d.date) }}</span>
+        </div>
         </div>
       </div>
       <p v-else class="empty">Bu dövrdə ziyarət qeyd olunmayıb.</p>
@@ -376,6 +382,15 @@ onMounted(async () => {
 }
 
 /* Qrafik */
+.chart-scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chart-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .chart {
   display: flex;
   align-items: flex-end;
@@ -386,6 +401,10 @@ onMounted(async () => {
 
 .bar-col {
   flex: 1;
+  /* Sabit minimum: "17 avq" yazısı kiçilə bilmir, sütun bundan dar
+     olanda konteyner daşırdı. İndi 30 gündə belə hər sütun ən azı
+     30px alır, sığmayanda .chart-scroll sürüşür. */
+  min-width: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;

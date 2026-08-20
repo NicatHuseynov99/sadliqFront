@@ -59,21 +59,21 @@
             :key="u.id"
             :class="{ blocked: !u.isActive && !u.isDeleted, removed: u.isDeleted }"
           >
-            <td>
+            <td data-label="Ad Soyad">
               <b class="name-link" @click="openDetail(u)">{{ u.fullName }}</b>
               <em v-if="u.id === auth.user?.id" class="you-tag">siz</em>
             </td>
-            <td class="muted">{{ u.email }}</td>
-            <td class="muted">{{ u.phone }}</td>
-            <td class="muted">{{ u.venueCount || '—' }}</td>
-            <td class="muted">{{ formatDateFull(u.createdAt.slice(0, 10)) }}</td>
-            <td>
+            <td class="muted" data-label="E-poçt">{{ u.email }}</td>
+            <td class="muted" data-label="Telefon">{{ u.phone }}</td>
+            <td class="muted" data-label="Saray">{{ u.venueCount || '—' }}</td>
+            <td class="muted" data-label="Qeydiyyat">{{ formatDateFull(u.createdAt.slice(0, 10)) }}</td>
+            <td data-label="Status">
               <span v-if="u.isDeleted" class="status-badge off">Silinib</span>
               <span v-else class="status-badge" :class="u.isActive ? 'ok' : 'off'">
                 {{ u.isActive ? 'Aktiv' : 'Bloklanıb' }}
               </span>
             </td>
-            <td>
+            <td data-label="Rol">
               <select
                 class="role-select"
                 :class="u.role.toLowerCase()"
@@ -84,11 +84,11 @@
                 <option v-for="r in roles" :key="r.value" :value="r.value">{{ r.label }}</option>
               </select>
             </td>
-            <td v-if="u.isDeleted" class="row-actions">
+            <td v-if="u.isDeleted" class="row-actions" data-label="Əməliyyatlar">
               <button class="mini-btn" @click="openDetail(u)">Ətraflı</button>
               <button class="mini-btn ok" @click="restore(u)">Geri qaytar</button>
             </td>
-            <td v-else class="row-actions">
+            <td v-else class="row-actions" data-label="Əməliyyatlar">
               <button class="mini-btn" @click="openDetail(u)">Ətraflı</button>
               <button class="mini-btn" @click="openEdit(u)">Redaktə</button>
               <button class="mini-btn" @click="openPassword(u)">Parol</button>
@@ -791,4 +791,107 @@ onMounted(load)
 .role-select.superadmin { border-color: var(--ink); color: var(--ink); }
 .role-select.venueadmin { border-color: #f0dfbe; color: #8a6220; }
 .role-select.support { border-color: #cfe3d4; color: #1e7e34; }
+
+/* Rol (6 seçim) və status (4 seçim) çipləri telefonda wrap ilə 5 sətrə
+   qədər qırılıb, siyahıya çatmaq üçün ekranın yarısını tuturdu.
+   Panelin qalan lentləri ilə eyni qayda: bir sətir, sığmayanda üfüqi
+   sürüşür, sağ kənarda solğunlaşma daha seçim olduğunu bildirir. */
+@media (max-width: 700px) {
+  .filter-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  }
+
+  .filter-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+/* ————— İstifadəçi cədvəli telefonda kart kimi —————
+   8 sütun (Ad, E-poçt, Telefon, Saray, Qeydiyyat, Status, Rol, Əməliyyat)
+   390px ekranda üfüqi sürüşmə tələb edirdi -- rolu deyişmək üçün belə
+   hər dəfə sağa sürüşmək lazım gəlirdi.
+
+   Klassik "responsive table" texnikası: sətir kart olur, hər xana öz
+   üstündə etiketini göstərir (data-label). JS-ə toxunulmayıb -- select,
+   düymələr, klik olayları eynilə işləyir, sadəcə düzülüş dəyişir. */
+@media (max-width: 760px) {
+  .user-table thead {
+    display: none;
+  }
+
+  .user-table,
+  .user-table tbody,
+  .user-table tr,
+  .user-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .user-table tr {
+    background: #fff;
+    border: 1px solid #f2ecee;
+    border-radius: 12px;
+    padding: 4px 12px;
+    margin-bottom: 10px;
+  }
+
+  .user-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #f2ecee;
+  }
+
+  .user-table td:last-child {
+    border-bottom: none;
+  }
+
+  .user-table td::before {
+    content: attr(data-label);
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #b8a3ab;
+    flex: 0 0 auto;
+  }
+
+  .user-table td[data-label="Ad Soyad"] {
+    justify-content: flex-start;
+  }
+
+  .user-table td[data-label="Ad Soyad"]::before {
+    display: none;
+  }
+
+  .user-table .name-link {
+    font-size: 0.95rem;
+  }
+
+  .user-table td.row-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .user-table td.row-actions::before {
+    display: none;
+  }
+
+  .role-select {
+    width: 100%;
+    max-width: 200px;
+  }
+}
 </style>
