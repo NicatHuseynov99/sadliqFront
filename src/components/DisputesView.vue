@@ -32,14 +32,18 @@
       </div>
     </div>
 
-    <div class="dv-layout">
+    <!-- Telefonda siyahı və yazışma ayrı ekran kimi davranır (Şikayətlərim
+         səhifəsindəki ilə eyni naxış): seçim siyahını gizlədir, "Bütün
+         işlər" geri qaytarır. Əvvəl ikisi üst-üstə göründüyü üçün heç nə
+         seçilməyəndə "İş seçin" boş vəziyyəti ekranın yarısını tuturdu. -->
+    <div class="dv-layout" :class="{ 'list-open': showListMobile }">
       <div class="dv-list" v-loading="isLoading">
         <button
           v-for="d in disputes"
           :key="d.id"
           class="dv-row"
           :class="{ active: activeId === d.id }"
-          @click="activeId = d.id"
+          @click="activeId = d.id; showListMobile = false"
         >
           <div class="dv-top">
             <b>{{ d.subject }}</b>
@@ -69,7 +73,10 @@
         <Pager :page="page" :page-size="pageSize" :total="total" @change="goPage" />
       </div>
 
-      <DisputeThread :dispute-id="activeId" is-staff @changed="load" />
+      <div class="dv-thread-wrap">
+        <button class="back-to-list" @click="showListMobile = true">← Bütün işlər</button>
+        <DisputeThread :dispute-id="activeId" is-staff @changed="load" />
+      </div>
     </div>
   </section>
 </template>
@@ -91,6 +98,10 @@ const search = ref('')
 const statusFilter = ref('')
 const isLoading = ref(false)
 const activeId = ref(null)
+
+// Telefonda siyahı ilə yazışma ayrı ekran kimi davranır — hansının
+// göründüyünü bu idarə edir. Masaüstündə CSS ikisini də göstərir.
+const showListMobile = ref(true)
 
 const load = async () => {
   isLoading.value = true
@@ -327,13 +338,39 @@ load()
   color: var(--info);
 }
 
+.back-to-list {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .dv-layout {
     grid-template-columns: 1fr;
   }
 
+  .dv-layout.list-open .dv-thread-wrap {
+    display: none;
+  }
+
+  .dv-layout:not(.list-open) .dv-list {
+    display: none;
+  }
+
   .dv-list {
-    max-height: 320px;
+    max-height: none;
+  }
+
+  .back-to-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--brand);
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 9px 2px;
+    margin: -9px -2px 10px;
   }
 }
 </style>

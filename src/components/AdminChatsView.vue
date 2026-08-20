@@ -19,7 +19,11 @@
       />
     </div>
 
-    <div class="chat-layout">
+    <!-- Telefonda siyahı və mesaj eyni ekranda üst-üstə görünürdü --
+         "Soldakı siyahıdan seçin" yazısı mobil düzülüşdə mənasız qalırdı,
+         çünki siyahı solda deyil, yuxarıdaydı. İndi ikisi ayrı ekran kimi
+         davranır (Şikayətlərdəki ilə eyni naxış). -->
+    <div class="chat-layout" :class="{ 'list-open': showListMobile }">
       <!-- Söhbətlərin siyahısı -->
       <div class="chat-list" v-loading="isLoading">
         <button
@@ -65,6 +69,8 @@
       </div>
 
       <!-- Seçilmiş söhbətin tam mətni -->
+      <div class="chat-detail-wrap">
+      <button class="back-to-list" @click="showListMobile = true">← Bütün söhbətlər</button>
       <div class="chat-detail" v-loading="isLoadingDetail">
         <template v-if="detail">
           <header class="cd-head">
@@ -127,6 +133,7 @@
           text="Soldakı siyahıdan bir yazışma seçin — bütün mesajlar burada görünəcək."
         />
       </div>
+      </div>
     </div>
 
     <!-- Mesajın gizlədilməsi: silinmir, yalnız tərəflərdən gizlədilir -->
@@ -164,6 +171,9 @@ const search = ref('')
 const isLoading = ref(false)
 
 const activeId = ref(null)
+
+// Telefonda siyahı ilə mesaj ayrı ekran kimi davranır.
+const showListMobile = ref(true)
 
 // Açıq lentin özü saxlanılır: gizlətmədən sonra onu yenidən yükləmək üçün
 // həm nömrə, həm də növ lazımdır — tək nömrə kifayət etmir.
@@ -210,6 +220,7 @@ const rowKey = (c) => `${c.threadKind}:${c.threadId}`
 const open = async (chat) => {
   activeId.value = rowKey(chat)
   activeChat.value = chat
+  showListMobile.value = false
   isLoadingDetail.value = true
   try {
     detail.value = await getChat(chat.threadId, chat.threadKind)
@@ -579,13 +590,39 @@ load()
   color: var(--danger);
 }
 
+.back-to-list {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .chat-layout {
     grid-template-columns: 1fr;
   }
 
+  .chat-layout.list-open .chat-detail-wrap {
+    display: none;
+  }
+
+  .chat-layout:not(.list-open) .chat-list {
+    display: none;
+  }
+
   .chat-list {
-    max-height: 340px;
+    max-height: none;
+  }
+
+  .back-to-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--brand);
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 9px 2px;
+    margin: -9px -2px 10px;
   }
 }
 </style>

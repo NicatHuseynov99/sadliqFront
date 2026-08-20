@@ -49,8 +49,10 @@
 
         <span class="field-label">Şəhərlər <em>boş = hamısı</em></span>
         <div class="chips">
+          <!-- Boş şəhər adı (bəzi test sarayları ünvansız yaradılıb) bir
+               şey yazılmayan boş çip kimi görünürdü -->
           <button
-            v-for="c in cities"
+            v-for="c in cities.filter((x) => x.name?.trim())"
             :key="c.id ?? c.name"
             type="button"
             class="chip"
@@ -118,7 +120,7 @@
       </header>
 
       <div v-loading="isLoadingHistory" class="rows">
-        <p v-if="!campaigns.length && !isLoadingHistory" class="empty">Hələ bildiriş göndərilməyib.</p>
+        <UiEmpty v-if="!campaigns.length && !isLoadingHistory" icon="📣" title="Hələ bildiriş göndərilməyib." />
 
         <article v-for="c in campaigns" :key="c.id" class="row">
           <div class="row-main">
@@ -157,6 +159,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import { toast } from '@/utils/toast'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import {
   BEHAVIORS,
   CAMPAIGN_STATUSES,
