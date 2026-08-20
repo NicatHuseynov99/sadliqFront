@@ -1008,7 +1008,8 @@ onMounted(load)
   font-weight: 600;
 }
 
-/* Şikayət — sönük saxlanılır, son çarədir */
+/* Şikayət — sönük saxlanılır, son çarədir.
+   Toxunma sahəsi: yazı 14px hündürlükdə idi, barmaq üçün çox darıdır. */
 .complain-btn {
   background: none;
   border: none;
@@ -1016,8 +1017,9 @@ onMounted(load)
   font-size: 0.75rem;
   cursor: pointer;
   text-decoration: underline;
-  padding: 0;
-  margin-left: 12px;
+  padding: 9px 2px;
+  margin: -9px -2px;
+  margin-left: 10px;
 }
 
 .complain-btn:hover {

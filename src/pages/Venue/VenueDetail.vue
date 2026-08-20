@@ -536,6 +536,9 @@ onMounted(async () => {
   margin: 0 auto;
 }
 
+/* Toxunma sahesi: yazi 17px hundurlukde idi, mus ucun kifayetdir amma
+   barmaq ucun deyil. Duz metn kimi qalir, sadece yuxari-asagi bosluq
+   elave olunur. */
 .back-btn {
   background: none;
   border: none;
@@ -543,8 +546,10 @@ onMounted(async () => {
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  padding: 0;
-  margin-bottom: 14px;
+  padding: 8px 0;
+  margin: -8px 0 6px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .head-row {
@@ -844,7 +849,10 @@ onMounted(async () => {
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 0;
+  padding: 9px 4px;
+  margin: -9px -4px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .calendar-toggle:hover {

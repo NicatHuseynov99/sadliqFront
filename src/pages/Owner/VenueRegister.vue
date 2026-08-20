@@ -756,6 +756,7 @@ onMounted(async () => {
   flex-wrap: wrap;
 }
 
+/* Toxunma sahesi: yazi 14px hundurlukde idi, barmaq ucun daridir. */
 .reset-link {
   background: none;
   border: none;
@@ -763,7 +764,8 @@ onMounted(async () => {
   font-size: 0.76rem;
   cursor: pointer;
   text-decoration: underline;
-  padding: 0;
+  padding: 9px 2px;
+  margin: -9px -2px;
 }
 
 /* Forma kartı */

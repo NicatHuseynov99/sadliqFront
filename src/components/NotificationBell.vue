@@ -207,16 +207,17 @@ onBeforeUnmount(() => {
   background: rgba(255, 255, 255, 0.09);
 }
 
+/* 0.62rem (9.9px) oxunmurdu -- reqem nisani ucun de asagi hedd var. */
 .dot {
   position: absolute;
   top: 0;
   right: 0;
   background: var(--accent);
   color: #fff;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  min-width: 17px;
-  height: 17px;
+  min-width: 18px;
+  height: 18px;
   padding: 0 4px;
   border-radius: 20px;
   display: flex;
