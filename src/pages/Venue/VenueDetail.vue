@@ -653,6 +653,10 @@ onMounted(async () => {
 }
 
 /* Sekmə sətri — yapışıq qalır ki, uzun siyahıda da əlçatan olsun */
+/* Telefonda 4 tab (Zallar/Menyular/Rəylər/Yer) 362px sahəyə sığmır
+   (403px) — sonuncu tab kəsik pin ikonu kimi görünürdü, sürüşdürmək
+   lazım olduğu heç yerdə bildirilmirdi. Panelin başqa lentlərində
+   olduğu kimi sağ kənara solğunlaşma və gizli sürüşdürücü zolaq. */
 .tabs {
   display: flex;
   gap: 6px;
@@ -664,6 +668,13 @@ onMounted(async () => {
   z-index: 5;
   padding-top: 6px;
   overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab {

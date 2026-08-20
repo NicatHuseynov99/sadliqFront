@@ -1162,13 +1162,24 @@ textarea:focus {
     padding: 22px 14px 50px;
   }
 
+  /* Əvvəl: avatar+düymə yuxarı sətirdə (hər ikisi order 0, DOM sırası),
+     mətn isə order:3 ilə tək başına aşağı sətirdə — nəticə mənasız
+     qatlanma idi: düymə mətndən əvvəl, aralarında əlaqə görünmürdü.
+     İndi: avatar+mətn birinci sətirdə (adi oxuma axını), düymə aşağıda
+     tam enində, aydın çağırış kimi. */
   .composer {
     flex-wrap: wrap;
+    gap: 10px 12px;
   }
 
   .composer-text {
-    flex-basis: 100%;
-    order: 3;
+    order: 1;
+  }
+
+  .composer-btn {
+    order: 2;
+    flex: 1 0 100%;
+    text-align: center;
   }
 
   .req-head {

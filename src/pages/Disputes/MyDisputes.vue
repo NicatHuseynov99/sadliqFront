@@ -22,7 +22,13 @@
         <UiButton to="/my-reservations">Rezervlərimə bax</UiButton>
       </UiEmpty>
 
-      <div v-else class="dis-layout">
+      <!-- Telefonda siyahı və yazışma eyni ekranda üst-üstə görünürdü —
+           bir işlə belə başlıq iki dəfə təkrarlanırdı, bir neçəsi olanda
+           isə yazışmaya çatmaq üçün bütün siyahını keçmək lazım gəlirdi.
+           Bu enlərdə ikisi ayrı ekran kimi davranır: seçim siyahını
+           gizlədir, «Bütün işlər» geri qaytarır. Masaüstündə hər ikisi
+           həmişə yan-yana görünür (CSS-də media sorğusu ilə). -->
+      <div v-else class="dis-layout" :class="{ 'list-open': showListMobile }">
         <!-- İşlərin siyahısı -->
         <div class="dis-list">
           <button
@@ -30,7 +36,7 @@
             :key="d.id"
             class="dis-row"
             :class="{ active: activeId === d.id }"
-            @click="activeId = d.id"
+            @click="activeId = d.id; showListMobile = false"
           >
             <div class="dr-top">
               <b>{{ d.subject }}</b>
@@ -49,7 +55,10 @@
         </div>
 
         <!-- Seçilmiş işin yazışması -->
-        <DisputeThread :dispute-id="activeId" @changed="load" />
+        <div class="dis-thread-wrap">
+          <button class="back-to-list" @click="showListMobile = true">← Bütün işlər</button>
+          <DisputeThread :dispute-id="activeId" @changed="load" />
+        </div>
       </div>
     </div>
   </div>
@@ -66,6 +75,10 @@ import { getMyDisputes, statusClass } from '@/services/disputeService'
 const disputes = ref([])
 const isLoading = ref(false)
 const activeId = ref(null)
+
+// Telefonda siyahı ilə yazışma ayrı ekran kimi davranır — hansının
+// göründüyünü bu idarə edir. Masaüstündə CSS ikisini də göstərir.
+const showListMobile = ref(true)
 
 const load = async () => {
   isLoading.value = true
@@ -211,6 +224,10 @@ onMounted(load)
   margin-top: 6px;
 }
 
+.back-to-list {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .dis-page {
     padding: 22px 14px 50px;
@@ -220,8 +237,32 @@ onMounted(load)
     grid-template-columns: 1fr;
   }
 
+  /* Bir ekranda ya siyahı, ya yazışma — ikisi birdən yox.
+     Siyahı açıq olanda yazışma tərəfi tam gizlənir və əksinə. */
+  .dis-layout.list-open .dis-thread-wrap {
+    display: none;
+  }
+
+  .dis-layout:not(.list-open) .dis-list {
+    display: none;
+  }
+
   .dis-list {
-    max-height: 300px;
+    max-height: none;
+  }
+
+  .back-to-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--brand);
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 9px 2px;
+    margin: -9px -2px 10px;
   }
 }
 </style>

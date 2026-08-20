@@ -50,8 +50,10 @@
       </div>
 
       <div class="avail-row" v-if="nearestDate !== undefined">
+        <!-- Qısa mətn: uzun cümlə ("Ən yaxın boş tarix: ...") mobil
+             kartda iki sətrə qırılıb nişanı köpüklü edirdi. -->
         <span v-if="nearestDate" class="avail-badge free">
-          ✅ Ən yaxın boş tarix: <b>{{ formatDate(nearestDate) }}</b>
+          ✅ Boş: <b>{{ formatDate(nearestDate) }}</b>
         </span>
         <span v-else class="avail-badge busy">⛔ Yaxın 4 ayda boş tarix yoxdur</span>
       </div>
@@ -289,6 +291,10 @@ const minPrice = computed(() => {
 
 .avail-badge {
   display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 0.76rem;
   font-weight: 600;
   padding: 3px 10px;
@@ -480,14 +486,16 @@ const minPrice = computed(() => {
   }
 
   .venue-info {
-    padding: 11px;
+    padding: 13px;
+    gap: 2px;
   }
 
   .title-row {
     /* Ad və reytinq yan-yana sığmır: reytinq adın altına düşür */
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 5px;
+    margin-bottom: 8px;
   }
 
   .title-row h3 {
