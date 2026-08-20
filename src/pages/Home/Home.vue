@@ -853,6 +853,66 @@ const selectVenue = (venue) => {
   .rb-btn {
     width: 100%;
   }
+
+  /* ————— Müqayisə zolağı —————
+     Masaüstü tərtibatı telefona olduğu kimi düşürdü: «flex-wrap: wrap»
+     və shrink-to-fit en ilə zolaq 195px enində, 295px hündürlüyündə
+     qara bloka çevrilirdi — ekranın ortasında dayanıb sarayların
+     üstünü örtürdü, dörd element dörd ayrı sətrə düşürdü.
+
+     İndi ekranın altına yapışan tam enli zolaqdır:
+       sətir 1 — seçilmiş sarayların adları, üfüqi sürüşür
+       sətir 2 — sayğac solda, «Təmizlə» və «Müqayisə et» sağda */
+  .cmp-bar {
+    left: 0;
+    right: 0;
+    bottom: 58px;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    padding: 10px 12px;
+
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas:
+      'names names names'
+      'count clear open';
+    gap: 8px 8px;
+    align-items: center;
+  }
+
+  /* Adlar bir sətirdə qalır: üç-dörd saray seçiləndə alt-alta düzülüb
+     zolağı ekranın yarısına qədər böyüdürdü. */
+  .cmp-names {
+    grid-area: names;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .cmp-names::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cmp-name {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .cmp-count {
+    grid-area: count;
+    font-size: 0.76rem;
+  }
+
+  .cmp-clear {
+    grid-area: clear;
+  }
+
+  .cmp-open {
+    grid-area: open;
+  }
 }
 .site-wrapper {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

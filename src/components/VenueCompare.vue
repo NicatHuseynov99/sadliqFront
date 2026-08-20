@@ -311,4 +311,49 @@ const rows = computed(() => [
   font-weight: 700;
   cursor: pointer;
 }
+
+/* ————— Telefon —————
+   Cədvəl onsuz da yan-yana sürüşürdü (335px sahədə 720px məzmun), amma
+   ekranda cəmi BİR saray görünürdü və sürüşdürmək olacağına dair heç bir
+   işarə yox idi — istifadəçi qalan sarayların itdiyini düşünürdü.
+
+   İki dəyişiklik: sütunlar daraldılır ki, iki saray eyni anda görünsün,
+   və sağ kənarda solğunlaşma daha məzmun olduğunu bildirir. */
+@media (max-width: 600px) {
+  .table-wrap {
+    mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
+  }
+
+  /* Etiket sütunu 190px tuturdu — ekranın yarısı sadəcə sətir adlarına
+     gedirdi. Adlar qısadır, bu en bəs edir. */
+  .row-label {
+    font-size: 0.72rem;
+    padding-left: 10px !important;
+    padding-right: 8px !important;
+    max-width: 112px;
+    white-space: normal;
+  }
+
+  .cmp-table {
+    font-size: 0.78rem;
+  }
+
+  .cmp-table th {
+    min-width: 132px;
+    padding: 10px 8px;
+  }
+
+  .cmp-table th img {
+    height: 66px;
+  }
+
+  .cmp-table th b {
+    font-size: 0.8rem;
+  }
+
+  .cmp-table td {
+    padding: 9px 8px;
+  }
+}
 </style>
