@@ -14,7 +14,7 @@
       </button>
     </div>
 
-    <p v-if="!isLoading && !items.length" class="empty-box">Hələ məlumat yoxdur.</p>
+    <UiEmpty v-if="!isLoading && !items.length" icon="📊" title="Hələ məlumat yoxdur." />
 
     <section v-for="s in items" :key="s.venueId" class="venue-block">
       <header class="vb-head">
@@ -98,6 +98,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { getOwnerStats } from '@/services/ownerService'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 
 const periods = [
   { value: 7, label: '7 gün' },

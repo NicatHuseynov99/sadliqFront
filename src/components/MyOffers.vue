@@ -1,9 +1,7 @@
 <template>
   <!-- Sahibin göndərdiyi təkliflər və müştəri ilə yazışmalar. -->
   <div class="my-offers" v-loading="isLoading">
-    <p v-if="!isLoading && !offers.length" class="empty-box">
-      Hələ təklif göndərməmisiniz. «Açıq sorğular» bölməsindən başlayın.
-    </p>
+    <UiEmpty v-if="!isLoading && !offers.length" icon="📨" title="Hələ təklif göndərməmisiniz. «Açıq sorğular» bölməsindən başlayın." />
 
     <article v-for="o in offers" :key="o.id" class="offer" :class="statusClass(o.status)">
       <div class="main">
@@ -52,6 +50,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import OfferChat from '@/components/OfferChat.vue'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import { getMyOffers } from '@/services/venueRequestService'
 
 const isLoading = ref(false)

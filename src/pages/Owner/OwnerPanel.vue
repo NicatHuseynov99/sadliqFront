@@ -142,9 +142,11 @@
             </div>
           </div>
 
-          <div v-if="!isLoadingReservations && visible.length === 0" class="empty-box">
-            Bu bölmədə sorğu yoxdur.
-          </div>
+          <UiEmpty
+            v-if="!isLoadingReservations && visible.length === 0"
+            icon="📭"
+            title="Bu bölmədə sorğu yoxdur."
+          />
 
           <article v-for="r in visible" :key="r.id" class="res-card" :class="statusClass(r.status)">
             <div class="res-top">
@@ -754,6 +756,8 @@ onMounted(load)
   overflow-x: auto;
   scrollbar-width: none;
   padding-bottom: 3px;
+  mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
 }
 
 .tabs::-webkit-scrollbar {

@@ -64,7 +64,7 @@
     <section class="staff-list">
       <h2 class="block-title">Mövcud administratorlar</h2>
 
-      <div v-if="!staff.length" class="empty-box">Hələ administrator təyin etməmisiniz.</div>
+      <UiEmpty v-if="!staff.length" icon="🧑‍💼" title="Hələ administrator təyin etməmisiniz." />
 
       <article v-for="s in staff" :key="s.id" class="staff-card" :class="{ off: !s.isActive }">
         <header class="sc-head">
@@ -256,6 +256,7 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
 import { toast } from '@/utils/toast'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import {
   getMyStaff,
   createStaff,

@@ -50,9 +50,7 @@
     </div>
 
     <!-- Jurnal siyahısı -->
-    <div v-if="!isLoading && !logs.length" class="empty-box">
-      Bu şərtlərə uyğun qeyd tapılmadı.
-    </div>
+    <UiEmpty v-if="!isLoading && !logs.length" icon="🗒" title="Bu şərtlərə uyğun qeyd tapılmadı." />
 
     <div v-for="group in grouped" :key="group.key" class="day-group">
       <div class="day-head">
@@ -121,6 +119,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import Pager from '@/components/Pager.vue'
 import { searchAuditLogs, getAuditFilterOptions, actionTone, ROLE_LABELS } from '@/services/auditService'
 import { formatDateFull } from '@/utils/date'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 
 const logs = ref([])
 const options = ref({ actions: [] })

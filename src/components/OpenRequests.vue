@@ -1,10 +1,8 @@
 <template>
   <!-- Müştərilərin paylaşdığı sorğular: boş qalan tarixi satmaq imkanı. -->
   <div class="open-requests" v-loading="isLoading">
-    <p v-if="!isLoading && !requests.length" class="empty-box">
-      Hazırda saraylarınıza uyğun açıq sorğu yoxdur.
-      Yeni sorğu düşəndə bildiriş alacaqsınız.
-    </p>
+    <UiEmpty v-if="!isLoading && !requests.length" icon="📣" title="Hazırda saraylarınıza uyğun açıq sorğu yoxdur.
+      Yeni sorğu düşəndə bildiriş alacaqsınız." />
 
     <article v-for="r in requests" :key="r.id" class="req">
       <header class="req-head">
@@ -124,6 +122,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { toast } from '@/utils/toast'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import { getOpenRequests, sendOffer } from '@/services/venueRequestService'
 
 const isLoading = ref(false)

@@ -15,9 +15,12 @@
         Yeni zal açmaq, sarayın özünü redaktə etmək və menyular rəhbərliyə aiddir.
       </p>
 
-      <div v-if="!venues.length && !isLoading" class="empty-box">
-        {{ canEdit ? 'Hələ sarayınız yoxdur — "Yeni saray" düyməsi ilə əlavə edin.' : 'Sizə hələ zal təyin olunmayıb.' }}
-      </div>
+      <UiEmpty
+        v-if="!venues.length && !isLoading"
+        icon="🏛"
+        :title="canEdit ? 'Hələ sarayınız yoxdur.' : 'Sizə hələ zal təyin olunmayıb.'"
+        :text="canEdit ? '&quot;Yeni saray&quot; düyməsi ilə əlavə edin.' : ''"
+      />
 
       <div v-for="v in venues" :key="v.id" class="vm-card" :class="{ pending: !v.isApproved }">
         <img :src="v.coverImageUrl || FALLBACK_IMAGE" :alt="v.name" @error="onImgError" />
@@ -177,7 +180,7 @@
           </div>
         </article>
 
-        <div v-if="!halls.length" class="empty-box">Bu sarayda hələ zal yoxdur.</div>
+        <UiEmpty v-if="!halls.length" icon="🚪" title="Bu sarayda hələ zal yoxdur." />
       </div>
     </el-dialog>
 
@@ -261,7 +264,7 @@
             </el-popconfirm>
           </div>
         </div>
-        <div v-if="!menus.length" class="empty-box">Bu sarayda hələ menyu yoxdur.</div>
+        <UiEmpty v-if="!menus.length" icon="🍽" title="Bu sarayda hələ menyu yoxdur." />
       </div>
 
       <div class="sub-form">
@@ -306,6 +309,7 @@
 import { computed, reactive, ref } from 'vue'
 import { toast } from '@/utils/toast'
 import HallCalendarEditor from '@/components/HallCalendarEditor.vue'
+import UiEmpty from '@/components/ui/UiEmpty.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 import {
