@@ -1330,6 +1330,13 @@ const selectVenue = (venue) => {
   font-weight: 700;
   text-transform: none;
   letter-spacing: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .range-val {
+    font-size: 0.85rem;
+  }
 }
 
 .price-slider {
