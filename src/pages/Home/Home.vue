@@ -1159,7 +1159,8 @@ const selectVenue = (venue) => {
 
 /* Çekmecənin içindəki sahələr kənara çıxmasın */
 .drawer-body :deep(.el-slider) {
-  padding: 0 6px;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 
 .drawer-body .field,
@@ -1170,6 +1171,12 @@ const selectVenue = (venue) => {
 
 :deep(.filter-drawer .el-drawer__body) {
   overflow-x: hidden;
+}
+
+@media (max-width: 600px) {
+  :deep(.filter-drawer.el-drawer) {
+    width: 100% !important;
+  }
 }
 
 .drawer-group .chips-label {
