@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { FALLBACK_IMAGE, onImgError } from '@/utils/imageFallback'
 
 const props = defineProps({
@@ -67,6 +67,15 @@ const props = defineProps({
 })
 
 defineEmits(['close', 'remove', 'open'])
+
+// el-dialog yalnız <body>-i kilidləyir, <html> özü hələ scroll ola bilir —
+// telefonda arxa səhifə çekmecə açıq ikən sürüşürdü. Açılanda html-i də kilidləyirik.
+onMounted(() => {
+  document.documentElement.classList.add('cmp-lock')
+})
+onUnmounted(() => {
+  document.documentElement.classList.remove('cmp-lock')
+})
 
 const minPrice = (v) => {
   const menus = v.menus ?? []
@@ -134,18 +143,6 @@ const rows = computed(() => [
     value: (v) => `${(v.menus ?? []).length}`,
     best: bestBy((v) => (v.menus ?? []).length),
   },
-  {
-    key: 'address',
-    label: 'Ünvan',
-    value: (v) => v.address || '—',
-    best: null,
-  },
-  {
-    key: 'phone',
-    label: 'Telefon',
-    value: (v) => v.phone || '—',
-    best: null,
-  },
 ])
 </script>
 
@@ -170,7 +167,7 @@ const rows = computed(() => [
   justify-content: space-between;
   background: linear-gradient(135deg, var(--brand), var(--accent));
   color: #fff;
-  padding: 15px 22px;
+  padding: 10px 22px;
   border-radius: 16px 16px 0 0;
 }
 
@@ -199,8 +196,25 @@ const rows = computed(() => [
 
 .table-wrap {
   overflow-x: auto;
-  max-height: 74vh;
-  overflow-y: auto;
+}
+
+@media (min-width: 601px) {
+  .table-wrap {
+    max-height: calc(80vh - 60px);
+    overflow-y: auto;
+  }
+
+  .cmp-table th {
+    padding: 8px 12px;
+  }
+
+  .cmp-table th img {
+    height: 60px;
+  }
+
+  .cmp-table td {
+    padding: 6px 12px;
+  }
 }
 
 .cmp-table {
@@ -321,6 +335,17 @@ const rows = computed(() => [
    uzun ünvan bir sütunu şişirdib digərini əzirdi. Sabit tərtibatda
    etiket sütunu 88px, qalan yer iki saray arasında bərabər bölünür. */
 @media (max-width: 600px) {
+  .table-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .cmp-head {
+    border-radius: 16px 16px 0 0;
+    flex-shrink: 0;
+  }
+
   .cmp-table {
     table-layout: fixed;
     width: 100%;
@@ -378,6 +403,42 @@ const rows = computed(() => [
   .mini-chip {
     font-size: 0.66rem;
     padding: 2px 7px;
+  }
+}
+</style>
+
+<!-- el-dialog Teleport ilə <body>-yə köçürülür, scoped stil ona çatmır —
+     ona görə telefon üçün tam-ekran override ayrı, scope olunmamış blokdadır. -->
+<style>
+html.cmp-lock,
+html.cmp-lock body {
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+@media (max-width: 600px) {
+  .cmp-dialog.el-dialog {
+    position: fixed !important;
+    top: 6dvh !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 94dvh !important;
+    max-height: 94dvh !important;
+    border-radius: 16px 16px 0 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .cmp-dialog.el-dialog .el-dialog__body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 }
 </style>
