@@ -288,7 +288,7 @@
       </template>
     </section>
     <!-- Müqayisə üçün seçilənlər: səhifənin altında üzən sətir -->
-    <div v-if="compareMap.size" class="cmp-bar">
+    <div v-if="compareMap.size" class="cmp-bar" :class="{ 'no-bottom-nav': !auth.isCustomer }">
       <span class="cmp-count">{{ compareMap.size }} saray seçildi</span>
 
       <div class="cmp-names">
@@ -867,13 +867,13 @@ const selectVenue = (venue) => {
        sətir 1 — seçilmiş sarayların adları, üfüqi sürüşür
        sətir 2 — sayğac solda, «Təmizlə» və «Müqayisə et» sağda */
   .cmp-bar {
-    left: 0;
-    right: 0;
+    left: 10px;
+    right: 10px;
     bottom: 58px;
     transform: none;
-    width: 100%;
+    width: auto;
     max-width: none;
-    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    border-radius: var(--r-lg);
     padding: 10px 12px;
 
     display: grid;
@@ -915,6 +915,11 @@ const selectVenue = (venue) => {
 
   .cmp-open {
     grid-area: open;
+  }
+
+  .cmp-bar.no-bottom-nav {
+    bottom: 10px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
 }
 .site-wrapper {
@@ -1229,6 +1234,10 @@ const selectVenue = (venue) => {
 
   .cmp-bar {
     bottom: 68px;
+  }
+
+  .cmp-bar.no-bottom-nav {
+    bottom: 0;
   }
 }
 
