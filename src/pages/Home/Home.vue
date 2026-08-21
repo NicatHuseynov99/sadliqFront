@@ -1171,6 +1171,8 @@ const selectVenue = (venue) => {
 
 :deep(.filter-drawer .el-drawer__body) {
   overflow-x: hidden;
+  padding-left: 25px;
+  padding-right: 25px;
 }
 
 @media (max-width: 600px) {
