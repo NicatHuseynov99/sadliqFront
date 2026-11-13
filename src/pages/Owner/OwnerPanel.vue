@@ -6,7 +6,7 @@
           <h1 class="page-title">İdarəetmə paneli</h1>
           <p class="page-sub">Saraylarınıza gələn rezerv sorğularını buradan idarə edin</p>
         </div>
-        <span class="owner-tag">{{ auth.isSuperAdmin ? '⚙️' : '🏛' }} {{ auth.user?.fullName }}</span>
+        <span class="owner-tag"><IcoSettings v-if="auth.isSuperAdmin" class="ico" /><IcoLandmark v-else class="ico" /> {{ auth.user?.fullName }}</span>
       </header>
 
       <!-- Ümumi göstəricilər -->
@@ -64,22 +64,54 @@
 
       <div v-else class="panel-body">
         <!-- Saray seçimi -->
-        <aside class="venue-list">
-          <span class="side-label">Saraylarım</span>
-          <button
-            v-for="v in venues"
-            :key="v.id"
-            class="venue-item"
-            :class="{ active: v.id === selectedVenueId }"
-            @click="selectVenue(v.id)"
-          >
-            <img :src="v.coverImageUrl || FALLBACK_IMAGE" :alt="v.name" @error="onImgError" />
+        <aside class="venue-list" :class="{ 'is-open': venueSheet, single: venues.length < 2 }">
+          <!-- Telefonda siyahı yoxdur: hazırkı saray bir düymədir, basanda
+               siyahı aşağıdan vərəq kimi açılır -->
+          <button type="button" class="venue-current" @click="venueSheet = true">
+            <img :src="selectedVenue?.coverImageUrl || FALLBACK_IMAGE" :alt="selectedVenue?.name" @error="onImgError" />
             <span class="vi-text">
-              <b>{{ v.name }}</b>
-              <em>{{ v.city }} · {{ v.hallCount }} zal</em>
+              <small>Saray</small>
+              <b>{{ selectedVenue?.name }}</b>
             </span>
-            <span v-if="pendingByVenue[v.id]" class="vi-badge">{{ pendingByVenue[v.id] }}</span>
+            <span v-if="otherPending" class="vi-badge">{{ otherPending }}</span>
+            <span class="vc-change">Dəyiş <IcoChevronDown class="ico" /></span>
           </button>
+
+          <div class="venue-pick" @click.self="venueSheet = false">
+            <div class="venue-pick-inner">
+              <div class="vp-head">
+                <span class="side-label">Saraylarım <em>{{ venues.length }}</em></span>
+                <button type="button" class="vp-close" aria-label="Bağla" @click="venueSheet = false">
+                  <IcoX class="ico" />
+                </button>
+              </div>
+
+              <!-- Az sarayda axtarış artıqdır; admin bütün sarayları görür -->
+              <label v-if="venues.length > 6" class="vp-search">
+                <IcoSearch class="ico" />
+                <input v-model="venueQuery" type="search" placeholder="Saray və ya şəhər axtar" />
+              </label>
+
+              <div class="vp-scroll">
+                <button
+                  v-for="v in filteredVenues"
+                  :key="v.id"
+                  type="button"
+                  class="venue-item"
+                  :class="{ active: v.id === selectedVenueId }"
+                  @click="pickVenue(v.id)"
+                >
+                  <img :src="v.coverImageUrl || FALLBACK_IMAGE" :alt="v.name" loading="lazy" @error="onImgError" />
+                  <span class="vi-text">
+                    <b>{{ v.name }}</b>
+                    <em>{{ v.city }} · {{ v.hallCount }} zal</em>
+                  </span>
+                  <span v-if="pendingByVenue[v.id]" class="vi-badge">{{ pendingByVenue[v.id] }}</span>
+                </button>
+                <p v-if="!filteredVenues.length" class="vp-empty">Bu axtarışa uyğun saray tapılmadı.</p>
+              </div>
+            </div>
+          </div>
         </aside>
 
         <!-- Rezerv sorğuları -->
@@ -239,7 +271,7 @@
 <script setup>
 import { ChartColumn, Inbox, Landmark, Megaphone, ScrollText, Send, Star, Users } from 'lucide-vue-next'
 import SectionNav from '@/components/SectionNav.vue'
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue'
 import { useCountUp } from '@/composables/useCountUp'
 import { toast } from '@/utils/toast'
 import UiEmpty from '@/components/ui/UiEmpty.vue'
@@ -325,6 +357,39 @@ const selectVenue = (venueId) => {
 }
 
 const selectedVenue = computed(() => venues.value.find((v) => v.id === selectedVenueId.value))
+
+// ————— saray seçimi: axtarış, sıralama, telefonda vərəq —————
+const venueQuery = ref('')
+const venueSheet = ref(false)
+
+const normalize = (text) => (text ?? '').toLocaleLowerCase('az')
+
+// Cavab gözləyən sorğusu olan saraylar yuxarıda: iş orada gözləyir
+const filteredVenues = computed(() => {
+  const q = normalize(venueQuery.value.trim())
+  const list = q
+    ? venues.value.filter((v) => normalize(v.name).includes(q) || normalize(v.city).includes(q))
+    : venues.value
+  return [...list].sort((a, b) => (pendingByVenue.value[b.id] || 0) - (pendingByVenue.value[a.id] || 0))
+})
+
+// Düymədə yalnız BAŞQA saraylarda gözləyən sorğuların cəmi görünür
+const otherPending = computed(() =>
+  Object.entries(pendingByVenue.value).reduce(
+    (sum, [id, count]) => sum + (Number(id) === selectedVenueId.value ? 0 : count),
+    0,
+  ),
+)
+
+const pickVenue = (venueId) => {
+  selectVenue(venueId)
+  venueSheet.value = false
+}
+
+// Vərəq açıq olanda arxadakı səhifə sürüşməsin
+watch(venueSheet, (isOpen) => {
+  document.body.style.overflow = isOpen ? 'hidden' : ''
+})
 
 // Hər saray üçün cavab gözləyən sorğu sayı (yan siyahıdakı nişan)
 const pendingByVenue = computed(() => {
@@ -613,13 +678,91 @@ onMounted(load)
   align-items: start;
 }
 
+/* Saray siyahısı səhifə ilə birlikdə yuxarı qaçmır: başlığın altında
+   yapışıb qalır və ekranın hündürlüyünü tutur. Əvvəl sabit 640px qutu idi —
+   həm öz içində, həm səhifədə sürüşürdü və hər ikisi brauzerin kobud
+   zolağı ilə. İndi səhifənin bir sürüşməsi var, siyahı isə yalnız özünə
+   sığmayanda, incə zolaqla sürüşür. */
 .venue-list {
-  background: #fff;
+  position: sticky;
+  top: calc(var(--header-h) + 16px);
+  max-height: calc(100vh - var(--header-h) - 32px);
+  max-height: calc(100dvh - var(--header-h) - 32px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 14px;
-  max-height: 640px;
+  border-radius: 18px;
+  padding: 14px 6px 8px 12px;
+  box-shadow: var(--shadow-1);
+}
+
+.venue-current,
+.vp-close {
+  display: none;
+}
+
+.venue-pick,
+.venue-pick-inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.vp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 8px;
+}
+
+.vp-head .side-label em {
+  font-style: normal;
+  margin-left: 4px;
+  color: var(--muted);
+}
+
+.vp-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  flex: none;
+  margin: 0 8px 10px 0;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.vp-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.vp-search:focus-within {
+  box-shadow: 0 0 0 1.5px var(--brand) inset;
+  color: var(--brand);
+}
+
+.vp-scroll {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+}
+
+.vp-empty {
+  margin: 18px 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .side-label {
@@ -1050,6 +1193,122 @@ onMounted(load)
   .panel-body {
     grid-template-columns: 1fr;
   }
+
+  /* Telefon və planşet: siyahı səhifədə yer tutmur. Hazırkı saray bir
+     düymədir; siyahı basanda aşağıdan vərəq kimi açılır. Bir sarayı olan
+     sahibə seçim lazım deyil — düymə ümumiyyətlə görünmür. */
+  .venue-list {
+    position: static;
+    max-height: none;
+    padding: 0;
+    border: none;
+    background: none;
+    box-shadow: none;
+  }
+
+  .venue-list.single {
+    display: none;
+  }
+
+  .venue-current {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px 10px 10px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    box-shadow: var(--shadow-1);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .venue-current img {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex: none;
+  }
+
+  .venue-current small {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .venue-current b {
+    font-size: 1rem;
+  }
+
+  .vc-change {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: var(--r-pill);
+    background: var(--surface-2);
+    color: var(--ink-2);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .venue-pick {
+    display: none;
+  }
+
+  .venue-list.is-open .venue-pick {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: rgba(27, 18, 22, 0.5);
+  }
+
+  .venue-pick-inner {
+    flex: none;
+    max-height: 82vh;
+    max-height: 82dvh;
+    padding: 16px 10px calc(12px + env(safe-area-inset-bottom, 0px)) 16px;
+    border-radius: 24px 24px 0 0;
+    background: var(--surface);
+    box-shadow: 0 -18px 50px rgba(27, 18, 22, 0.3);
+  }
+
+  .vp-close {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+
+  .vp-head {
+    margin-bottom: 8px;
+  }
+
+  .vp-head .side-label {
+    margin: 0;
+    font-size: 0.8rem;
+  }
+
+  .venue-item {
+    padding: 10px 8px;
+  }
+}
+
+@media (max-width: 980px) {
 
   /* Grid sütununun ilkin «min-width: auto» dəyəri sütunun məzmundan
      kiçilməsinə imkan vermir: saray adları sətri qırmadığına görə
