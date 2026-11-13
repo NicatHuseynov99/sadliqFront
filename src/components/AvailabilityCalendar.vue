@@ -1,9 +1,9 @@
 <template>
   <div class="calendar">
     <div class="cal-head">
-      <button class="nav-btn" :disabled="!canGoBack" @click="shiftMonth(-1)">‹</button>
+      <button class="nav-btn" :disabled="!canGoBack" aria-label="Əvvəlki ay" @click="shiftMonth(-1)"><IcoChevronLeft class="ico" /></button>
       <span class="cal-title">{{ monthLabel }}</span>
-      <button class="nav-btn" @click="shiftMonth(1)">›</button>
+      <button class="nav-btn" aria-label="Növbəti ay" @click="shiftMonth(1)"><IcoChevronRight class="ico" /></button>
     </div>
 
     <!-- Ayın doluluq göstəricisi -->
@@ -155,8 +155,11 @@ const dayTitle = (d) =>
 }
 
 .nav-btn {
-  width: 30px;
-  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1px solid #f0e6ea;
   background: #fff;
@@ -236,6 +239,8 @@ const dayTitle = (d) =>
 }
 
 .day {
+  min-width: 0;
+  padding: 0;
   aspect-ratio: 1;
   border: 1px solid transparent;
   border-radius: 9px;
@@ -334,5 +339,37 @@ const dayTitle = (d) =>
 .dot.busy {
   background: #f6f7f8;
   border-color: #e3e6e8;
+}
+/* Telefon: təqvim öz qabının enindən çıxmasın, günlər barmaq üçün iri olsun */
+.calendar {
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .calendar {
+    padding: 14px 12px 12px;
+    box-shadow: none;
+  }
+
+  .week-days,
+  .days {
+    gap: 4px;
+  }
+
+  .day {
+    font-size: 0.92rem;
+    border-radius: 10px;
+  }
+
+  /* Telefonda «hover» yoxdur — toxunanda qalxıb qalan gün qəribə görünür */
+  .day.free:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .legend {
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
 }
 </style>

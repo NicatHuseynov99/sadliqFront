@@ -12,7 +12,7 @@
         <!-- Axtarış və filtr paneli -->
         <div class="search-box">
           <div class="search-main">
-            <span class="search-icon">🔍</span>
+            <span class="search-icon"><IcoSearch class="ico" /></span>
             <input
               v-model="filters.searchQuery"
               type="text"
@@ -22,7 +22,7 @@
               @focus="suggestOpen = true"
               @blur="closeSuggest"
             />
-            <button class="search-clear" v-if="filters.searchQuery" @click="clearSearch">✕</button>
+            <button class="search-clear" v-if="filters.searchQuery" @click="clearSearch"><IcoX class="ico" /></button>
 
             <!-- Yazdıqca çıxan təkliflər -->
             <ul v-if="suggestOpen && suggestions.length" class="suggest-list">
@@ -40,7 +40,7 @@
                   <span class="sug-type">saray</span>
                 </template>
                 <template v-else>
-                  <span class="sug-city-icon">📍</span>
+                  <span class="sug-city-icon"><IcoMapPin class="ico" /></span>
                   <span class="sug-text"><b>{{ s.text }}</b><em>{{ s.count }} saray</em></span>
                   <span class="sug-type">şəhər</span>
                 </template>
@@ -84,12 +84,12 @@
             </div>
 
             <button class="filter-btn" @click="isFilterOpen = true">
-              🔍 Ətraflı axtarış
+              <IcoSearch class="ico" /> Ətraflı axtarış
               <em v-if="activeFilterCount">{{ activeFilterCount }}</em>
             </button>
 
             <button v-if="hasActiveFilters" class="clear-link" @click="resetFilters">
-              Təmizlə ✕
+              Təmizlə <IcoX class="ico" />
             </button>
           </div>
 
@@ -135,7 +135,7 @@
               :aria-pressed="filters.minRating === r"
               @click="filters.minRating = filters.minRating === r ? null : r"
             >
-              ★ {{ r }}+
+              <IcoStar class="ico ico-fill" /> {{ r }}+
             </button>
           </div>
         </div>
@@ -150,7 +150,7 @@
               :aria-pressed="filters.minParking === p.value"
               @click="filters.minParking = filters.minParking === p.value ? null : p.value"
             >
-              🅿️ {{ p.label }}
+              <IcoSquareParking class="ico" /> {{ p.label }}
             </button>
           </div>
         </div>
@@ -226,8 +226,8 @@
         <div class="header-tools">
           <!-- Siyahı və xəritə eyni süzgəclərlə işləyir -->
           <div class="view-switch">
-            <button :class="{ active: view === 'list' }" @click="view = 'list'">☰ Siyahı</button>
-            <button :class="{ active: view === 'map' }" @click="view = 'map'">🗺 Xəritə</button>
+            <button :class="{ active: view === 'list' }" @click="view = 'list'"><IcoList class="ico" /> Siyahı</button>
+            <button :class="{ active: view === 'map' }" @click="view = 'map'"><IcoMap class="ico" /> Xəritə</button>
           </div>
 
           <div class="sort-box" v-if="view === 'list'">
@@ -294,7 +294,7 @@
       <div class="cmp-names">
         <span v-for="v in compareVenues" :key="v.id" class="cmp-name">
           {{ v.name }}
-          <button @click="toggleCompare(v)">✕</button>
+          <button @click="toggleCompare(v)"><IcoX class="ico" /></button>
         </span>
       </div>
 
@@ -923,7 +923,7 @@ const selectVenue = (venue) => {
   }
 }
 .site-wrapper {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font);
   color: #2c3e50;
   background-color: #f4f6f8;
   min-height: 100vh;
@@ -2132,5 +2132,13 @@ const selectVenue = (venue) => {
   .rb-btn {
     width: 100%;
   }
+}
+
+/* Sürgünün dəstəyi 20px enindədir və ucda yarısı kənara çıxırdı */
+.price-slider {
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  box-sizing: border-box;
 }
 </style>

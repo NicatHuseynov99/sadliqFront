@@ -30,7 +30,7 @@
             {{ v.name }}
             <span v-if="!v.isApproved" class="wait-badge">⏳ Təsdiq gözləyir</span>
           </b>
-          <span>📍 {{ v.city }} · {{ v.address }}</span>
+          <span><IcoMapPin class="ico" /> {{ v.city }} · {{ v.address }}</span>
           <em>{{ v.halls?.length ?? 0 }} zal · {{ v.menus?.length ?? 0 }} menyu</em>
 
           <!-- Rədd edilib: səbəb göstərilir və düzəliş açılır -->
@@ -159,12 +159,12 @@
 
           <div class="hc-body">
             <h4>{{ h.name }}</h4>
-            <span class="hc-capacity">👥 {{ h.capacity }} qonaq</span>
+            <span class="hc-capacity"><IcoUsers class="ico" /> {{ h.capacity }} qonaq</span>
             <p class="hc-desc">{{ h.description || 'Təsvir yazılmayıb' }}</p>
 
             <div v-if="isActiveApproved" class="hc-actions">
-              <button class="act-btn" @click="openCalendar(h)"><span>📅</span> Təqvim</button>
-              <button class="act-btn" @click="openHallForm(h)"><span>✏️</span> Redaktə</button>
+              <button class="act-btn" @click="openCalendar(h)"><span><IcoCalendarDays class="ico" /></span> Təqvim</button>
+              <button class="act-btn" @click="openHallForm(h)"><span><IcoPencil class="ico" /></span> Redaktə</button>
               <el-popconfirm
                 v-if="canEdit"
                 title="Zal silinsin?"
@@ -173,7 +173,7 @@
                 @confirm="removeHall(h)"
               >
                 <template #reference>
-                  <button class="act-btn danger"><span>🗑</span> Sil</button>
+                  <button class="act-btn danger"><span><IcoTrash2 class="ico" /></span> Sil</button>
                 </template>
               </el-popconfirm>
             </div>
@@ -194,7 +194,7 @@
         <!-- Şəkil önizləməsi -->
         <div class="hf-preview">
           <img v-if="hallForm.imageUrl" :src="hallForm.imageUrl || FALLBACK_IMAGE" alt="" @error="onImgError" />
-          <div v-else class="hf-placeholder">🏛<span>Şəkil linki əlavə edin</span></div>
+          <div v-else class="hf-placeholder"><IcoLandmark class="ico" /><span>Şəkil linki əlavə edin</span></div>
         </div>
 
         <el-form label-position="top" class="hf-fields" @submit.prevent>
@@ -285,7 +285,7 @@
               <el-option v-for="c in categories" :key="c" :value="c" :label="c" />
             </el-select>
             <el-input v-model="item.imageUrl" placeholder="Şəkil linki" />
-            <button class="mini-btn danger" @click="menuForm.items.splice(i, 1)">✕</button>
+            <button class="mini-btn danger" @click="menuForm.items.splice(i, 1)"><IcoX class="ico" /></button>
           </div>
           <button class="mini-btn" @click="menuForm.items.push({ name: '', category: 'İsti', imageUrl: '' })">
             + Yemək əlavə et
@@ -1107,5 +1107,39 @@ const removeMenu = async (menu) => {
   margin: 8px 0 0;
   color: #d93025;
   font-size: 13px;
+}
+
+/* Telefon: saray sətri. Əvvəl şəkil, mətn və dörd düymə bir sətirdə idi —
+   düymələr sağda üst-üstə yığılır, ad və ünvan isə hər sözdən bir sınırdı.
+   İndi düymələr mətnin altında, bərabər enli bir cərgədir. */
+@media (max-width: 600px) {
+  .vm-card {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .vm-card img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .vm-text {
+    flex: 1 1 0;
+  }
+
+  .vm-actions {
+    flex-basis: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .vm-actions > * {
+    width: 100%;
+    min-height: 40px;
+    justify-content: center;
+    text-align: center;
+  }
 }
 </style>

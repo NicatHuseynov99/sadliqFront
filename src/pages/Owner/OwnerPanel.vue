@@ -152,7 +152,7 @@
             <div class="res-top">
               <div>
                 <h3>{{ r.customerName }}</h3>
-                <span class="res-meta">{{ r.customerEmail }} · 📞 {{ r.contactPhone }}</span>
+                <span class="res-meta">{{ r.customerEmail }} · <IcoPhone class="ico" /> {{ r.contactPhone }}</span>
               </div>
               <span class="status-tag" :class="statusClass(r.status)">{{ statusText(r.status) }}</span>
             </div>
@@ -178,16 +178,16 @@
               </div>
             </div>
 
-            <p class="res-note" v-if="r.note">💬 {{ r.note }}</p>
+            <p class="res-note" v-if="r.note"><IcoMessageCircle class="ico" /> {{ r.note }}</p>
 
             <!-- Ləğv səbəbi: tarix boşalıbsa niyə boşaldığını bilmək lazımdır -->
             <p class="cancel-note" v-if="r.cancellationReason">
-              🚫 Ləğv səbəbi: {{ r.cancellationReason }}
+              <IcoBan class="ico" /> Ləğv səbəbi: {{ r.cancellationReason }}
             </p>
 
             <!-- Cavabı kim verdi: sarayda bir neçə administrator işləyə bilər -->
             <p class="answered-by" v-if="r.respondedByName">
-              ✍️ Cavabı verdi: <b>{{ r.respondedByName }}</b>
+              <IcoPenLine class="ico" /> Cavabı verdi: <b>{{ r.respondedByName }}</b>
               <span v-if="r.respondedAt"> · {{ formatDateFull(r.respondedAt.slice(0, 10)) }}</span>
             </p>
 
@@ -488,7 +488,7 @@ onMounted(load)
   min-height: calc(100vh - 61px);
   background: #f4f6f8;
   padding: 30px 40px 60px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font);
 }
 
 .panel-inner {
@@ -1098,6 +1098,17 @@ onMounted(load)
   }
   .panel-page {
     padding: 24px 16px 50px;
+  }
+}
+
+/* Telefon: ad onsuz da yuxarıdakı başlıqda var — burada başlığı sıxışdırırdı */
+@media (max-width: 600px) {
+  .owner-tag {
+    display: none;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
   }
 }
 </style>

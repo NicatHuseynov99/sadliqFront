@@ -8,7 +8,7 @@
       :aria-label="unread > 0 ? `Bildirişlər, ${unread} oxunmamış` : 'Bildirişlər'"
       @click="toggle"
     >
-      🔔
+      <IcoBell class="ico" />
       <span v-if="unread > 0" class="dot">{{ unread > 99 ? '99+' : unread }}</span>
     </button>
 
@@ -39,7 +39,7 @@
             <span class="tag">{{ n.typeLabel }}</span>
           </div>
 
-          <button class="del" title="Sil" aria-label="Bildirişi sil" @click.stop="remove(n)">✕</button>
+          <button class="del" title="Sil" aria-label="Bildirişi sil" @click.stop="remove(n)"><IcoX class="ico" /></button>
         </article>
       </div>
 
@@ -376,5 +376,16 @@ onBeforeUnmount(() => {
   padding: 9px 16px;
   text-align: center;
   border-top: 1px solid #f4eef0;
+}
+
+/* Zəng ikonu tünd başlıqda görünsün (emoji əvəzinə xətt ikonudur) */
+.bell {
+  color: var(--gold);
+}
+
+.bell .ico {
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 </style>

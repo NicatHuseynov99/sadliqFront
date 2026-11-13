@@ -17,21 +17,21 @@
             :longitude="venue.longitude"
           />
           <p class="venue-phone">
-            📞 <a :href="`tel:${venue.phone.replace(/\s/g, '')}`">{{ venue.phone }}</a>
+            <IcoPhone class="ico" /> <a :href="`tel:${venue.phone.replace(/\s/g, '')}`">{{ venue.phone }}</a>
           </p>
           <p v-if="venue.parkingCapacity" class="venue-parking">
-            🅿️ Parkinq: <b>{{ venue.parkingCapacity }} avtomobil</b>
+            <IcoSquareParking class="ico" /> Parkinq: <b>{{ venue.parkingCapacity }} avtomobil</b>
             <span v-if="venue.hasValetParking" class="valet-tag">valet xidməti</span>
           </p>
         </div>
         <div class="rating-box">
-          <span class="rating-score">★ {{ venue.rating }}</span>
+          <span class="rating-score"><IcoStar class="ico ico-fill" /> {{ venue.rating }}</span>
           <span class="rating-count">{{ venue.reviewCount }} rəy</span>
         </div>
       </div>
 
       <div class="feature-tags" v-if="venue.features?.length">
-        <span v-for="f in venue.features" :key="f" class="feature-tag">✓ {{ f }}</span>
+        <span v-for="f in venue.features" :key="f" class="feature-tag"><IcoCheck class="ico" /> {{ f }}</span>
       </div>
 
       <p class="venue-desc">{{ venue.description }}</p>
@@ -64,7 +64,7 @@
             <div class="hall-top">
               <div>
                 <h3>{{ h.name }}</h3>
-                <p class="hall-meta">👥 {{ h.capacity }} qonaq tutumu</p>
+                <p class="hall-meta"><IcoUsers class="ico" /> {{ h.capacity }} qonaq tutumu</p>
               </div>
               <span class="price">{{ h.minPrice }} ₼-dən</span>
             </div>
@@ -95,7 +95,8 @@
 
             <div class="hall-footer">
               <button class="calendar-toggle" @click="toggleCalendar(h.id)">
-                {{ openCalendars.has(h.id) ? '▲ Təqvimi gizlət' : '📅 Bütün ayı gör' }}
+                <template v-if="openCalendars.has(h.id)"><IcoChevronUp class="ico" /> Təqvimi gizlət</template>
+                <template v-else><IcoCalendarDays class="ico" /> Bütün ayı gör</template>
               </button>
               <UiButton size="sm" @click="openReserve(h)">Rezerv et</UiButton>
             </div>
@@ -168,7 +169,7 @@
             </ul>
 
             <div class="menu-foot">
-              <button class="photo-btn" @click="openMenu(m)">📷 Yeməklərin şəkilləri</button>
+              <button class="photo-btn" @click="openMenu(m)"><IcoCamera class="ico" /> Yeməklərin şəkilləri</button>
             </div>
           </div>
         </div>
@@ -519,7 +520,6 @@ const submitReserve = async () => {
 // Şəkil yüklənməsə ehtiyat şəkil qoyur
 onMounted(async () => {
   await loadVenue()
-  await loadEligibility()
 })
 </script>
 
@@ -528,7 +528,7 @@ onMounted(async () => {
   min-height: calc(100vh - 61px);
   background: #f4f6f8;
   padding: 24px 40px 60px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font);
 }
 
 .detail-inner {
@@ -864,6 +864,7 @@ onMounted(async () => {
   margin: -9px -4px;
   display: inline-flex;
   align-items: center;
+  gap: 6px;
 }
 
 .calendar-toggle:hover {
@@ -1004,9 +1005,35 @@ onMounted(async () => {
   line-height: 1.3;
 }
 
+/* minmax(0, 1fr): sadə «1fr» sütunu məzmundan dar ola bilmir — 360px
+   telefonda təqvim qabından 26px kənara çıxır və sağ sütunu kəsilirdi. */
 @media (max-width: 820px) {
   .hall-calendar {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Telefonda iç-içə üç çərçivə (zal kartı → boz qab → təqvim kartı) eni
+   yeyirdi. Boz qab götürülür, təqvim kartın tam enini tutur. */
+@media (max-width: 600px) {
+  .hall-calendar {
+    padding: 0;
+    gap: 12px;
+    background: none;
+    border: none;
+  }
+
+  .side-block {
+    padding: 12px;
+  }
+
+  .free-days {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+  }
+
+  .free-day {
+    min-width: 0;
   }
 }
 
