@@ -25,7 +25,7 @@
 
     <div class="user-box" v-if="auth.isAuth">
       <NotificationBell />
-      <router-link to="/profile" class="user-name"><UserRound :size="17" /><span>{{ auth.user?.fullName }}</span></router-link>
+      <router-link to="/profile" class="user-name"><UserRound :size="17" /><span class="name-full">{{ auth.user?.fullName }}</span><span class="name-first">{{ firstName }}</span></router-link>
       <button class="ghost-btn hide-narrow" @click="auth.logout()">Çıxış</button>
 
       <button class="burger" :class="{ on: isMenuOpen }" title="Menyu" @click="isMenuOpen = !isMenuOpen">
@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import {
@@ -79,6 +79,9 @@ const auth = useAuthStore()
 const route = useRoute()
 
 const isMenuOpen = ref(false)
+
+// Telefonda ad və soyad sığmır və yarıda kəsilirdi — yalnız ad göstərilir
+const firstName = computed(() => auth.user?.firstName || (auth.user?.fullName ?? '').trim().split(/s+/)[0] || '')
 
 // Səhifə dəyişəndə menyu açıq qalmasın
 watch(
@@ -134,6 +137,10 @@ watch(
 .user-name span {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.name-first {
+  display: none;
 }
 
 .nav-links a {
@@ -268,7 +275,17 @@ watch(
   }
 
   .user-name {
-    max-width: 110px;
+    max-width: none;
+    flex: none;
+  }
+
+  .name-full {
+    display: none;
+  }
+
+  .name-first {
+    display: inline;
+    overflow: visible;
   }
 
   /* Menyu başlığın altından açılır */
