@@ -750,7 +750,7 @@ onMounted(async () => {
 .chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 5px 13px;
   border-radius: 20px;
   font-size: 0.76rem;
@@ -891,7 +891,7 @@ onMounted(async () => {
 .mini-chip {
   font-size: 0.7rem;
   background: #f6f1f3;
-  color: #6c757d;
+  color: var(--muted);
   padding: 2px 9px;
   border-radius: 20px;
 }
@@ -914,7 +914,7 @@ onMounted(async () => {
 .owner-line em {
   font-style: normal;
   margin-left: 6px;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 .status-badge {
@@ -947,7 +947,7 @@ onMounted(async () => {
 .act {
   background: #fff;
   border: none;
-  color: #6c757d;
+  color: var(--muted);
   padding: 9px 6px;
   font-size: 0.73rem;
   font-weight: 600;
@@ -1118,7 +1118,7 @@ onMounted(async () => {
   border-radius: 0 10px 10px 0;
   padding: 10px 13px;
   font-size: 0.79rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.55;
 }
 
@@ -1171,7 +1171,7 @@ onMounted(async () => {
   font-size: 0.73rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   font-weight: 700;
   margin-bottom: 8px;
 }
@@ -1258,7 +1258,7 @@ onMounted(async () => {
 .role-chip {
   font-size: 0.68rem;
   background: #f6f1f3;
-  color: #6c757d;
+  color: var(--muted);
   padding: 2px 9px;
   border-radius: 20px;
   white-space: nowrap;
@@ -1266,7 +1266,7 @@ onMounted(async () => {
 
 .now {
   font-size: 0.68rem;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 .tick {
@@ -1315,7 +1315,7 @@ onMounted(async () => {
   margin: 0;
   font-size: 0.85rem;
   line-height: 1.6;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 :deep(.venue-dialog.confirm .el-dialog__header) {
@@ -1416,7 +1416,7 @@ onMounted(async () => {
 /* Düymələr */
 .mini-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--ink-2);
   padding: 6px 14px;
   border-radius: 8px;
@@ -1481,6 +1481,120 @@ onMounted(async () => {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ————— Telefon: saray yığcam sətirdir —————
+   Əvvəl hər saray 178px şəkilli iri kart idi: bir ekrana bir saray düşür,
+   45 saray 8600px tuturdu. Admin burada şəkilə baxmır — adı, vəziyyəti və
+   əməliyyatı axtarır. Şəkil kiçik nişana çevrilir, ad və vəziyyət onun
+   yanında dayanır, bir ekranda üç-dörd saray görünür.
+   «display: contents» şəklin üstündəki elementləri kartın öz toruna çıxarır,
+   ona görə şablon dəyişmir və geniş ekran olduğu kimi qalır. */
+@media (max-width: 600px) {
+  .venue-grid {
+    gap: 12px;
+  }
+
+  .venue-card {
+    display: grid;
+    grid-template-columns: 68px minmax(0, 1fr) auto;
+    column-gap: 12px;
+    row-gap: 2px;
+    padding: 12px 12px 0;
+    border-radius: 18px;
+    border-color: var(--line);
+    box-shadow: var(--shadow-1);
+  }
+
+  .venue-card:hover {
+    transform: none;
+    box-shadow: var(--shadow-1);
+  }
+
+  .cover-wrap {
+    display: contents;
+  }
+
+  .cover {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 68px;
+    height: 68px;
+    border-radius: 14px;
+  }
+
+  .cover-wrap .status-badge {
+    position: static;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+    align-self: end;
+  }
+
+  .rating {
+    position: static;
+    grid-column: 3;
+    grid-row: 1;
+    align-self: end;
+    background: var(--gold-soft);
+    color: var(--gold-ink);
+  }
+
+  .cover-shade {
+    position: static;
+    grid-column: 2 / -1;
+    grid-row: 2;
+    align-self: start;
+    min-width: 0;
+    padding: 0;
+    background: none;
+  }
+
+  .venue-name {
+    color: var(--ink);
+    font-size: 1.02rem;
+    font-weight: 600;
+    text-shadow: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .venue-sub {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  .card-body {
+    grid-column: 1 / -1;
+    padding: 10px 0 0;
+  }
+
+  /* Şəkil və rəy sayı telefonda ikinci dərəcəlidir — önizləmədə var */
+  .chips-line .mini-chip:nth-child(3),
+  .chips-line .mini-chip:nth-child(4),
+  .owner-line em {
+    display: none;
+  }
+
+  .mini-chip {
+    font-size: 0.74rem;
+    padding: 3px 10px;
+    background: var(--surface-2);
+  }
+
+  .venue-actions {
+    grid-column: 1 / -1;
+    margin: 10px -12px 0;
+    background: var(--line);
+    border-top-color: var(--line);
+  }
+
+  .act {
+    min-height: 42px;
+    font-size: 0.78rem;
+    color: var(--ink-2);
   }
 }
 </style>
