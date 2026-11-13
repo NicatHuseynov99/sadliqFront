@@ -330,7 +330,7 @@ onMounted(async () => {
 .stat-label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .stat-sub {
@@ -582,7 +582,7 @@ onMounted(async () => {
 .chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 5px 13px;
   border-radius: 20px;
   font-size: 0.76rem;
@@ -617,9 +617,9 @@ onMounted(async () => {
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   padding: 8px 10px;
-  border-bottom: 1px solid #f2ecee;
+  border-bottom: 1px solid var(--line);
   white-space: nowrap;
 }
 
@@ -646,8 +646,8 @@ onMounted(async () => {
 }
 
 .guest-tag {
-  background: #f1f3f5;
-  color: #6c757d;
+  background: var(--surface-2);
+  color: var(--muted);
   font-size: 0.72rem;
   font-weight: 600;
   padding: 2px 9px;
@@ -667,8 +667,8 @@ onMounted(async () => {
   font-weight: 600;
   padding: 3px 9px;
   border-radius: 20px;
-  background: #f1f3f5;
-  color: #6c757d;
+  background: var(--surface-2);
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -679,7 +679,7 @@ onMounted(async () => {
 
 .page-badge.search {
   background: #fdf3e0;
-  color: #b07d2b;
+  color: var(--gold-ink);
 }
 
 .page-badge.home {
@@ -712,7 +712,7 @@ onMounted(async () => {
 
 .mini-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--ink-2);
   padding: 6px 14px;
   border-radius: 8px;

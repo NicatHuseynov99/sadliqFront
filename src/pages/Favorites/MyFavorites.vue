@@ -184,7 +184,7 @@ onMounted(load)
 <style scoped>
 .fav-page {
   min-height: calc(100vh - 61px);
-  background: #f4f6f8;
+  background: var(--bg);
   padding: 30px 40px 60px;
   font-family: var(--font);
 }
@@ -210,7 +210,7 @@ onMounted(load)
 
 .page-sub {
   margin: 0;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.92rem;
 }
 

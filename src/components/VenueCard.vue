@@ -138,7 +138,7 @@ const minPrice = computed(() => {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--line);
   font-family: var(--font);
   cursor: pointer;
 }
@@ -185,7 +185,7 @@ const minPrice = computed(() => {
   display: grid;
   place-items: center;
   font-size: 1rem;
-  color: #adb5bd;
+  color: var(--muted-2);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s;
@@ -214,7 +214,7 @@ const minPrice = computed(() => {
   display: grid;
   place-items: center;
   font-size: 1.1rem;
-  color: #adb5bd;
+  color: var(--muted-2);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s;
@@ -277,7 +277,7 @@ const minPrice = computed(() => {
 
 .rating-pill {
   background: #fdf3e0;
-  color: #b07d2b;
+  color: var(--gold-ink);
   font-weight: 700;
   font-size: 0.85rem;
   padding: 3px 9px;
@@ -303,12 +303,12 @@ const minPrice = computed(() => {
 
 .avail-badge.free {
   background: #e8f6ec;
-  color: #1e7e34;
+  color: var(--ok);
 }
 
 .avail-badge.busy {
   background: var(--danger-soft);
-  color: #c0392b;
+  color: var(--danger);
 }
 
 .address-row {
@@ -320,7 +320,7 @@ const minPrice = computed(() => {
 }
 
 .rev-count {
-  color: #adb5bd;
+  color: var(--muted-2);
   font-size: 0.8rem;
 }
 
@@ -337,7 +337,7 @@ const minPrice = computed(() => {
 
 .description {
   font-size: 0.88rem;
-  color: #495057;
+  color: var(--ink-2);
   margin-bottom: 14px;
   line-height: 1.45;
   display: -webkit-box;
@@ -354,8 +354,8 @@ const minPrice = computed(() => {
 }
 
 .hall-tag {
-  background: #f1f3f5;
-  color: #495057;
+  background: var(--surface-2);
+  color: var(--ink-2);
   font-size: 11px;
   padding: 3px 8px;
   border-radius: 4px;
@@ -372,7 +372,7 @@ const minPrice = computed(() => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #adb5bd;
+  color: var(--muted-2);
   margin-bottom: 7px;
 }
 
@@ -387,8 +387,8 @@ const minPrice = computed(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f8f9fa;
-  border: 1px solid #eaeaea;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 5px 10px 5px 5px;
   cursor: pointer;
@@ -429,14 +429,14 @@ const minPrice = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid #f1f3f5;
+  border-top: 1px solid var(--surface-2);
   padding-top: 12px;
   margin-top: auto;
   gap: 10px;
 }
 
 .menus-summary small {
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.75rem;
   display: block;
   max-width: 170px;

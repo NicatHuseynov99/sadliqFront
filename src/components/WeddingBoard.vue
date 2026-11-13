@@ -250,8 +250,8 @@ const steps = computed(() => {
 }
 
 .steps li.done i {
-  background: #1e7e34;
-  border-color: #1e7e34;
+  background: var(--ok);
+  border-color: var(--ok);
 }
 
 .steps li.now i {
@@ -291,7 +291,7 @@ const steps = computed(() => {
 
 .side-btn.ghost {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--brand);
 }
 

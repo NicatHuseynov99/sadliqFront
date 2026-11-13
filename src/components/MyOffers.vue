@@ -112,12 +112,12 @@ onMounted(load)
 }
 
 .offer.accepted {
-  border-left-color: #1e7e34;
+  border-left-color: var(--ok);
 }
 
 .offer.declined,
 .offer.withdrawn {
-  border-left-color: #ced4da;
+  border-left-color: var(--faint);
   opacity: 0.7;
 }
 
@@ -153,7 +153,7 @@ onMounted(load)
 
 .status.declined,
 .status.withdrawn {
-  background: #f1f3f5;
+  background: var(--surface-2);
   color: var(--muted);
 }
 
@@ -172,7 +172,7 @@ onMounted(load)
 .last {
   margin: 5px 0 0;
   font-size: 0.75rem;
-  color: #6c757d;
+  color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -238,7 +238,7 @@ onMounted(load)
 
 .empty-box {
   background: #fff;
-  border: 1px dashed #eadfe3;
+  border: 1px dashed var(--line);
   border-radius: 14px;
   padding: 30px;
   text-align: center;

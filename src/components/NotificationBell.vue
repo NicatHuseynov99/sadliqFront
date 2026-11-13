@@ -333,7 +333,7 @@ onBeforeUnmount(() => {
 .text p {
   margin: 3px 0 5px;
   font-size: 0.76rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.5;
   white-space: pre-line;
   display: -webkit-box;

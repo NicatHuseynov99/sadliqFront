@@ -33,7 +33,7 @@ defineProps({
 }
 
 .neutral {
-  background: #f1f3f5;
+  background: var(--surface-2);
   color: var(--muted);
 }
 

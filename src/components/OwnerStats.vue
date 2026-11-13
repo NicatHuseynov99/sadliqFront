@@ -159,7 +159,7 @@ onMounted(load)
 .period-btn {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.78rem;
@@ -228,7 +228,7 @@ onMounted(load)
 
 .step-label {
   font-size: 0.78rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .step-extra {
@@ -295,7 +295,7 @@ onMounted(load)
 .offers-line {
   margin-top: 12px;
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .offers-line b {
@@ -326,13 +326,13 @@ onMounted(load)
 
 .advice li {
   font-size: 0.79rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.7;
 }
 
 .empty-box {
   background: #fff;
-  border: 1px dashed #eadfe3;
+  border: 1px dashed var(--line);
   border-radius: 14px;
   padding: 30px;
   text-align: center;

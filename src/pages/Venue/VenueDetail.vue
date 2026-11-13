@@ -526,7 +526,7 @@ onMounted(async () => {
 <style scoped>
 .detail-page {
   min-height: calc(100vh - 61px);
-  background: #f4f6f8;
+  background: var(--bg);
   padding: 24px 40px 60px;
   font-family: var(--font);
 }
@@ -567,13 +567,13 @@ onMounted(async () => {
 
 .venue-phone {
   margin: 4px 0 0;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.92rem;
 }
 
 .venue-parking {
   margin: 4px 0 0;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.92rem;
   display: flex;
   align-items: center;
@@ -599,7 +599,7 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   min-height: 36px;
-  color: #6c757d;
+  color: var(--muted);
   text-decoration: none;
 }
 
@@ -611,7 +611,7 @@ onMounted(async () => {
 .rating-box {
   text-align: center;
   background: #fff;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 10px 18px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -621,12 +621,12 @@ onMounted(async () => {
   display: block;
   font-size: 1.3rem;
   font-weight: 700;
-  color: #b07d2b;
+  color: var(--gold-ink);
 }
 
 .rating-count {
   font-size: 0.78rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .feature-tags {
@@ -638,7 +638,7 @@ onMounted(async () => {
 
 .feature-tag {
   background: #fdf3e0;
-  color: #8a6220;
+  color: var(--gold-ink);
   font-size: 12px;
   padding: 4px 11px;
   border-radius: 20px;
@@ -647,7 +647,7 @@ onMounted(async () => {
 
 .venue-desc {
   margin: 10px 0 0;
-  color: #495057;
+  color: var(--ink-2);
   line-height: 1.65;
   font-size: 0.95rem;
 }
@@ -716,7 +716,7 @@ onMounted(async () => {
   background: #fff;
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--line);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   display: flex;
 }
@@ -751,7 +751,7 @@ onMounted(async () => {
 .hall-meta {
   margin: 0;
   font-size: 0.85rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .hall-desc {
@@ -776,12 +776,12 @@ onMounted(async () => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .strip-free {
   font-size: 0.78rem;
-  color: #8a6220;
+  color: var(--gold-ink);
 }
 
 .strip-free b {
@@ -837,9 +837,9 @@ onMounted(async () => {
 }
 
 .strip-day.busy {
-  background: #f6f7f8;
+  background: var(--surface-2);
   border: 1px solid transparent;
-  color: #ced4da;
+  color: var(--faint);
   cursor: not-allowed;
   text-decoration: line-through;
 }
@@ -849,7 +849,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  border-top: 1px solid #f1f3f5;
+  border-top: 1px solid var(--surface-2);
   padding-top: 12px;
 }
 
@@ -876,7 +876,7 @@ onMounted(async () => {
   padding: 18px;
   border-radius: 16px;
   background: linear-gradient(135deg, #fbf7f8 0%, #f8f4f5 100%);
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   display: grid;
   grid-template-columns: minmax(280px, 360px) 1fr;
   gap: 20px;
@@ -891,7 +891,7 @@ onMounted(async () => {
 
 .side-block {
   background: linear-gradient(180deg, #fdfbfc, var(--bg));
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 14px 16px;
 }
@@ -902,7 +902,7 @@ onMounted(async () => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   margin-bottom: 12px;
 }
 
@@ -945,12 +945,12 @@ onMounted(async () => {
 }
 
 .free-day.weekend .fd-day {
-  color: #8a6220;
+  color: var(--gold-ink);
 }
 
 .fd-weekday {
   font-size: 0.6rem;
-  color: #c2b2b8;
+  color: var(--muted-2);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -972,7 +972,7 @@ onMounted(async () => {
   display: block;
   margin-top: 10px;
   font-size: 0.72rem;
-  color: #b8a3ab;
+  color: var(--muted-2);
   line-height: 1.5;
 }
 
@@ -999,7 +999,7 @@ onMounted(async () => {
 
 .stat-label {
   font-size: 0.66rem;
-  color: #b8a3ab;
+  color: var(--muted-2);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1.3;
@@ -1048,7 +1048,7 @@ onMounted(async () => {
   background: #fff;
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--line);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
@@ -1125,9 +1125,9 @@ onMounted(async () => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #8a6220;
+  color: var(--gold-ink);
   padding-bottom: 7px;
-  border-bottom: 1px dashed #e9ecef;
+  border-bottom: 1px dashed var(--line);
   margin-bottom: 10px;
 }
 
@@ -1142,9 +1142,9 @@ onMounted(async () => {
   align-items: center;
   gap: 6px;
   font-size: 0.87rem;
-  color: #495057;
+  color: var(--ink-2);
   padding: 5px 0;
-  border-bottom: 1px solid #f8f9fa;
+  border-bottom: 1px solid var(--surface-2);
 }
 
 .composition .dot {
@@ -1154,8 +1154,8 @@ onMounted(async () => {
 
 .cat-mini {
   margin-left: auto;
-  background: #f8f9fa;
-  color: #adb5bd;
+  background: var(--surface-2);
+  color: var(--muted-2);
   font-size: 0.68rem;
   font-weight: 600;
   padding: 2px 8px;
@@ -1166,7 +1166,7 @@ onMounted(async () => {
 .menu-foot {
   margin-top: auto;
   padding-top: 12px;
-  border-top: 1px solid #f1f3f5;
+  border-top: 1px solid var(--surface-2);
 }
 
 .photo-btn {
@@ -1205,7 +1205,7 @@ onMounted(async () => {
 
 .dialog-desc {
   margin: 0 0 16px;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.88rem;
 }
 
@@ -1218,8 +1218,8 @@ onMounted(async () => {
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #8a6220;
-  border-bottom: 1px dashed #e9ecef;
+  color: var(--gold-ink);
+  border-bottom: 1px dashed var(--line);
   padding-bottom: 6px;
 }
 
@@ -1243,7 +1243,7 @@ onMounted(async () => {
 
 .dish span {
   font-size: 0.8rem;
-  color: #495057;
+  color: var(--ink-2);
   line-height: 1.3;
   display: block;
 }
@@ -1271,7 +1271,7 @@ onMounted(async () => {
 
 .form-error {
   margin: 0;
-  color: #d93025;
+  color: var(--danger);
   font-size: 13px;
   white-space: pre-line;
 }

@@ -226,7 +226,7 @@ const send = async () => {
 .current {
   margin: 0 0 14px;
   font-size: 0.78rem;
-  color: #6c757d;
+  color: var(--muted);
   background: #fbf7f8;
   border-radius: 10px;
   padding: 9px 12px;
@@ -290,7 +290,7 @@ textarea:focus {
 
 .ghost-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--brand);
   padding: 8px 16px;
   border-radius: 9px;

@@ -480,7 +480,7 @@ onMounted(async () => {
 .page-sub {
   margin: 0;
   font-size: 0.86rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.6;
   max-width: 640px;
 }
@@ -673,12 +673,12 @@ textarea:focus {
 }
 
 .req-card.done {
-  border-left-color: #1e7e34;
+  border-left-color: var(--ok);
 }
 
 .req-card.closed,
 .req-card.expired {
-  border-left-color: #ced4da;
+  border-left-color: var(--faint);
   opacity: 0.75;
 }
 
@@ -723,14 +723,14 @@ textarea:focus {
 
 .req-status.closed,
 .req-status.expired {
-  background: #f1f3f5;
+  background: var(--surface-2);
   color: var(--muted);
 }
 
 .req-note {
   margin: 10px 0 0;
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .waiting {
@@ -775,7 +775,7 @@ textarea:focus {
 .waiting-box span {
   display: block;
   font-size: 0.78rem;
-  color: var(--muted, #6c757d);
+  color: var(--muted, var(--muted));
   line-height: 1.5;
 }
 
@@ -1036,7 +1036,7 @@ textarea:focus {
 .offer-message {
   margin: 10px 0 0;
   font-size: 0.78rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.5;
   white-space: pre-line;
   flex: 1;
@@ -1063,7 +1063,7 @@ textarea:focus {
   margin-left: auto;
   font-style: normal;
   font-size: 0.76rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .offer-actions {
@@ -1128,7 +1128,7 @@ textarea:focus {
 
 .ghost-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--brand);
   padding: 8px 16px;
   border-radius: 9px;
@@ -1149,7 +1149,7 @@ textarea:focus {
 
 .empty-box {
   background: #fff;
-  border: 1px dashed #eadfe3;
+  border: 1px dashed var(--line);
   border-radius: 14px;
   padding: 30px;
   text-align: center;

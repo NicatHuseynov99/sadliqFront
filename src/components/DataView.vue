@@ -340,7 +340,7 @@ onMounted(refresh)
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 .table-list {
@@ -384,7 +384,7 @@ onMounted(refresh)
 .table-count {
   font-style: normal;
   font-size: 0.7rem;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 .table-btn.active .table-count {
@@ -458,7 +458,7 @@ onMounted(refresh)
   align-items: center;
   gap: 6px;
   font-size: 0.78rem;
-  color: #6c757d;
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -492,9 +492,9 @@ onMounted(refresh)
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   padding: 8px 10px;
-  border-bottom: 1px solid #f2ecee;
+  border-bottom: 1px solid var(--line);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
@@ -520,7 +520,7 @@ onMounted(refresh)
 
 /* Silinmiş sətir üstündən xətlə göstərilir */
 .grid tr.removed td {
-  color: #b8a3ab;
+  color: var(--muted-2);
   text-decoration: line-through;
 }
 
@@ -560,7 +560,7 @@ onMounted(refresh)
 
 .mini-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--ink-2);
   padding: 5px 12px;
   border-radius: 8px;

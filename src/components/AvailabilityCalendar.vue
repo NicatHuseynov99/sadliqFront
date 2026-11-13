@@ -133,7 +133,7 @@ const dayTitle = (d) =>
 <style scoped>
 .calendar {
   background: #fff;
-  border: 1px solid #efe9eb;
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 16px 18px 14px;
   box-shadow: 0 6px 20px rgba(114, 20, 56, 0.06);
@@ -161,7 +161,7 @@ const dayTitle = (d) =>
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid #f0e6ea;
+  border: 1px solid var(--line);
   background: #fff;
   color: var(--brand);
   font-size: 1.1rem;
@@ -207,7 +207,7 @@ const dayTitle = (d) =>
 
 .occ-text {
   font-size: 0.72rem;
-  color: #adb5bd;
+  color: var(--muted-2);
   white-space: nowrap;
 }
 
@@ -230,12 +230,12 @@ const dayTitle = (d) =>
   text-align: center;
   font-size: 0.68rem;
   font-weight: 700;
-  color: #ced4da;
+  color: var(--faint);
   text-transform: uppercase;
 }
 
 .week-days span.weekend {
-  color: #b07d2b;
+  color: var(--gold-ink);
 }
 
 .day {
@@ -277,7 +277,7 @@ const dayTitle = (d) =>
 .day.free.weekend {
   background: #fdf6e9;
   border-color: #f2e3c6;
-  color: #8a6220;
+  color: var(--gold-ink);
 }
 
 .day.free.weekend:hover {
@@ -288,14 +288,14 @@ const dayTitle = (d) =>
 
 /* Dolu gün — həyəcan siqnalı deyil, sadəcə susdurulmuş */
 .day.busy {
-  background: #f6f7f8;
-  color: #ced4da;
+  background: var(--surface-2);
+  color: var(--faint);
   text-decoration: line-through;
   text-decoration-thickness: 1px;
 }
 
 .day.past {
-  color: #e9ecef;
+  color: var(--line);
 }
 
 .day.today {
@@ -337,7 +337,7 @@ const dayTitle = (d) =>
 }
 
 .dot.busy {
-  background: #f6f7f8;
+  background: var(--surface-2);
   border-color: #e3e6e8;
 }
 /* Telefon: təqvim öz qabının enindən çıxmasın, günlər barmaq üçün iri olsun */

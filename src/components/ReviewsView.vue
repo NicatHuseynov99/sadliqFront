@@ -517,7 +517,7 @@ onMounted(refresh)
 .stat-label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .stat-sub {
@@ -606,7 +606,7 @@ onMounted(refresh)
 .chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 5px 13px;
   border-radius: 20px;
   font-size: 0.76rem;
@@ -709,7 +709,7 @@ onMounted(refresh)
 }
 
 .review-item.removed .comment {
-  color: #b8a3ab;
+  color: var(--muted-2);
   text-decoration: line-through;
 }
 
@@ -753,7 +753,7 @@ onMounted(refresh)
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   font-weight: 700;
   margin-bottom: 6px;
 }
@@ -770,7 +770,7 @@ onMounted(refresh)
   border: none;
   font-size: 1.5rem;
   line-height: 1;
-  color: #ece5e8;
+  color: var(--line);
   cursor: pointer;
   padding: 0 1px;
   transition: color 0.12s, transform 0.12s;
@@ -852,7 +852,7 @@ onMounted(refresh)
 }
 
 .stars i {
-  color: #ece5e8;
+  color: var(--line);
   font-style: normal;
 }
 
@@ -877,8 +877,8 @@ onMounted(refresh)
   padding: 3px 9px;
   border-radius: 20px;
   border: none;
-  background: #f1f3f5;
-  color: #6c757d;
+  background: var(--surface-2);
+  color: var(--muted);
 }
 
 .tag.warn {
@@ -938,8 +938,8 @@ onMounted(refresh)
 
 .role-tag {
   font-size: 0.7rem;
-  background: #f1f3f5;
-  color: #6c757d;
+  background: var(--surface-2);
+  color: var(--muted);
   padding: 2px 8px;
   border-radius: 20px;
 }
@@ -1053,7 +1053,7 @@ onMounted(refresh)
 /* Düymələr */
 .mini-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--ink-2);
   padding: 6px 14px;
   border-radius: 8px;

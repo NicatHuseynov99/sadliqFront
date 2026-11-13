@@ -436,7 +436,7 @@ onMounted(load)
 <style scoped>
 .block {
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 20px 22px;
   margin-bottom: 20px;
@@ -469,7 +469,7 @@ onMounted(load)
 }
 
 .approve-btn {
-  background: #1e7e34;
+  background: var(--ok);
   color: #fff;
   border: none;
   padding: 8px 16px;
@@ -481,7 +481,7 @@ onMounted(load)
 }
 
 .approve-btn:hover {
-  background: #17692b;
+  background: var(--ok);
 }
 
 .head-tools {
@@ -548,7 +548,7 @@ onMounted(load)
 .chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -583,9 +583,9 @@ onMounted(load)
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   padding: 8px 10px;
-  border-bottom: 1px solid #f2ecee;
+  border-bottom: 1px solid var(--line);
   white-space: nowrap;
 }
 
@@ -609,7 +609,7 @@ onMounted(load)
 /* Silinmiş hesab sönük və üstündən xətli — amma yerində qalır */
 .user-table tr.removed td {
   background: #fbf8f9;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 .user-table tr.removed td:not(.row-actions) {
@@ -652,7 +652,7 @@ onMounted(load)
 
 .mini-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--ink-2);
   padding: 5px 11px;
   border-radius: 8px;
@@ -685,7 +685,7 @@ onMounted(load)
 }
 
 .mini-btn.ok:hover:not(:disabled) {
-  background: #17692b;
+  background: var(--ok);
   color: #fff;
 }
 
@@ -714,8 +714,8 @@ onMounted(load)
   margin: 0;
   display: grid;
   gap: 1px;
-  background: #f2ecee;
-  border: 1px solid #f2ecee;
+  background: var(--line);
+  border: 1px solid var(--line);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -749,7 +749,7 @@ onMounted(load)
 
 .dialog-input {
   width: 100%;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   border-radius: 10px;
   padding: 10px 14px;
   font-size: 0.9rem;
@@ -762,7 +762,7 @@ onMounted(load)
 
 .you-tag {
   background: #fdf3e0;
-  color: #b07d2b;
+  color: var(--gold-ink);
   font-style: normal;
   font-size: 0.66rem;
   font-weight: 700;
@@ -772,14 +772,14 @@ onMounted(load)
 }
 
 .role-select {
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 5px 10px;
   font-size: 0.82rem;
   font-weight: 600;
   background: #fff;
   cursor: pointer;
-  color: #495057;
+  color: var(--ink-2);
 }
 
 .role-select:disabled {
@@ -789,8 +789,8 @@ onMounted(load)
 
 .role-select.owner { border-color: #e8cdd8; color: var(--brand); }
 .role-select.superadmin { border-color: var(--ink); color: var(--ink); }
-.role-select.venueadmin { border-color: #f0dfbe; color: #8a6220; }
-.role-select.support { border-color: #cfe3d4; color: #1e7e34; }
+.role-select.venueadmin { border-color: #f0dfbe; color: var(--gold-ink); }
+.role-select.support { border-color: #cfe3d4; color: var(--ok); }
 
 /* Rol (6 seçim) və status (4 seçim) çipləri telefonda wrap ilə 5 sətrə
    qədər qırılıb, siyahıya çatmaq üçün ekranın yarısını tuturdu.
@@ -839,7 +839,7 @@ onMounted(load)
 
   .user-table tr {
     background: #fff;
-    border: 1px solid #f2ecee;
+    border: 1px solid var(--line);
     border-radius: 12px;
     padding: 4px 12px;
     margin-bottom: 10px;
@@ -851,7 +851,7 @@ onMounted(load)
     justify-content: space-between;
     gap: 12px;
     padding: 8px 0;
-    border-bottom: 1px dashed #f2ecee;
+    border-bottom: 1px dashed var(--line);
   }
 
   .user-table td:last-child {
@@ -864,7 +864,7 @@ onMounted(load)
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #b8a3ab;
+    color: var(--muted-2);
     flex: 0 0 auto;
   }
 

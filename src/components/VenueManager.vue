@@ -623,7 +623,7 @@ const removeMenu = async (menu) => {
 <style scoped>
 .vm-list {
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 20px 22px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
@@ -644,7 +644,7 @@ const removeMenu = async (menu) => {
   border: 1px solid #f0dfbe;
   border-radius: 10px;
   font-size: 0.82rem;
-  color: #8a6220;
+  color: var(--gold-ink);
   line-height: 1.5;
 }
 
@@ -668,7 +668,7 @@ const removeMenu = async (menu) => {
   display: flex;
   align-items: center;
   gap: 14px;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 12px;
   margin-bottom: 10px;
@@ -784,7 +784,7 @@ const removeMenu = async (menu) => {
 .vm-text em {
   font-style: normal;
   font-size: 0.8rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .vm-actions,
@@ -797,8 +797,8 @@ const removeMenu = async (menu) => {
 
 .mini-btn {
   background: #fff;
-  border: 1px solid #eaeaea;
-  color: #6c757d;
+  border: 1px solid var(--line);
+  color: var(--muted);
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 0.78rem;
@@ -813,8 +813,8 @@ const removeMenu = async (menu) => {
 }
 
 .mini-btn.danger:hover {
-  border-color: #c0392b;
-  color: #c0392b;
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 .form-row {
@@ -832,7 +832,7 @@ const removeMenu = async (menu) => {
 .feature-chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -859,7 +859,7 @@ const removeMenu = async (menu) => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 .hall-grid {
@@ -869,7 +869,7 @@ const removeMenu = async (menu) => {
 }
 
 .hall-card {
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
   background: #fff;
@@ -921,7 +921,7 @@ const removeMenu = async (menu) => {
 .hc-desc {
   margin: 8px 0 12px;
   font-size: 0.8rem;
-  color: #adb5bd;
+  color: var(--muted-2);
   line-height: 1.45;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -944,7 +944,7 @@ const removeMenu = async (menu) => {
   gap: 5px;
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 0.78rem;
@@ -960,8 +960,8 @@ const removeMenu = async (menu) => {
 }
 
 .act-btn.danger:hover {
-  border-color: #c0392b;
-  color: #c0392b;
+  border-color: var(--danger);
+  color: var(--danger);
   background: #fdf4f3;
 }
 
@@ -979,7 +979,7 @@ const removeMenu = async (menu) => {
   border-radius: 12px;
   overflow: hidden;
   background: var(--bg);
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
 }
 
 .hf-preview img {
@@ -1001,7 +1001,7 @@ const removeMenu = async (menu) => {
 
 .hf-placeholder span {
   font-size: 0.75rem;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 @media (max-width: 640px) {
@@ -1024,7 +1024,7 @@ const removeMenu = async (menu) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 10px;
   padding: 10px;
   margin-bottom: 8px;
@@ -1053,7 +1053,7 @@ const removeMenu = async (menu) => {
 .sub-text em {
   font-style: normal;
   font-size: 0.76rem;
-  color: #adb5bd;
+  color: var(--muted-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1083,7 +1083,7 @@ const removeMenu = async (menu) => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   margin-bottom: 8px;
 }
 
@@ -1105,7 +1105,7 @@ const removeMenu = async (menu) => {
 
 .form-error {
   margin: 8px 0 0;
-  color: #d93025;
+  color: var(--danger);
   font-size: 13px;
 }
 

@@ -394,7 +394,7 @@ select:focus {
 .chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 6px 13px;
   border-radius: 20px;
   font-size: 0.77rem;
@@ -445,7 +445,7 @@ select:focus {
 
 .summary {
   font-size: 0.78rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .actions {
@@ -461,7 +461,7 @@ select:focus {
 
 .ghost-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--brand);
   padding: 8px 16px;
   border-radius: 9px;
@@ -561,8 +561,8 @@ select:focus {
   font-size: 0.68rem;
   padding: 2px 9px;
   border-radius: 20px;
-  background: #f1f3f5;
-  color: #6c757d;
+  background: var(--surface-2);
+  color: var(--muted);
 }
 
 .status.sent {
@@ -583,7 +583,7 @@ select:focus {
 .row-body {
   margin: 4px 0 5px;
   font-size: 0.77rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;

@@ -574,7 +574,7 @@ onMounted(async () => {
 <style scoped>
 .register-page {
   min-height: calc(100vh - 61px);
-  background: #f4f6f8;
+  background: var(--bg);
   padding: 30px 20px 60px;
 }
 
@@ -680,7 +680,7 @@ onMounted(async () => {
 .progress-bar {
   flex: 1;
   height: 7px;
-  background: #ece5e8;
+  background: var(--line);
   border-radius: 20px;
   overflow: hidden;
 }
@@ -792,7 +792,7 @@ onMounted(async () => {
 .hint em,
 label em {
   font-style: normal;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 .grid {
@@ -807,7 +807,7 @@ label,
   flex-direction: column;
   gap: 5px;
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 label.wide,
@@ -850,7 +850,7 @@ label.check {
 .label-text {
   display: block;
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--muted);
   margin: 16px 0 8px;
 }
 
@@ -863,7 +863,7 @@ label.check {
 .chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 6px 13px;
   border-radius: 20px;
   font-size: 0.78rem;
@@ -957,7 +957,7 @@ label.check {
 .ask-box p {
   margin: 6px 0 12px;
   font-size: 0.82rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.55;
 }
 
@@ -1010,7 +1010,7 @@ label.check {
   border-radius: 0 10px 10px 0;
   padding: 11px 14px;
   font-size: 0.83rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.6;
 }
 
@@ -1059,7 +1059,7 @@ label.check {
 .done-text {
   margin: 0 auto 20px;
   max-width: 460px;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.7;
 }
 

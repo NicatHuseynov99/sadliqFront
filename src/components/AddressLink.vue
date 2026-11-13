@@ -69,7 +69,7 @@ const openMap = async (command) => {
   align-items: center;
   gap: 5px;
   cursor: pointer;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.92rem;
   transition: color 0.2s;
   outline: none;
@@ -89,6 +89,6 @@ const openMap = async (command) => {
 
 .hint {
   font-size: 0.78rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 </style>

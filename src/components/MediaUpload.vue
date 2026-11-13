@@ -138,7 +138,7 @@ const onDrop = (event) => {
 .bar {
   width: 70%;
   height: 5px;
-  background: #ece5e8;
+  background: var(--line);
   border-radius: 20px;
   overflow: hidden;
   margin-top: 6px;

@@ -147,7 +147,7 @@ const dayTitle = (d) =>
 <style scoped>
 .editor {
   background: #fff;
-  border: 1px solid #efe9eb;
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 16px 18px 14px;
 }
@@ -169,7 +169,7 @@ const dayTitle = (d) =>
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1px solid #f0e6ea;
+  border: 1px solid var(--line);
   background: #fff;
   color: var(--brand);
   font-size: 1.1rem;
@@ -203,12 +203,12 @@ const dayTitle = (d) =>
   text-align: center;
   font-size: 0.68rem;
   font-weight: 700;
-  color: #ced4da;
+  color: var(--faint);
   text-transform: uppercase;
 }
 
 .week-days span.weekend {
-  color: #b07d2b;
+  color: var(--gold-ink);
 }
 
 .day {
@@ -243,7 +243,7 @@ const dayTitle = (d) =>
 .day.free.weekend {
   background: #fdf6e9;
   border-color: #f2e3c6;
-  color: #8a6220;
+  color: var(--gold-ink);
 }
 
 .day.blocked {
@@ -264,7 +264,7 @@ const dayTitle = (d) =>
 }
 
 .day.past {
-  color: #e9ecef;
+  color: var(--line);
   cursor: default;
 }
 
@@ -299,7 +299,7 @@ const dayTitle = (d) =>
 .hint {
   margin: 10px 0 0;
   font-size: 0.75rem;
-  color: #adb5bd;
+  color: var(--muted-2);
   line-height: 1.5;
 }
 </style>

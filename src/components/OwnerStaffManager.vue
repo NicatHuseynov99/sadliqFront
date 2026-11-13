@@ -498,7 +498,7 @@ onMounted(() => {
 .staff-form,
 .staff-list {
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 20px 22px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
@@ -525,12 +525,12 @@ onMounted(() => {
 
 .form-error {
   margin: 0 0 10px;
-  color: #d93025;
+  color: var(--danger);
   font-size: 13px;
 }
 
 .staff-card {
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-left: 4px solid var(--gold);
   border-radius: 14px;
   padding: 14px 16px;
@@ -545,7 +545,7 @@ onMounted(() => {
 
 .staff-card.off {
   background: #faf9fa;
-  border-left-color: #ced4da;
+  border-left-color: var(--faint);
 }
 
 .staff-card.off .staff-avatar {
@@ -574,7 +574,7 @@ onMounted(() => {
 
 .sc-title span {
   font-size: 0.78rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 /* Məlumat sətirləri */
@@ -598,7 +598,7 @@ onMounted(() => {
   font-size: 0.64rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #c2b2b8;
+  color: var(--muted-2);
   font-weight: 700;
 }
 
@@ -660,7 +660,7 @@ onMounted(() => {
 .hall-chip {
   background: #fdf6e9;
   border: 1px solid #f0dfbe;
-  color: #8a6220;
+  color: var(--gold-ink);
   font-size: 0.76rem;
   font-weight: 600;
   padding: 3px 11px;
@@ -705,7 +705,7 @@ onMounted(() => {
   gap: 5px;
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 0.78rem;
@@ -725,13 +725,13 @@ onMounted(() => {
 }
 
 .act-btn.warn:hover {
-  border-color: #b07d2b;
-  color: #b07d2b;
+  border-color: var(--gold-ink);
+  color: var(--gold-ink);
 }
 
 .act-btn.danger:hover {
-  border-color: #c0392b;
-  color: #c0392b;
+  border-color: var(--danger);
+  color: var(--danger);
   background: #fdf4f3;
 }
 
@@ -794,7 +794,7 @@ onMounted(() => {
 .ho-text em {
   font-style: normal;
   font-size: 0.75rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .picker-summary {
@@ -828,7 +828,7 @@ onMounted(() => {
   place-items: center;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, var(--brand), #b07d2b);
+  background: linear-gradient(135deg, var(--brand), var(--gold-ink));
   flex-shrink: 0;
   font-size: 0.9rem;
 }
@@ -836,7 +836,7 @@ onMounted(() => {
 .field-hint {
   display: block;
   font-size: 0.72rem;
-  color: #adb5bd;
+  color: var(--muted-2);
   line-height: 1.4;
 }
 
@@ -855,7 +855,7 @@ onMounted(() => {
   font-weight: 700;
   padding: 4px 11px;
   border-radius: 20px;
-  background: #f1f3f5;
+  background: var(--surface-2);
   color: var(--muted);
   white-space: nowrap;
 }
@@ -864,17 +864,17 @@ onMounted(() => {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #ced4da;
+  background: var(--faint);
   display: inline-block;
 }
 
 .staff-status.on {
   background: #e3f6e8;
-  color: #1e7e34;
+  color: var(--ok);
 }
 
 .staff-status.on .dot {
-  background: #1e7e34;
+  background: var(--ok);
 }
 
 .empty-box {

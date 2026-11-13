@@ -226,7 +226,7 @@ onMounted(async () => {
 <style scoped>
 .profile-page {
   min-height: calc(100vh - 61px);
-  background: #f4f6f8;
+  background: var(--bg);
   padding: 30px 40px 60px;
   font-family: var(--font);
 }
@@ -248,7 +248,7 @@ onMounted(async () => {
 
 .page-sub {
   margin: 0;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.92rem;
 }
 
@@ -266,7 +266,7 @@ onMounted(async () => {
 /* Sol hesab kartı */
 .account-card {
   background: linear-gradient(180deg, #fff 0%, #fdfbfc 100%);
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 24px 20px 20px;
   text-align: center;
@@ -283,7 +283,7 @@ onMounted(async () => {
   font-size: 1.5rem;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, var(--brand), #b07d2b);
+  background: linear-gradient(135deg, var(--brand), var(--gold-ink));
   box-shadow: 0 8px 18px rgba(114, 20, 56, 0.25);
 }
 
@@ -299,13 +299,13 @@ onMounted(async () => {
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 20px;
-  background: #f1f3f5;
+  background: var(--surface-2);
   color: var(--muted);
 }
 
 .role-tag.customer {
   background: #fdf6e9;
-  color: #8a6220;
+  color: var(--gold-ink);
 }
 
 .role-tag.owner {
@@ -317,7 +317,7 @@ onMounted(async () => {
   list-style: none;
   margin: 18px 0 18px;
   padding: 16px 0 0;
-  border-top: 1px solid #f2ecee;
+  border-top: 1px solid var(--line);
   text-align: left;
 }
 
@@ -332,7 +332,7 @@ onMounted(async () => {
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   font-weight: 700;
 }
 
@@ -377,7 +377,7 @@ onMounted(async () => {
   border-radius: 10px;
   padding: 11px 14px;
   font-size: 0.78rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.6;
 }
 
@@ -415,7 +415,7 @@ onMounted(async () => {
 
 .form-error {
   margin: 0 0 10px;
-  color: #d93025;
+  color: var(--danger);
   font-size: 13px;
   white-space: pre-line;
 }

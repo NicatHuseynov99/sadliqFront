@@ -537,7 +537,7 @@ onMounted(load)
 .chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 0.76rem;
@@ -669,7 +669,7 @@ label.check {
 .sub-desc {
   margin: 0;
   font-size: 0.82rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 /* Yekun */
@@ -740,7 +740,7 @@ label.check {
 
 .ghost-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--ink-2);
 }
 
@@ -749,13 +749,13 @@ label.check {
 }
 
 .approve-btn {
-  background: #1e7e34;
-  border: 1px solid #1e7e34;
+  background: var(--ok);
+  border: 1px solid var(--ok);
   color: #fff;
 }
 
 .approve-btn:hover:not(:disabled) {
-  background: #17692b;
+  background: var(--ok);
 }
 
 .approve-btn:disabled,

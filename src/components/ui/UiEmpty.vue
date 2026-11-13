@@ -22,7 +22,7 @@ defineProps({
    görünürdü. İndi qalan yerin ortasına oturur. */
 .ui-empty {
   background: var(--surface);
-  border: 1px dashed #eadfe3;
+  border: 1px dashed var(--line);
   border-radius: var(--r-lg);
   padding: 56px 24px;
   text-align: center;

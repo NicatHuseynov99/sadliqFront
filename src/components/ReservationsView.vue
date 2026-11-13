@@ -391,7 +391,7 @@ onMounted(refresh)
 .stat-label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .stat-sub {
@@ -557,7 +557,7 @@ onMounted(refresh)
 .chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 5px 13px;
   border-radius: 20px;
   font-size: 0.76rem;
@@ -706,8 +706,8 @@ onMounted(refresh)
   font-weight: 600;
   padding: 3px 10px;
   border-radius: 20px;
-  background: #f1f3f5;
-  color: #6c757d;
+  background: var(--surface-2);
+  color: var(--muted);
 }
 
 .status-badge.pending {
@@ -726,8 +726,8 @@ onMounted(refresh)
 }
 
 .status-badge.cancelled {
-  background: #f1f3f5;
-  color: #6c757d;
+  background: var(--surface-2);
+  color: var(--muted);
 }
 
 .status-badge.expired {
@@ -756,7 +756,7 @@ onMounted(refresh)
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 .val {
@@ -792,7 +792,7 @@ onMounted(refresh)
 /* Düymələr */
 .mini-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--ink-2);
   padding: 6px 14px;
   border-radius: 8px;

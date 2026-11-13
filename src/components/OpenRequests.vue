@@ -279,8 +279,8 @@ onMounted(load)
 
 .rivals {
   font-size: 0.72rem;
-  background: #f1f3f5;
-  color: #6c757d;
+  background: var(--surface-2);
+  color: var(--muted);
   padding: 3px 11px;
   border-radius: 20px;
 }
@@ -299,7 +299,7 @@ onMounted(load)
 .note {
   margin: 9px 0 0;
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .venues {
@@ -352,7 +352,7 @@ onMounted(load)
 
 .empty-box {
   background: #fff;
-  border: 1px dashed #eadfe3;
+  border: 1px dashed var(--line);
   border-radius: 14px;
   padding: 30px;
   text-align: center;
@@ -419,7 +419,7 @@ onMounted(load)
 .dlg-req {
   margin: 0 0 13px;
   font-size: 0.79rem;
-  color: #6c757d;
+  color: var(--muted);
   background: #fbf7f8;
   border-radius: 10px;
   padding: 9px 12px;
@@ -484,7 +484,7 @@ input:disabled {
 
 .ghost-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--brand);
   padding: 8px 16px;
   border-radius: 9px;

@@ -235,7 +235,7 @@ watch(
 .tool {
   width: 38px;
   height: 38px;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   background: #fff;
   border-radius: 10px;
   font-size: 1rem;
@@ -384,7 +384,7 @@ watch(
 
 .pin-meta {
   font-size: 0.74rem;
-  color: #b07d2b;
+  color: var(--gold-ink);
 }
 
 .pin-btn {

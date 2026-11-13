@@ -397,14 +397,14 @@ onMounted(() => {
 .review-summary {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #b07d2b;
+  color: var(--gold-ink);
   margin-left: 10px;
 }
 
 /* Rəy yazma formu */
 .review-form {
   background: #fff;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 18px 20px;
   margin-bottom: 16px;
@@ -429,7 +429,7 @@ onMounted(() => {
   border: none;
   font-size: 1.6rem;
   line-height: 1;
-  color: #e9ecef;
+  color: var(--line);
   cursor: pointer;
   padding: 0;
   transition: transform 0.12s, color 0.12s;
@@ -459,7 +459,7 @@ onMounted(() => {
 .link-btn {
   background: none;
   border: none;
-  color: #c0392b;
+  color: var(--danger);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -499,7 +499,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.9rem;
 }
 
@@ -522,7 +522,7 @@ onMounted(() => {
 
 .mine-tag {
   background: #fdf3e0;
-  color: #b07d2b;
+  color: var(--gold-ink);
   font-style: normal;
   font-size: 0.68rem;
   font-weight: 700;
@@ -554,8 +554,8 @@ onMounted(() => {
 }
 
 .icon-btn {
-  background: #f8f9fa;
-  border: 1px solid #eaeaea;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   border-radius: 6px;
   width: 30px;
   height: 28px;
@@ -573,7 +573,7 @@ onMounted(() => {
 }
 
 .icon-btn.danger:hover {
-  border-color: #c0392b;
+  border-color: var(--danger);
   background: var(--danger-soft);
 }
 
@@ -587,7 +587,7 @@ onMounted(() => {
   background: #fff;
   border-radius: 12px;
   padding: 14px 18px;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--line);
 }
 
 .review-head {
@@ -610,14 +610,14 @@ onMounted(() => {
 
 .review-text {
   margin: 0 0 6px;
-  color: #495057;
+  color: var(--ink-2);
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
 .review-date {
   font-size: 0.75rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 /* Sarayın cavabı — rəydən içəri girintili, ayrıca blok kimi görünür */
@@ -724,7 +724,7 @@ onMounted(() => {
 .reason-chip {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 5px 13px;
   border-radius: 20px;
   font-size: 0.76rem;
@@ -745,7 +745,7 @@ onMounted(() => {
 
 .form-error {
   margin: 0;
-  color: #d93025;
+  color: var(--danger);
   font-size: 13px;
   white-space: pre-line;
 }

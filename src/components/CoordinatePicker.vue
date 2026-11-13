@@ -240,7 +240,7 @@ watch(
 
 .find-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--brand);
   padding: 7px 14px;
   border-radius: 9px;
@@ -287,7 +287,7 @@ watch(
   z-index: 400;
   width: 36px;
   height: 36px;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   border-radius: 10px;
   background: #fff;
   font-size: 1rem;

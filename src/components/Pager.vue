@@ -96,7 +96,7 @@ const go = (value) => {
   padding: 0 10px;
   border: 1px solid var(--line-2);
   background: #fff;
-  color: #6c757d;
+  color: var(--muted);
   border-radius: 9px;
   font-size: 0.82rem;
   font-weight: 600;

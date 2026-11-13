@@ -254,7 +254,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 /* Süzgəclər */
 .filters {
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 16px 18px;
   margin-bottom: 18px;
@@ -273,7 +273,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   margin-bottom: 5px;
 }
 
@@ -285,7 +285,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   border-radius: 8px;
   font-size: 0.85rem;
   background: #fff;
-  color: #212529;
+  color: var(--ink);
 }
 
 .field input:focus,
@@ -309,14 +309,14 @@ onBeforeUnmount(() => clearTimeout(timer))
   align-items: center;
   gap: 6px;
   font-size: 0.82rem;
-  color: #6c757d;
+  color: var(--muted);
   cursor: pointer;
 }
 
 .result-count {
   margin-left: auto;
   font-size: 0.78rem;
-  color: #b8a3ab;
+  color: var(--muted-2);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -325,7 +325,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 .clear-link {
   background: none;
   border: none;
-  color: #c0392b;
+  color: var(--danger);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -340,7 +340,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .log-row {
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-left: 3px solid transparent;
   border-radius: 10px;
   overflow: hidden;
@@ -348,11 +348,11 @@ onBeforeUnmount(() => clearTimeout(timer))
 }
 
 .log-row:hover {
-  border-color: #eadfe3;
+  border-color: var(--line);
 }
 
 .log-row.failed {
-  border-left-color: #c0392b;
+  border-left-color: var(--danger);
   background: #fffbfb;
 }
 
@@ -395,7 +395,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .day-count {
   font-size: 0.72rem;
-  color: #b8a3ab;
+  color: var(--muted-2);
   white-space: nowrap;
 }
 
@@ -409,7 +409,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   font-size: 0.68rem;
   font-weight: 700;
   color: #fff;
-  background: #b8a3ab;
+  background: var(--muted-2);
   letter-spacing: 0.02em;
 }
 
@@ -418,7 +418,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 }
 
 .avatar.support {
-  background: linear-gradient(135deg, #2f8f52, #1e7e34);
+  background: linear-gradient(135deg, #2f8f52, var(--ok));
 }
 
 .avatar.owner {
@@ -447,7 +447,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 .log-time em {
   font-style: normal;
   font-size: 0.68rem;
-  color: #c2b2b8;
+  color: var(--muted-2);
 }
 
 .log-badge {
@@ -456,16 +456,16 @@ onBeforeUnmount(() => clearTimeout(timer))
   padding: 4px 10px;
   border-radius: 20px;
   text-align: center;
-  background: #f1f3f5;
+  background: var(--surface-2);
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.log-badge.success { background: #e3f6e8; color: #1e7e34; }
-.log-badge.warning { background: #fff6e0; color: #b07d2b; }
-.log-badge.danger { background: var(--danger-soft); color: #c0392b; }
+.log-badge.success { background: #e3f6e8; color: var(--ok); }
+.log-badge.warning { background: #fff6e0; color: var(--gold-ink); }
+.log-badge.danger { background: var(--danger-soft); color: var(--danger); }
 .log-badge.info { background: #eef2f7; color: #4a6fa5; }
 
 .log-text {
@@ -479,7 +479,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 .fail-tag {
   font-style: normal;
   font-size: 0.7rem;
-  color: #c0392b;
+  color: var(--danger);
   margin-left: 8px;
 }
 
@@ -498,16 +498,16 @@ onBeforeUnmount(() => clearTimeout(timer))
 .role-tag {
   font-style: normal;
   font-size: 0.66rem;
-  color: #b8a3ab;
+  color: var(--muted-2);
 }
 
 .role-tag.superadmin { color: var(--ink); font-weight: 700; }
-.role-tag.support { color: #1e7e34; }
+.role-tag.support { color: var(--ok); }
 .role-tag.owner { color: var(--brand); }
-.role-tag.venueadmin { color: #8a6220; }
+.role-tag.venueadmin { color: var(--gold-ink); }
 
 .log-toggle {
-  color: #ced4da;
+  color: var(--faint);
   font-size: 0.7rem;
   text-align: center;
 }
@@ -515,7 +515,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 /* Detallar */
 .log-details {
   background: var(--bg);
-  border-top: 1px solid #f2ecee;
+  border-top: 1px solid var(--line);
   padding: 14px 16px;
 }
 
@@ -535,7 +535,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   font-size: 0.64rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #c2b2b8;
+  color: var(--muted-2);
   font-weight: 700;
 }
 
@@ -551,7 +551,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 0.82rem;
-  color: #c0392b;
+  color: var(--danger);
 }
 
 .detail-payload {
@@ -562,18 +562,18 @@ onBeforeUnmount(() => clearTimeout(timer))
   font-size: 0.64rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #c2b2b8;
+  color: var(--muted-2);
   font-weight: 700;
 }
 
 .detail-payload pre {
   margin: 6px 0 0;
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 0.75rem;
-  color: #495057;
+  color: var(--ink-2);
   max-height: 220px;
   overflow: auto;
 }
@@ -581,7 +581,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 .detail-agent {
   margin-top: 10px;
   font-size: 0.7rem;
-  color: #c2b2b8;
+  color: var(--muted-2);
   word-break: break-all;
 }
 
@@ -597,7 +597,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 .page-btn {
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 7px 16px;
   border-radius: 8px;
   font-size: 0.83rem;

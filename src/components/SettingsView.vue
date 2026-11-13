@@ -603,7 +603,7 @@ onMounted(loadAll)
 
 /* Silinmiş sətir sönük göstərilir */
 .ref-list li.removed .ref-name {
-  color: #b8a3ab;
+  color: var(--muted-2);
   text-decoration: line-through;
 }
 
@@ -612,7 +612,7 @@ onMounted(loadAll)
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   font-weight: 700;
   margin: 12px 0 5px;
 }
@@ -645,7 +645,7 @@ onMounted(loadAll)
 
 .mini-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--ink-2);
   padding: 5px 12px;
   border-radius: 8px;

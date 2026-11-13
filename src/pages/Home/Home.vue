@@ -925,7 +925,7 @@ const selectVenue = (venue) => {
 .site-wrapper {
   font-family: var(--font);
   color: #2c3e50;
-  background-color: #f4f6f8;
+  background-color: var(--bg);
   min-height: 100vh;
   padding-bottom: 60px;
 }
@@ -989,8 +989,8 @@ const selectVenue = (venue) => {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   border-radius: 10px;
   padding: 12px 16px;
   margin-bottom: 16px;
@@ -1064,7 +1064,7 @@ const selectVenue = (venue) => {
 
 .sug-type {
   font-size: 0.68rem;
-  color: #b8a3ab;
+  color: var(--muted-2);
   background: #f6f1f3;
   padding: 2px 8px;
   border-radius: 20px;
@@ -1086,14 +1086,14 @@ const selectVenue = (venue) => {
   border: none;
   background: transparent;
   font-size: 1rem;
-  color: #212529;
+  color: var(--ink);
   outline: none;
 }
 
 .search-clear {
   border: none;
-  background: #e9ecef;
-  color: #6c757d;
+  background: var(--line);
+  color: var(--muted);
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -1103,8 +1103,8 @@ const selectVenue = (venue) => {
 }
 
 .search-clear:hover {
-  background: #dee2e6;
-  color: #212529;
+  background: var(--line);
+  color: var(--ink);
 }
 
 /* Görünən süzgəc sətri: şəhər, qonaq sayı və çekmecə açarı */
@@ -1260,9 +1260,9 @@ const selectVenue = (venue) => {
 
 .mini-chip {
   flex: 1;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--line);
   background: #fff;
-  color: #6c757d;
+  color: var(--muted);
   padding: 4px 0;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -1273,7 +1273,7 @@ const selectVenue = (venue) => {
 
 .mini-chip:hover {
   border-color: var(--gold);
-  color: #212529;
+  color: var(--ink);
 }
 
 .mini-chip[aria-pressed="true"] {
@@ -1295,7 +1295,7 @@ const selectVenue = (venue) => {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #adb5bd;
+  color: var(--muted-2);
   font-weight: 700;
   font-size: 0.85rem;
   pointer-events: none;
@@ -1305,7 +1305,7 @@ const selectVenue = (venue) => {
   display: block;
   margin-top: 5px;
   font-size: 0.72rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .chip-row {
@@ -1314,19 +1314,19 @@ const selectVenue = (venue) => {
   gap: 8px;
   margin-top: 18px;
   padding-top: 14px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--line);
   align-items: center;
 }
 
 .divider-label {
   margin-left: 10px;
   padding-left: 14px;
-  border-left: 1px solid #e9ecef;
+  border-left: 1px solid var(--line);
 }
 
 .chip-star[aria-pressed="true"] {
-  background: #b07d2b;
-  border-color: #b07d2b;
+  background: var(--gold-ink);
+  border-color: var(--gold-ink);
 }
 
 .field-wide {
@@ -1387,18 +1387,18 @@ const selectVenue = (venue) => {
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #6c757d;
+  color: var(--muted);
   margin-bottom: 5px;
 }
 
 .field input, .field select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--faint);
   border-radius: 6px;
   font-size: 14px;
   background: #fff;
-  color: #212529;
+  color: var(--ink);
 }
 
 .field input:focus, .field select:focus {
@@ -1412,7 +1412,7 @@ const selectVenue = (venue) => {
   align-items: center;
   gap: 8px;
   background: #fff;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--faint);
   border-radius: 6px;
   padding: 6px 10px;
 }
@@ -1452,24 +1452,24 @@ const selectVenue = (venue) => {
   gap: 8px;
   margin-top: 15px;
   padding-top: 12px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--line);
   align-items: center;
 }
 
 .chips-label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #6c757d;
+  color: var(--muted);
   margin-right: 5px;
 }
 
 .chip {
-  border: 1px solid #ced4da;
-  background: #f8f9fa;
+  border: 1px solid var(--faint);
+  background: var(--surface-2);
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 0.8rem;
-  color: #495057;
+  color: var(--ink-2);
   cursor: pointer;
   transition: all 0.2s;
   font-weight: 500;
@@ -1477,7 +1477,7 @@ const selectVenue = (venue) => {
 
 .chip:hover {
   border-color: var(--gold);
-  color: #212529;
+  color: var(--ink);
 }
 
 .chip[aria-pressed="true"] {
@@ -1497,14 +1497,14 @@ const selectVenue = (venue) => {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.9rem;
 }
 
 .spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--line);
   border-top-color: var(--brand);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
@@ -1515,7 +1515,7 @@ const selectVenue = (venue) => {
 }
 
 .list-end {
-  color: #adb5bd;
+  color: var(--muted-2);
   font-size: 0.85rem;
   margin: 0;
 }
@@ -1563,7 +1563,7 @@ const selectVenue = (venue) => {
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #6c757d;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -1583,12 +1583,12 @@ const selectVenue = (venue) => {
   align-items: center;
   gap: 10px;
   font-size: 0.9rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .sort-box select {
   padding: 6px 12px;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--faint);
   border-radius: 6px;
   background: #fff;
   font-size: 0.9rem;
@@ -1608,7 +1608,7 @@ const selectVenue = (venue) => {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--line);
 }
 
 .venue-card:hover {
@@ -1714,7 +1714,7 @@ const selectVenue = (venue) => {
 
 .rating-pill {
   background: #fdf3e0;
-  color: #b07d2b;
+  color: var(--gold-ink);
   font-weight: 700;
   font-size: 0.85rem;
   padding: 3px 9px;
@@ -1723,7 +1723,7 @@ const selectVenue = (venue) => {
 }
 
 .rev-count {
-  color: #adb5bd;
+  color: var(--muted-2);
   font-size: 0.8rem;
 }
 
@@ -1741,12 +1741,12 @@ const selectVenue = (venue) => {
 
 .avail-badge.free {
   background: #e8f6ec;
-  color: #1e7e34;
+  color: var(--ok);
 }
 
 .avail-badge.busy {
   background: var(--danger-soft);
-  color: #c0392b;
+  color: var(--danger);
 }
 
 .address-row {
@@ -1767,7 +1767,7 @@ const selectVenue = (venue) => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #adb5bd;
+  color: var(--muted-2);
   margin-bottom: 7px;
 }
 
@@ -1782,8 +1782,8 @@ const selectVenue = (venue) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f8f9fa;
-  border: 1px solid #eaeaea;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 5px 10px 5px 5px;
   cursor: pointer;
@@ -1822,7 +1822,7 @@ const selectVenue = (venue) => {
 
 .description {
   font-size: 0.88rem;
-  color: #495057;
+  color: var(--ink-2);
   margin-bottom: 14px;
   line-height: 1.45;
   display: -webkit-box;
@@ -1839,8 +1839,8 @@ const selectVenue = (venue) => {
 }
 
 .hall-tag {
-  background: #f1f3f5;
-  color: #495057;
+  background: var(--surface-2);
+  color: var(--ink-2);
   font-size: 11px;
   padding: 3px 8px;
   border-radius: 4px;
@@ -1851,14 +1851,14 @@ const selectVenue = (venue) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid #f1f3f5;
+  border-top: 1px solid var(--surface-2);
   padding-top: 12px;
   margin-top: auto;
   gap: 10px;
 }
 
 .menus-summary small {
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.75rem;
   display: block;
   max-width: 170px;

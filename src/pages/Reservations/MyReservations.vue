@@ -378,7 +378,7 @@ onMounted(load)
 <style scoped>
 .res-page {
   min-height: calc(100vh - 61px);
-  background: #f4f6f8;
+  background: var(--bg);
   padding: 30px 40px 60px;
   font-family: var(--font);
 }
@@ -404,7 +404,7 @@ onMounted(load)
 
 .page-sub {
   margin: 0;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.92rem;
 }
 
@@ -507,11 +507,11 @@ onMounted(load)
 .res-card {
   background: #fff;
   border-radius: 14px;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--line);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   display: flex;
   overflow: hidden;
-  border-left: 4px solid #eaeaea;
+  border-left: 4px solid var(--line);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -521,9 +521,9 @@ onMounted(load)
 }
 
 .res-card.pending { border-left-color: var(--gold); }
-.res-card.confirmed { border-left-color: #1e7e34; }
-.res-card.rejected { border-left-color: #c0392b; }
-.res-card.cancelled { border-left-color: #ced4da; }
+.res-card.confirmed { border-left-color: var(--ok); }
+.res-card.rejected { border-left-color: var(--danger); }
+.res-card.cancelled { border-left-color: var(--faint); }
 .res-card.expired { border-left-color: #d8c39a; }
 .res-card.offered { border-left-color: #7ba1d0; }
 
@@ -558,7 +558,7 @@ onMounted(load)
 .offer-message {
   margin: 0 0 10px;
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--muted);
   line-height: 1.55;
   white-space: pre-line;
 }
@@ -570,7 +570,7 @@ onMounted(load)
 }
 
 .accept-btn {
-  background: #1e7e34;
+  background: var(--ok);
   color: #fff;
   border: none;
   padding: 7px 18px;
@@ -581,7 +581,7 @@ onMounted(load)
 }
 
 .accept-btn:hover {
-  background: #17692b;
+  background: var(--ok);
 }
 
 /* «Öz şərtimi təklif et» — qəbul və rəddin arasında orta variant */
@@ -702,7 +702,7 @@ onMounted(load)
 
 .res-city {
   font-size: 0.8rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .status-tag {
@@ -713,10 +713,10 @@ onMounted(load)
   white-space: nowrap;
 }
 
-.status-tag.pending { background: #fff6e0; color: #b07d2b; }
-.status-tag.confirmed { background: #e3f6e8; color: #1e7e34; }
-.status-tag.rejected { background: var(--danger-soft); color: #c0392b; }
-.status-tag.cancelled { background: #f1f3f5; color: var(--muted); }
+.status-tag.pending { background: #fff6e0; color: var(--gold-ink); }
+.status-tag.confirmed { background: #e3f6e8; color: var(--ok); }
+.status-tag.rejected { background: var(--danger-soft); color: var(--danger); }
+.status-tag.cancelled { background: var(--surface-2); color: var(--muted); }
 .status-tag.offered { background: #eaf1fa; color: var(--info); }
 .status-tag.expired { background: #f4efe6; color: #8a6d3b; }
 
@@ -726,8 +726,8 @@ onMounted(load)
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 14px;
   padding: 12px 0;
-  border-top: 1px solid #f1f3f5;
-  border-bottom: 1px solid #f1f3f5;
+  border-top: 1px solid var(--surface-2);
+  border-bottom: 1px solid var(--surface-2);
 }
 
 .fact {
@@ -741,7 +741,7 @@ onMounted(load)
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #adb5bd;
+  color: var(--muted-2);
   font-weight: 700;
 }
 
@@ -780,12 +780,12 @@ onMounted(load)
 
 .res-contact {
   font-size: 0.83rem;
-  color: #6c757d;
+  color: var(--muted);
 }
 
 .cancel-btn {
   background: #fff;
-  color: #c0392b;
+  color: var(--danger);
   border: 1px solid #e5b4ae;
   padding: 7px 16px;
   border-radius: 6px;
@@ -797,8 +797,8 @@ onMounted(load)
 }
 
 .cancel-btn:hover {
-  background: #c0392b;
-  border-color: #c0392b;
+  background: var(--danger);
+  border-color: var(--danger);
   color: #fff;
 }
 
