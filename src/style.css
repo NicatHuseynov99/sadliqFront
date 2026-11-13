@@ -75,7 +75,7 @@ select:focus {
 }
 
 select:disabled {
-  background-color: #f5f7fa;
+  background-color: var(--surface-2);
   color: var(--muted-2);
   cursor: not-allowed;
 }
@@ -225,4 +225,33 @@ textarea {
 
 .ico-fill {
   fill: currentColor;
+}
+
+/* ————— Pəncərələrdə başlıq yerində qalır, yalnız məzmun sürüşür —————
+   Əvvəl uzun pəncərədə bütün pəncərə sürüşürdü: başlıq (nə ilə məşğul
+   olduğun) və altdakı düymələr (Yadda saxla / İmtina) ekrandan çıxırdı. */
+.el-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  max-height: 90dvh;
+}
+
+.el-dialog__header,
+.el-dialog__footer {
+  flex: none;
+}
+
+.el-dialog__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Sürüşən sahə bitəndə arxadakı səhifə sürüşməyə başlamasın */
+.el-drawer__body,
+.el-message-box__content {
+  overscroll-behavior: contain;
 }
