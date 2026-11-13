@@ -9,7 +9,7 @@
           <b>{{ title }}</b>
           <span class="ch-sub">{{ subtitle }}</span>
         </div>
-        <button class="ch-close" @click="$emit('close')">✕</button>
+        <button class="ch-close" @click="$emit('close')"><IcoX class="ico" /></button>
       </div>
     </template>
 

@@ -1,16 +1,16 @@
 <template>
   <el-dropdown trigger="click" @command="openMap">
     <span class="address-link" :class="{ compact }">
-      <span class="pin">📍</span>
+      <span class="pin"><IcoMapPin class="ico" /></span>
       <span class="text">{{ label }}</span>
       <span class="hint" v-if="!compact">— xəritədə aç</span>
     </span>
 
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item command="google">🗺️ Google Maps-də aç</el-dropdown-item>
-        <el-dropdown-item command="waze">🚗 Waze ilə yol göstər</el-dropdown-item>
-        <el-dropdown-item command="copy" divided>📋 Ünvanı kopyala</el-dropdown-item>
+        <el-dropdown-item command="google"><IcoMap class="ico" /> Google Maps-də aç</el-dropdown-item>
+        <el-dropdown-item command="waze"><IcoCar class="ico" /> Waze ilə yol göstər</el-dropdown-item>
+        <el-dropdown-item command="copy" divided><IcoClipboardList class="ico" /> Ünvanı kopyala</el-dropdown-item>
       </el-dropdown-menu>
     </template>
   </el-dropdown>

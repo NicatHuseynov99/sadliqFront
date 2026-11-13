@@ -2,7 +2,7 @@
   <footer class="app-footer">
     <div class="footer-grid">
       <div class="footer-col">
-        <h4 class="footer-logo">Şadlıq Sarayları</h4>
+        <h4 class="footer-logo">TOYUN</h4>
         <p class="footer-about">
           Azərbaycanda toy, nişan və özəl tədbir məkanlarını bir ünvanda toplayan onlayn rezervasiya platforması.
         </p>
@@ -28,14 +28,14 @@
 
       <div class="footer-col">
         <h5>Əlaqə</h5>
-        <span>📞 +994 12 000 00 00</span>
-        <span>✉️ info@sadliqsaraylari.az</span>
-        <span>📍 Bakı, Azərbaycan</span>
+        <span><IcoPhone class="ico" /> +994 12 000 00 00</span>
+        <span><IcoMail class="ico" /> info@toyun.az</span>
+        <span><IcoMapPin class="ico" /> Bakı, Azərbaycan</span>
       </div>
     </div>
 
     <div class="footer-bottom">
-      © {{ new Date().getFullYear() }} Şadlıq Sarayları — Bütün hüquqlar qorunur.
+      © {{ new Date().getFullYear() }} TOYUN — Bütün hüquqlar qorunur.
     </div>
   </footer>
 </template>
@@ -45,7 +45,7 @@
   background: var(--ink);
   color: #cbc3c8;
   padding: 44px 40px 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font);
 }
 
 .footer-grid {

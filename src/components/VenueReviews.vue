@@ -3,7 +3,7 @@
     <h2 class="section-title">
       Qonaq rəyləri
       <span class="review-summary" v-if="reviews.length">
-        ★ {{ averageRating }} · {{ reviews.length }} rəy
+        <IcoStar class="ico ico-fill" /> {{ averageRating }} · {{ reviews.length }} rəy
       </span>
     </h2>
 
@@ -22,7 +22,7 @@
             @mouseenter="hoverRating = n"
             @mouseleave="hoverRating = 0"
           >
-            ★
+            <IcoStar class="ico ico-fill" />
           </button>
           <span class="star-hint">{{ ratingHint }}</span>
         </div>
@@ -48,7 +48,7 @@
 
       <!-- Rəy yalnız tədbiri keçmiş qonaqdan qəbul olunur — səbəbi burada yazılır -->
       <div v-else-if="auth.isAuth" class="review-locked">
-        <span class="lock-icon">🔒</span>
+        <span class="lock-icon"><IcoLock class="ico" /></span>
         <div>
           <b>{{ canReview.reason || 'Bu saraya rəy yaza bilmirsiniz.' }}</b>
           <span>Reytinqin dəyəri budur: yalnız orada tədbir keçirmiş qonaqlar yaza bilir.</span>
@@ -68,7 +68,7 @@
             {{ r.author }}
             <em v-if="isMine(r)" class="mine-tag">siz</em>
             <em v-if="r.isVerifiedGuest" class="verified-tag" title="Bu saraydakı tədbiri keçmiş qonaq">
-              ✓ təsdiqlənmiş qonaq
+              <IcoCheck class="ico" /> təsdiqlənmiş qonaq
             </em>
           </span>
           <span class="review-stars">{{ '★'.repeat(r.rating) }}{{ '☆'.repeat(5 - r.rating) }}</span>
@@ -79,7 +79,7 @@
         <!-- Sarayın açıq cavabı: rəyi cavabsız qoymaq sarayın özünə ziyandır -->
         <div v-if="r.ownerReply && replyingId !== r.id" class="owner-reply">
           <div class="or-head">
-            <b>🏛 Sarayın cavabı</b>
+            <b><IcoLandmark class="ico" /> Sarayın cavabı</b>
             <span v-if="r.ownerRepliedAt">{{ formatDateFull(r.ownerRepliedAt.slice(0, 10)) }}</span>
           </div>
           <p>{{ r.ownerReply }}</p>
@@ -119,7 +119,7 @@
           <span class="review-date">{{ formatDateFull(r.date) }}</span>
 
           <div class="review-actions" v-if="isMine(r)">
-            <button class="icon-btn" title="Redaktə et" @click="startEdit(r)">✏️</button>
+            <button class="icon-btn" title="Redaktə et" @click="startEdit(r)"><IcoPencil class="ico" /></button>
             <el-popconfirm
               title="Bu rəyi silmək istəyirsiniz?"
               confirm-button-text="Bəli, sil"
@@ -127,7 +127,7 @@
               @confirm="removeReview(r)"
             >
               <template #reference>
-                <button class="icon-btn danger" title="Sil">🗑️</button>
+                <button class="icon-btn danger" title="Sil"><IcoTrash2 class="ico" /></button>
               </template>
             </el-popconfirm>
           </div>

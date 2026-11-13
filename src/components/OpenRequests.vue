@@ -10,8 +10,8 @@
           <b>{{ r.city }} · {{ r.guestCount }} qonaq</b>
           <span class="meta">
             {{ r.isDateFlexible ? '📅 tarix çevikdir' : `📅 ${formatDate(r.eventDate)}` }}
-            <template v-if="r.budgetPerPerson"> · 💰 {{ r.budgetPerPerson }} ₼ / nəfər</template>
-            <template v-if="r.needsParking"> · 🅿 parkinq lazımdır</template>
+            <template v-if="r.budgetPerPerson"> · <IcoCoins class="ico" /> {{ r.budgetPerPerson }} ₼ / nəfər</template>
+            <template v-if="r.needsParking"> · <IcoSquareParking class="ico" /> parkinq lazımdır</template>
           </span>
         </div>
 
@@ -23,7 +23,7 @@
         </div>
       </header>
 
-      <p v-if="r.note" class="note">💬 {{ r.note }}</p>
+      <p v-if="r.note" class="note"><IcoMessageCircle class="ico" /> {{ r.note }}</p>
 
       <!-- Artıq təklif göndərilmiş saraylar ayrıca göstərilir -->
       <div class="venues">
@@ -48,7 +48,7 @@
             <span class="dlg-caption">Təklif göndərilir</span>
             <b>{{ current.venue?.venueName }}</b>
           </div>
-          <button class="dlg-close" @click="isDialogOpen = false">✕</button>
+          <button class="dlg-close" @click="isDialogOpen = false"><IcoX class="ico" /></button>
         </div>
       </template>
 

@@ -95,8 +95,8 @@ select:focus-visible,
 
 /* Telefonda alt naviqasiya məzmunun üstünü örtməsin */
 @media (max-width: 700px) {
-  body {
-    padding-bottom: 58px;
+  body:has(.bottom-nav) {
+    padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -170,4 +170,59 @@ select:focus-visible,
   .el-button {
     min-height: 38px;
   }
+}
+
+/* ————— Sahələrdə ikiqat/göy haşiyə olmasın —————
+   Element Plus sahəsinin öz fokus halqası var (bükücü element üzərində,
+   brend rəngində). Yuxarıdakı ümumi «input:focus-visible» qaydası isə
+   içəridəki xam input-a ikinci, düzbucaqlı haşiyə çəkirdi. Telefonda
+   buna toxunma zamanı brauzerin göy parıltısı da əlavə olunurdu. */
+.el-input__inner:focus-visible,
+.el-textarea__inner:focus-visible,
+.el-select__input:focus-visible {
+  outline: none;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Brauzerin avtomatik doldurması sahəni açıq-göy boyamasın */
+.el-input__inner:-webkit-autofill,
+.el-input__inner:-webkit-autofill:hover,
+.el-input__inner:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink);
+  box-shadow: 0 0 0 1000px var(--surface) inset;
+  transition: background-color 9999s ease-out;
+}
+
+/* ————— Yazı —————
+   Əsas başlıqlar Fraunces ilə: saytın «üzü» buradan tanınır. Düymə və
+   sahələr brauzerdə öz şriftini (Arial) işlədir — səhifənin şriftini
+   miras alsınlar. */
+h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* ————— İkonlar —————
+   Mətnin içində dayanan ikon: ölçüsü yazının ölçüsü ilə böyüyür və
+   rəngini ondan alır. Doldurulmuş variant ulduz və ürək üçündür. */
+.ico {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+  vertical-align: -0.18em;
+}
+
+.ico-fill {
+  fill: currentColor;
 }

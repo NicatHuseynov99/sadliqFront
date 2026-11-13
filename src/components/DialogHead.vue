@@ -4,7 +4,7 @@
     <img :src="venue.coverImageUrl || FALLBACK_IMAGE" :alt="venue.name" @error="onImgError" />
     <div class="shade"></div>
 
-    <button class="close" title="Bağla" @click="$emit('close')">✕</button>
+    <button class="close" title="Bağla" @click="$emit('close')"><IcoX class="ico" /></button>
 
     <div class="text">
       <span class="caption">{{ caption }}</span>

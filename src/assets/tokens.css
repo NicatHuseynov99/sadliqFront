@@ -50,7 +50,11 @@
   --sp-6: 30px;
 
   /* ————— yazı ————— */
-  --font: 'Segoe UI', system-ui, Tahoma, Geneva, Verdana, sans-serif;
+  /* Onest — mətn, Fraunces — başlıqlar. Hər ikisi ə, ğ, ı, ş və ₼ işarəsini
+     tam dəstəkləyir (yoxlanılıb); fayllar layihənin içindədir, internetdən
+     yüklənmir. */
+  --font: 'Onest Variable', 'Segoe UI', system-ui, Tahoma, sans-serif;
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
   --fs-xs: 0.72rem;
   --fs-sm: 0.8rem;
   --fs-md: 0.88rem;

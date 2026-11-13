@@ -37,7 +37,7 @@
 
       <div class="side-foot">
         <a class="side-btn" :href="`tel:${(reservation.venuePhone || '').replace(/\s/g, '')}`">
-          📞 Sarayla əlaqə
+          <IcoPhone class="ico" /> Sarayla əlaqə
         </a>
         <router-link class="side-btn ghost" :to="`/venue/${reservation.venueId}`">
           Sarayın səhifəsi

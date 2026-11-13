@@ -45,7 +45,7 @@
             <div class="res-title-row">
               <div>
                 <h3>{{ r.venueName }}</h3>
-                <span class="res-city" v-if="r.venueCity">📍 {{ r.venueCity }}</span>
+                <span class="res-city" v-if="r.venueCity"><IcoMapPin class="ico" /> {{ r.venueCity }}</span>
               </div>
               <span class="status-tag" :class="statusClass(r.status)">
                 {{ statusIcon(r.status) }} {{ statusText(r.status) }}
@@ -74,11 +74,11 @@
               </div>
             </div>
 
-            <p class="res-note" v-if="r.note">💬 {{ r.note }}</p>
+            <p class="res-note" v-if="r.note"><IcoMessageCircle class="ico" /> {{ r.note }}</p>
 
             <!-- Ləğv səbəbi: müştəri niyə ləğv olunduğunu bilməlidir -->
             <p class="cancel-note" v-if="r.cancellationReason">
-              🚫 Ləğv səbəbi: {{ r.cancellationReason }}
+              <IcoBan class="ico" /> Ləğv səbəbi: {{ r.cancellationReason }}
             </p>
 
             <!-- Sahibin göndərdiyi əks-təklif -->
@@ -136,7 +136,7 @@
             </div>
 
             <footer class="res-foot">
-              <span class="res-contact">📞 {{ r.contactPhone }}</span>
+              <span class="res-contact"><IcoPhone class="ico" /> {{ r.contactPhone }}</span>
 
               <!-- Şəffaflıq: sorğunun sahib tərəfindən açılıb-açılmadığı
                    və cavaba nə qədər vaxt qaldığı -->
@@ -380,7 +380,7 @@ onMounted(load)
   min-height: calc(100vh - 61px);
   background: #f4f6f8;
   padding: 30px 40px 60px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font);
 }
 
 .res-inner {

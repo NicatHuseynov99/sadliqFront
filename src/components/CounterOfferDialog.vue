@@ -7,7 +7,7 @@
           <span class="co-caption">{{ isCustomer ? 'Şərt təklif et' : 'Əks-təklif' }}</span>
           <b>{{ isCustomer ? reservation.venueName : reservation.customerName }}</b>
         </div>
-        <button class="co-close" @click="$emit('close')">✕</button>
+        <button class="co-close" @click="$emit('close')"><IcoX class="ico" /></button>
       </div>
     </template>
 

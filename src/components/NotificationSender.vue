@@ -27,7 +27,7 @@
           <input v-model="form.link" placeholder="/venues?city=Bakı" />
         </label>
 
-        <p class="hint">🔔 Bildiriş saytda, zəng siyahısında görünəcək. E-poçt və SMS hələ işlədilmir.</p>
+        <p class="hint"><IcoBell class="ico" /> Bildiriş saytda, zəng siyahısında görünəcək. E-poçt və SMS hələ işlədilmir.</p>
       </div>
 
       <div class="card">

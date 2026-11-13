@@ -39,7 +39,7 @@
         <header class="rc-head">
           <div>
             <b>{{ r.author }}</b>
-            <em v-if="r.isVerifiedGuest" class="verified">✓ təsdiqlənmiş qonaq</em>
+            <em v-if="r.isVerifiedGuest" class="verified"><IcoCheck class="ico" /> təsdiqlənmiş qonaq</em>
           </div>
           <span class="rc-stars">{{ '★'.repeat(r.rating) }}{{ '☆'.repeat(5 - r.rating) }}</span>
         </header>

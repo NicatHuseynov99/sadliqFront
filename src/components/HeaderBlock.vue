@@ -1,30 +1,31 @@
 <template>
   <header class="app-header">
     <router-link to="/" class="logo" @click="isMenuOpen = false">
-      Şadlıq <span>Sarayları</span>
+      <BrandMark :size="26" />
+      <span class="logo-word">TOY<b>UN</b></span>
     </router-link>
 
     <!-- Geniş ekranda düz sətir, darda açılan menyu -->
     <nav class="nav-links" :class="{ open: isMenuOpen }" @click="isMenuOpen = false">
       <router-link to="/">Ana səhifə</router-link>
-      <router-link v-if="auth.isSuperAdmin" to="/admin" class="panel-link">⚙️ Admin panel</router-link>
-      <router-link v-else-if="auth.isSupport" to="/admin" class="panel-link">🛟 Admin panel</router-link>
-      <router-link v-if="auth.canManageVenues" to="/panel" class="panel-link">🏛 Saraylar</router-link>
-      <router-link v-if="auth.isCustomer" to="/favorites">♥ Seçilmişlər</router-link>
+      <router-link v-if="auth.isSuperAdmin" to="/admin" class="panel-link"><Settings :size="16" /> Admin panel</router-link>
+      <router-link v-else-if="auth.isSupport" to="/admin" class="panel-link"><LifeBuoy :size="16" /> Admin panel</router-link>
+      <router-link v-if="auth.canManageVenues" to="/panel" class="panel-link"><Building2 :size="16" /> Saraylar</router-link>
+      <router-link v-if="auth.isCustomer" to="/favorites">Seçilmişlər</router-link>
       <router-link v-if="auth.isCustomer" to="/my-reservations">Rezervlərim</router-link>
       <router-link v-if="auth.isCustomer" to="/sorgularim">Sorğularım</router-link>
 
       <!-- Menyu açılanda hesab əməliyyatları da burada olsun -->
       <div class="nav-account" v-if="auth.isAuth">
-        <router-link to="/sikayetlerim">⚖️ Şikayətlərim</router-link>
-        <router-link to="/profile">👤 {{ auth.user?.fullName }}</router-link>
+        <router-link to="/sikayetlerim"><Scale :size="16" /> Şikayətlərim</router-link>
+        <router-link to="/profile"><UserRound :size="16" /> {{ auth.user?.fullName }}</router-link>
         <button class="ghost-btn" @click="auth.logout()">Çıxış</button>
       </div>
     </nav>
 
     <div class="user-box" v-if="auth.isAuth">
       <NotificationBell />
-      <router-link to="/profile" class="user-name">👤 {{ auth.user?.fullName }}</router-link>
+      <router-link to="/profile" class="user-name"><UserRound :size="17" /><span>{{ auth.user?.fullName }}</span></router-link>
       <button class="ghost-btn hide-narrow" @click="auth.logout()">Çıxış</button>
 
       <button class="burger" :class="{ on: isMenuOpen }" title="Menyu" @click="isMenuOpen = !isMenuOpen">
@@ -48,10 +49,19 @@
 
   <!-- Telefonda əsas keçidlər barmağın çatdığı yerdə: aşağıda -->
   <nav v-if="auth.isCustomer" class="bottom-nav">
-    <router-link to="/"><span>🔍</span>Axtar</router-link>
-    <router-link to="/sorgularim"><span>📣</span>Sorğularım</router-link>
-    <router-link to="/favorites"><span>♥</span>Seçilmiş</router-link>
-    <router-link to="/my-reservations"><span>📅</span>Rezervlər</router-link>
+    <router-link to="/"><Search :size="21" />Axtar</router-link>
+    <router-link to="/sorgularim"><Megaphone :size="21" />Sorğularım</router-link>
+    <router-link to="/favorites"><Heart :size="21" />Seçilmiş</router-link>
+    <router-link to="/my-reservations"><CalendarDays :size="21" />Rezervlər</router-link>
+  </nav>
+
+  <!-- Qonaq üçün də alt naviqasiya: əvvəl yalnız müştəridə vardı və
+       giriş etməmiş adam telefonda əsas yolları burger menyusunda axtarırdı -->
+  <nav v-else-if="!auth.isAuth" class="bottom-nav">
+    <router-link to="/"><Search :size="21" />Axtar</router-link>
+    <router-link to="/saray-elave-et"><Building2 :size="21" />Saray əlavə et</router-link>
+    <router-link to="/register"><UserRoundPlus :size="21" />Qeydiyyat</router-link>
+    <router-link to="/login"><LogIn :size="21" />Daxil ol</router-link>
   </nav>
 </template>
 
@@ -59,7 +69,11 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
+import {
+  Building2, CalendarDays, Heart, LifeBuoy, LogIn, Megaphone, Scale, Search, Settings, UserRound, UserRoundPlus,
+} from 'lucide-vue-next'
 import NotificationBell from '@/components/NotificationBell.vue'
+import BrandMark from '@/components/BrandMark.vue'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -87,15 +101,39 @@ watch(
 }
 
 .logo {
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--gold);
   text-decoration: none;
   white-space: nowrap;
 }
 
-.logo span {
+.logo-word {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.32rem;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.logo-word b {
+  font-weight: 600;
   color: var(--gold);
+}
+
+/* İkonlu keçidlər: ikon və mətn bir xətdə */
+.nav-links a,
+.nav-account a,
+.user-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-links a {
@@ -289,8 +327,8 @@ watch(
     padding: 12px 14px;
   }
 
-  .logo {
-    font-size: 1.05rem;
+  .logo-word {
+    font-size: 1.15rem;
   }
 
   /* «Qeydiyyat» gizlənir — giriş səhifəsində «Hesabınız yoxdur?
@@ -329,8 +367,12 @@ watch(
     color: var(--muted);
   }
 
-  .bottom-nav a span {
-    font-size: 1.1rem;
+  .bottom-nav a svg {
+    stroke-width: 1.8;
+  }
+
+  .bottom-nav a.menu-item-active svg {
+    stroke-width: 2.2;
   }
 
   .bottom-nav a.menu-item-active {

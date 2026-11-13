@@ -3,7 +3,7 @@
     <div class="register-inner">
       <!-- Uğurlu göndərişdən sonra forma əvəzinə nəticə göstərilir -->
       <div v-if="submitted" class="done-box">
-        <span class="done-icon">🎉</span>
+        <span class="done-icon"><IcoPartyPopper class="ico" /></span>
         <h1>Müraciətiniz göndərildi</h1>
         <p class="done-text">
           <b>{{ submitted.venueName }}</b> yoxlanışa göndərildi.
@@ -64,7 +64,7 @@
         </ol>
 
         <p class="saved-note">
-          💾 Yazdıqlarınız avtomatik saxlanılır — səhifəni bağlasanız da itmir.
+          <IcoSave class="ico" /> Yazdıqlarınız avtomatik saxlanılır — səhifəni bağlasanız da itmir.
           <button class="reset-link" @click="resetDraft">Hamısını təmizlə</button>
         </p>
 
@@ -146,7 +146,7 @@
             <!-- Yer avtomatik götürülür, amma təsdiq olmadan yazılmır:
                  sahibkar evdən doldurursa saray başqa yerdədir -->
             <div v-if="askLocation" class="ask-box">
-              <b>📍 Bura sarayın yeridir?</b>
+              <b><IcoMapPin class="ico" /> Bura sarayın yeridir?</b>
               <p>Cihazınızın göstərdiyi yeri xəritədə işarələdik. Doğrudursa təsdiqləyin.</p>
               <div class="ask-actions">
                 <UiButton @click="confirmLocation">Bəli, bura saraydır</UiButton>
@@ -155,7 +155,7 @@
             </div>
 
             <UiButton v-else variant="ghost" :is-loading="isLocating" @click="useMyLocation">
-              📍 Hazırkı yerimi götür
+              <IcoMapPin class="ico" /> Hazırkı yerimi götür
             </UiButton>
 
             <div class="picker-box">
@@ -206,7 +206,7 @@
             <div v-for="(hall, i) in form.halls" :key="i" class="sub-card">
               <div class="sub-head">
                 <b>{{ hall.name || `Zal ${i + 1}` }}</b>
-                <button v-if="form.halls.length > 1" class="del-btn" type="button" @click="form.halls.splice(i, 1)">✕</button>
+                <button v-if="form.halls.length > 1" class="del-btn" type="button" @click="form.halls.splice(i, 1)"><IcoX class="ico" /></button>
               </div>
 
               <div class="grid">
@@ -241,7 +241,7 @@
             <div v-for="(menu, i) in form.menus" :key="i" class="sub-card">
               <div class="sub-head">
                 <b>{{ menu.name || `Menyu ${i + 1}` }}</b>
-                <button class="del-btn" type="button" @click="form.menus.splice(i, 1)">✕</button>
+                <button class="del-btn" type="button" @click="form.menus.splice(i, 1)"><IcoX class="ico" /></button>
               </div>
 
               <div class="grid">

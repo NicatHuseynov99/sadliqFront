@@ -84,7 +84,7 @@
                 :title="`Son dəyişən: ${r.lastEditedBy}`"
                 @click="openEdits(r)"
               >
-                ✎ Dəyişdirilib ({{ r.editCount }})
+                <IcoPencil class="ico" /> Dəyişdirilib ({{ r.editCount }})
               </button>
 
               <button
@@ -180,7 +180,7 @@
           :class="{ filled: n <= editRating }"
           @click="editRating = n"
         >
-          ★
+          <IcoStar class="ico ico-fill" />
         </button>
         <span class="star-hint">{{ RATING_WORDS[editRating] }}</span>
       </div>

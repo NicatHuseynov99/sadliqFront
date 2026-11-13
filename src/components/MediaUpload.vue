@@ -5,7 +5,7 @@
       <video v-if="isVideo" :src="modelValue" controls></video>
       <img v-else :src="modelValue || FALLBACK_IMAGE" alt="" @error="onImgError" />
 
-      <button class="remove" title="Sil" @click="$emit('update:modelValue', '')">✕</button>
+      <button class="remove" title="Sil" @click="$emit('update:modelValue', '')"><IcoX class="ico" /></button>
     </div>
 
     <!-- Boşdursa: fayl seçmə sahəsi -->

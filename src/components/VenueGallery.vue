@@ -60,7 +60,7 @@
     <!-- Şəkli tam ekranda böyütmək: klik, ← → oxları, Esc ilə bağlanır -->
     <Teleport to="body">
       <div v-if="isLightboxOpen" class="lightbox" @click.self="closeLightbox">
-        <button class="lb-close" title="Bağla (Esc)" aria-label="Bağla" @click="closeLightbox">✕</button>
+        <button class="lb-close" title="Bağla (Esc)" aria-label="Bağla" @click="closeLightbox"><IcoX class="ico" /></button>
 
         <button v-if="slides.length > 1" class="lb-arrow left" title="Əvvəlki (←)" aria-label="Əvvəlki şəkil" @click="prevSlide">‹</button>
 

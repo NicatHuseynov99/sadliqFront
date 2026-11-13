@@ -13,7 +13,7 @@
 
       <!-- Elan qutusu: bağlı halda bir sətir, klikləyəndə forma açılır -->
       <section v-if="!hasOpenRequest && !isComposerOpen" class="composer" @click="isComposerOpen = true">
-        <span class="composer-avatar">📣</span>
+        <span class="composer-avatar"><IcoMegaphone class="ico" /></span>
         <span class="composer-text">Toyunuz üçün nə axtarırsınız?</span>
         <span class="composer-btn">Elan yaz</span>
       </section>
@@ -22,7 +22,7 @@
       <section v-else-if="!hasOpenRequest" class="form-card">
         <header class="form-head">
           <h2 class="card-title">Şərtlərinizi yazın</h2>
-          <button class="close-x" title="Bağla" @click="isComposerOpen = false">✕</button>
+          <button class="close-x" title="Bağla" @click="isComposerOpen = false"><IcoX class="ico" /></button>
         </header>
 
         <!-- Yazdıqca elanın necə görünəcəyi -->
@@ -108,7 +108,7 @@
           </div>
         </header>
 
-        <p v-if="r.note" class="req-note">💬 {{ r.note }}</p>
+        <p v-if="r.note" class="req-note"><IcoMessageCircle class="ico" /> {{ r.note }}</p>
 
         <!-- Təkliflər -->
         <div v-if="!r.offers.length && r.status === REQUEST_STATUS.open" class="waiting-box">
@@ -154,8 +154,8 @@
                   <span v-if="i === 0 && sortBy === 'price' && o.status === 0" class="best-tag">
                     ən sərfəli
                   </span>
-                  <span v-if="o.rating" class="rating">★ {{ o.rating }}</span>
-                  <span v-if="o.isChatOpen" class="chat-dot" title="Yazışma açıqdır">💬</span>
+                  <span v-if="o.rating" class="rating"><IcoStar class="ico ico-fill" /> {{ o.rating }}</span>
+                  <span v-if="o.isChatOpen" class="chat-dot" title="Yazışma açıqdır"><IcoMessageCircle class="ico" /></span>
                 </div>
 
                 <span class="row-meta">
@@ -182,7 +182,7 @@
                 </dl>
 
                 <p class="offer-message">{{ o.message }}</p>
-                <p v-if="o.lastMessage" class="last-msg">💬 {{ o.lastMessage }}</p>
+                <p v-if="o.lastMessage" class="last-msg"><IcoMessageCircle class="ico" /> {{ o.lastMessage }}</p>
 
                 <div v-if="o.status === 0 && r.status === REQUEST_STATUS.open" class="offer-actions">
                   <template v-if="o.isChatOpen">
@@ -199,7 +199,7 @@
                   </template>
                 </div>
 
-                <span v-else-if="o.status === 1" class="offer-tag ok">✓ Seçdiniz</span>
+                <span v-else-if="o.status === 1" class="offer-tag ok"><IcoCheck class="ico" /> Seçdiniz</span>
                 <span v-else-if="o.status === 2" class="offer-tag">Siyahıdan çıxarıldı</span>
               </div>
             </article>

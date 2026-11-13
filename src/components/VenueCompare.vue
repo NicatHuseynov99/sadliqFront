@@ -8,7 +8,7 @@
           <span class="cmp-caption">Müqayisə</span>
           <b>{{ venues.length }} saray yan-yana</b>
         </div>
-        <button class="cmp-close" @click="$emit('close')">✕</button>
+        <button class="cmp-close" @click="$emit('close')"><IcoX class="ico" /></button>
       </div>
     </template>
 

@@ -12,7 +12,7 @@
       <div class="rv-head">
         <img :src="form.coverImageUrl || FALLBACK_IMAGE" alt="" @error="onImgError" />
         <div class="rv-shade"></div>
-        <button class="rv-close" @click="closeDialog">✕</button>
+        <button class="rv-close" @click="closeDialog"><IcoX class="ico" /></button>
 
         <div class="rv-title">
           <span class="rv-caption">Müraciətin yoxlanışı</span>
@@ -108,7 +108,7 @@
         <div v-for="h in halls" :key="h.id" class="sub-card">
           <div class="sub-head">
             <b>{{ h.name }}</b>
-            <span class="sub-meta">👥 {{ h.capacity }} nəfər · {{ h.minPrice }} ₼-dən</span>
+            <span class="sub-meta"><IcoUsers class="ico" /> {{ h.capacity }} nəfər · {{ h.minPrice }} ₼-dən</span>
           </div>
           <p class="sub-desc">{{ h.description || 'Təsvir yazılmayıb' }}</p>
         </div>
@@ -157,7 +157,7 @@
         {{ isSaving ? 'Saxlanılır…' : isDirty ? 'Saxla və bağla' : 'Bağla' }}
       </button>
       <button v-if="!venue.isApproved" class="approve-btn" :disabled="isSaving" @click="approve">
-        ✓ Təsdiqlə
+        <IcoCheck class="ico" /> Təsdiqlə
       </button>
     </template>
   </el-dialog>

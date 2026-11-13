@@ -45,7 +45,7 @@
 
         <span class="result-count">{{ totalCount }} qeyd</span>
 
-        <button v-if="hasFilters" class="clear-link" @click="resetFilters">Süzgəcləri təmizlə ✕</button>
+        <button v-if="hasFilters" class="clear-link" @click="resetFilters">Süzgəcləri təmizlə <IcoX class="ico" /></button>
       </div>
     </div>
 
@@ -96,7 +96,7 @@
             <div><span>Əməliyyat kodu</span><b>{{ log.action }}</b></div>
           </div>
 
-          <div v-if="log.errorMessage" class="detail-error">⚠️ {{ log.errorMessage }}</div>
+          <div v-if="log.errorMessage" class="detail-error"><IcoTriangleAlert class="ico" /> {{ log.errorMessage }}</div>
 
           <div v-if="log.payload" class="detail-payload">
             <span class="detail-label">Göndərilən məlumat</span>

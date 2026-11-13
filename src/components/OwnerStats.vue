@@ -19,7 +19,7 @@
     <section v-for="s in items" :key="s.venueId" class="venue-block">
       <header class="vb-head">
         <b>{{ s.venueName }}</b>
-        <span v-if="s.rating" class="rating">★ {{ s.rating }} · {{ s.reviewCount }} rəy</span>
+        <span v-if="s.rating" class="rating"><IcoStar class="ico ico-fill" /> {{ s.rating }} · {{ s.reviewCount }} rəy</span>
       </header>
 
       <!-- Baxışdan rezervə: yol boyu hər addım -->

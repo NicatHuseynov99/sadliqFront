@@ -51,7 +51,7 @@
             <span v-else class="status-badge" :class="v.isApproved ? 'ok' : 'wait'">
               {{ v.isApproved ? 'Saytda' : 'Təsdiq gözləyir' }}
             </span>
-            <span v-if="v.rating" class="rating">★ {{ v.rating }}</span>
+            <span v-if="v.rating" class="rating"><IcoStar class="ico ico-fill" /> {{ v.rating }}</span>
             <div class="cover-shade">
               <b class="venue-name">{{ v.name }}</b>
               <span class="venue-sub">{{ v.city }} · {{ v.address }}</span>
@@ -60,12 +60,12 @@
 
           <div class="card-body">
             <div class="chips-line">
-              <span class="mini-chip">🏛 {{ v.hallCount }} zal</span>
-              <span class="mini-chip">🍽 {{ v.menuCount }} menyu</span>
-              <span class="mini-chip">🖼 {{ v.imageCount }} şəkil</span>
-              <span class="mini-chip">⭐ {{ v.reviewCount }} rəy</span>
+              <span class="mini-chip"><IcoLandmark class="ico" /> {{ v.hallCount }} zal</span>
+              <span class="mini-chip"><IcoUtensils class="ico" /> {{ v.menuCount }} menyu</span>
+              <span class="mini-chip"><IcoImage class="ico" /> {{ v.imageCount }} şəkil</span>
+              <span class="mini-chip"><IcoStar class="ico ico-fill" /> {{ v.reviewCount }} rəy</span>
               <span class="mini-chip" :class="{ warn: v.pendingReservationCount }">
-                📅 {{ v.reservationCount }} rezerv<template v-if="v.pendingReservationCount">
+                <IcoCalendarDays class="ico" /> {{ v.reservationCount }} rezerv<template v-if="v.pendingReservationCount">
                   · {{ v.pendingReservationCount }} cavabsız</template>
               </span>
             </div>
@@ -149,7 +149,7 @@
         <h4 class="sub-title">Zallar <em>{{ halls.length }}</em></h4>
         <ul v-if="halls.length" class="inner-list">
           <li v-for="h in halls" :key="h.id">
-            <span class="inner-icon">🏛</span>
+            <span class="inner-icon"><IcoLandmark class="ico" /></span>
             <b>{{ h.name }}</b>
             <span class="inner-sub">{{ h.capacity }} nəfər</span>
           </li>
@@ -159,7 +159,7 @@
         <h4 class="sub-title">Menyular <em>{{ menus.length }}</em></h4>
         <ul v-if="menus.length" class="inner-list">
           <li v-for="m in menus" :key="m.id">
-            <span class="inner-icon">🍽</span>
+            <span class="inner-icon"><IcoUtensils class="ico" /></span>
             <b>{{ m.name }}</b>
             <span class="inner-sub">{{ m.pricePerPerson }} ₼ / nəfər</span>
           </li>
@@ -268,7 +268,7 @@
           </span>
           <span class="role-chip">{{ roleLabel(u.role) }}</span>
           <span v-if="u.id === ownerTarget?.ownerId" class="now">indiki</span>
-          <span v-else-if="newOwnerId === u.id" class="tick">✓</span>
+          <span v-else-if="newOwnerId === u.id" class="tick"><IcoCheck class="ico" /></span>
         </li>
         <li v-if="!filteredOwners.length" class="empty-line">İstifadəçi tapılmadı.</li>
       </ul>

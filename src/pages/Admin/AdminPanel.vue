@@ -235,7 +235,7 @@ onMounted(load)
   min-height: calc(100vh - 61px);
   background: #f4f6f8;
   padding: 30px 40px 60px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font);
 }
 
 .admin-inner {

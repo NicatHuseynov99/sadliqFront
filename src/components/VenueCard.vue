@@ -34,7 +34,7 @@
         :title="isFavorite ? 'Seçilmişlərdən sil' : 'Seçilmişlərə əlavə et'"
         @click.stop="$emit('toggle-favorite', venue)"
       >
-        ♥
+        <IcoHeart class="ico ico-fill" />
       </button>
 
       <div class="card-price-tag">
@@ -46,16 +46,16 @@
     <div class="venue-info">
       <div class="title-row">
         <h3>{{ venue.name }}</h3>
-        <span class="rating-pill">★ {{ venue.rating }}</span>
+        <span class="rating-pill"><IcoStar class="ico ico-fill" /> {{ venue.rating }}</span>
       </div>
 
       <div class="avail-row" v-if="nearestDate !== undefined">
         <!-- Qısa mətn: uzun cümlə ("Ən yaxın boş tarix: ...") mobil
              kartda iki sətrə qırılıb nişanı köpüklü edirdi. -->
         <span v-if="nearestDate" class="avail-badge free">
-          ✅ Boş: <b>{{ formatDate(nearestDate) }}</b>
+          <IcoCircleCheck class="ico" /> Boş: <b>{{ formatDate(nearestDate) }}</b>
         </span>
-        <span v-else class="avail-badge busy">⛔ Yaxın 4 ayda boş tarix yoxdur</span>
+        <span v-else class="avail-badge busy"><IcoOctagonMinus class="ico" /> Yaxın 4 ayda boş tarix yoxdur</span>
       </div>
 
       <div class="address-row">
@@ -69,7 +69,7 @@
         <span class="rev-count">· {{ venue.reviewCount }} rəy</span>
         <!-- Parkinq tutumu ünvanın yanında verilir: yer seçimində ikinci ən vacib məlumatdır -->
         <span v-if="venue.parkingCapacity" class="parking-tag" :title="venue.hasValetParking ? 'Valet xidməti var' : ''">
-          🅿️ {{ venue.parkingCapacity }}{{ venue.hasValetParking ? ' · valet' : '' }}
+          <IcoSquareParking class="ico" /> {{ venue.parkingCapacity }}{{ venue.hasValetParking ? ' · valet' : '' }}
         </span>
       </div>
 
@@ -139,7 +139,7 @@ const minPrice = computed(() => {
   display: flex;
   flex-direction: column;
   border: 1px solid #eaeaea;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font);
   cursor: pointer;
 }
 

@@ -74,7 +74,7 @@
         <input v-model="filters.from" type="date" class="select" @change="reload" />
         <input v-model="filters.to" type="date" class="select" @change="reload" />
         <button v-if="filters.venueId" class="chip active" @click="filterByVenue(null)">
-          Saray süzgəci ✕
+          Saray süzgəci <IcoX class="ico" />
         </button>
       </div>
 

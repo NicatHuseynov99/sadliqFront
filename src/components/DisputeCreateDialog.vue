@@ -7,7 +7,7 @@
           <span class="dc-caption">Şikayət</span>
           <b>{{ contextLabel }}</b>
         </div>
-        <button class="dc-close" @click="$emit('close')">✕</button>
+        <button class="dc-close" @click="$emit('close')"><IcoX class="ico" /></button>
       </div>
     </template>
 

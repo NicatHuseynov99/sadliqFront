@@ -16,7 +16,7 @@
           <span class="rd-caption">{{ caption }}</span>
           <b>{{ title }}</b>
         </div>
-        <button class="rd-close" @click="$emit('close')">✕</button>
+        <button class="rd-close" @click="$emit('close')"><IcoX class="ico" /></button>
       </div>
     </template>
 

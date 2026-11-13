@@ -110,7 +110,7 @@
 
                 <!-- Gizlədilmiş mesaj tərəflərə görünmür, admin görür -->
                 <p v-if="m.isHidden" class="hidden-note">
-                  🚫 Gizlədilib{{ m.hiddenReason ? `: ${m.hiddenReason}` : '' }}
+                  <IcoBan class="ico" /> Gizlədilib{{ m.hiddenReason ? `: ${m.hiddenReason}` : '' }}
                 </p>
 
                 <span class="time">

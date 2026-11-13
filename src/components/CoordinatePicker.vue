@@ -28,7 +28,7 @@
         Uzunluq dairəsi
         <input v-model.number="lng" class="value-box" type="number" step="0.0001" @change="apply" />
       </label>
-      <button v-if="lat || lng" class="clear-btn" title="Koordinatı sil" @click="clear">✕</button>
+      <button v-if="lat || lng" class="clear-btn" title="Koordinatı sil" @click="clear"><IcoX class="ico" /></button>
     </div>
 
     <p v-if="message" class="picker-msg" :class="{ bad: isBad }">{{ message }}</p>

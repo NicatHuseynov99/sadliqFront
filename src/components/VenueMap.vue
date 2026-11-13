@@ -6,7 +6,7 @@
       <button class="tool" :class="{ busy: isLocating }" title="Mənə yaxın" @click="goToMe">
         {{ isLocating ? '…' : '📍' }}
       </button>
-      <button class="tool" title="Bütün sarayları göstər" @click="fitAll">🗺</button>
+      <button class="tool" title="Bütün sarayları göstər" @click="fitAll"><IcoMap class="ico" /></button>
     </div>
 
     <div class="map-info">

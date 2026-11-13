@@ -98,7 +98,7 @@
               <span v-for="h in s.hallNames" :key="h" class="hall-chip">{{ h }}</span>
             </template>
             <span v-else class="hall-chip all">Bütün zallar</span>
-            <button class="chip-edit" title="Zalları dəyiş" @click="openHallPicker(s)">✎</button>
+            <button class="chip-edit" title="Zalları dəyiş" @click="openHallPicker(s)"><IcoPencil class="ico" /></button>
           </div>
         </div>
 
@@ -138,10 +138,10 @@
 
         <footer class="sc-actions">
           <button class="act-btn" @click="editStaff(s)">
-            <span>✏️</span> Redaktə
+            <span><IcoPencil class="ico" /></span> Redaktə
           </button>
           <button class="act-btn" @click="askResetPassword(s)">
-            <span>🔑</span> Parol
+            <span><IcoKeyRound class="ico" /></span> Parol
           </button>
           <button class="act-btn" :class="{ warn: s.isActive }" @click="toggleStaff(s)">
             <span>{{ s.isActive ? '⏸' : '▶' }}</span> {{ s.isActive ? 'Girişi bağla' : 'Aktivləşdir' }}
@@ -153,7 +153,7 @@
             @confirm="removeStaff(s)"
           >
             <template #reference>
-              <button class="act-btn danger"><span>🗑</span> Sil</button>
+              <button class="act-btn danger"><span><IcoTrash2 class="ico" /></span> Sil</button>
             </template>
           </el-popconfirm>
         </footer>
@@ -178,7 +178,7 @@
           <span class="ho-check">{{ hallPickerSelection.includes(h.id) ? '✓' : '' }}</span>
           <span class="ho-text">
             <b>{{ h.name }}</b>
-            <em>👥 {{ h.capacity }} qonaq · {{ h.minPrice }} ₼-dən</em>
+            <em><IcoUsers class="ico" /> {{ h.capacity }} qonaq · {{ h.minPrice }} ₼-dən</em>
           </span>
         </button>
       </div>

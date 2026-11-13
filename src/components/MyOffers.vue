@@ -16,7 +16,7 @@
           {{ formatDate(o.eventDate) }}
         </span>
 
-        <p v-if="o.lastMessage" class="last">💬 {{ o.lastMessage }}</p>
+        <p v-if="o.lastMessage" class="last"><IcoMessageCircle class="ico" /> {{ o.lastMessage }}</p>
       </div>
 
       <div class="price">
