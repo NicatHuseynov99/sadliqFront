@@ -26,14 +26,17 @@ const extractMessage = (data) => {
   return null
 }
 
-const notifyError = (title, message) => {
+// Sorğu «silentError: true» ilə göndərilibsə bildiriş çıxmır: giriş və
+// qeydiyyat formaları xətanı öz içində göstərir, ikinci dəfə lazım deyil.
+const notifyError = (title, message, config) => {
+  if (config?.silentError) return
   toast.error(message, title)
 }
 
 api.interceptors.response.use((response) => {
   // HTTP 200 olsa belə backend Success=false qaytara bilər
   if (response.data && response.data.success === false) {
-    notifyError('Xəta', response.data.message ?? 'Naməlum xəta')
+    notifyError('Xəta', response.data.message ?? 'Naməlum xəta', response.config)
     return Promise.reject(new Error(response.data.message ?? 'Naməlum xəta'))
   }
   return response
@@ -51,26 +54,26 @@ api.interceptors.response.use((response) => {
     if (hadToken && window.location.pathname !== '/login') {
       window.location.href = '/login'
     }
-    notifyError('Giriş xətası', message ?? 'Yenidən daxil olun')
+    notifyError('Giriş xətası', message ?? 'Yenidən daxil olun', error.config)
     return Promise.reject(error)
   }
 
   if (status === 403) {
-    notifyError('İcazə yoxdur', message ?? 'Bu əməliyyat üçün icazəniz yoxdur')
+    notifyError('İcazə yoxdur', message ?? 'Bu əməliyyat üçün icazəniz yoxdur', error.config)
     return Promise.reject(error)
   }
 
   if (status === 404) {
-    notifyError('Tapılmadı', message ?? 'Resurs tapılmadı')
+    notifyError('Tapılmadı', message ?? 'Resurs tapılmadı', error.config)
     return Promise.reject(error)
   }
 
   if (!error.response) {
-    notifyError('Bağlantı xətası', 'Serverə qoşulmaq mümkün olmadı')
+    notifyError('Bağlantı xətası', 'Serverə qoşulmaq mümkün olmadı', error.config)
     return Promise.reject(error)
   }
 
-  notifyError('Xəta', message ?? 'Naməlum xəta baş verdi')
+  notifyError('Xəta', message ?? 'Naməlum xəta baş verdi', error.config)
   return Promise.reject(error)
 })
 

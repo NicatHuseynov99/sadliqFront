@@ -1,86 +1,126 @@
 <template>
-  <div class="auth-page">
-    <!-- Əvvəlcə kim olduğunu soruşuruq: axınlar tamamilə fərqlidir.
-         Müştəri bir formada bitir, restoran isə çoxaddımlı anket doldurur. -->
-    <div v-if="!mode" class="auth-card choice-card">
-      <h1 class="title">Qeydiyyat</h1>
-      <p class="subtitle">Kim kimi qeydiyyatdan keçirsiniz?</p>
-
-      <div class="choices">
-        <button class="choice" @click="mode = 'customer'">
-          <span class="choice-icon">👤</span>
-          <b>Müştəriyəm</b>
-          <span class="choice-text">
-            Saray axtarıram, rezerv etmək və rəy yazmaq istəyirəm.
-          </span>
+  <!-- Əvvəlcə kim olduğunu soruşuruq: axınlar tamamilə fərqlidir.
+       Müştəri bir formada bitir, restoran isə çoxaddımlı anket doldurur. -->
+  <AuthShell
+    v-if="!mode"
+    wide
+    title="TOYUN-a qoşulun"
+    subtitle="Kim kimi qeydiyyatdan keçirsiniz?"
+  >
+    <div class="choices">
+      <button type="button" class="choice" @click="mode = 'customer'">
+        <span class="choice-icon"><UserRound :size="22" /></span>
+        <b>Müştəriyəm</b>
+        <span class="choice-text">Saray axtarıram, rezerv etmək və rəy yazmaq istəyirəm.</span>
+        <span class="choice-foot">
           <span class="choice-meta">1 dəqiqə</span>
-        </button>
+          <ArrowRight :size="18" class="choice-arrow" />
+        </span>
+      </button>
 
-        <button class="choice owner" @click="goToVenueForm">
-          <span class="choice-icon">🏛</span>
-          <b>Restoran / saray sahibiyəm</b>
-          <span class="choice-text">
-            Məkanımı platformaya əlavə etmək istəyirəm. Qısa anket dolduracaqsınız:
-            saray, yer, şəkillər, zallar və menyular.
-          </span>
-          <span class="choice-meta">7 addım · yoxlanışdan sonra saytda görünür</span>
-        </button>
+      <button type="button" class="choice owner" @click="goToVenueForm">
+        <span class="choice-icon"><Building2 :size="22" /></span>
+        <b>Saray / restoran sahibiyəm</b>
+        <span class="choice-text">
+          Məkanımı platformaya əlavə etmək istəyirəm: saray, yer, şəkillər, zallar və menyular.
+        </span>
+        <span class="choice-foot">
+          <span class="choice-meta">7 addım · yoxlanışdan sonra görünür</span>
+          <ArrowRight :size="18" class="choice-arrow" />
+        </span>
+      </button>
+    </div>
+
+    <p class="auth-switch">
+      Artıq hesabınız var?
+      <router-link to="/login" class="auth-link">Daxil olun</router-link>
+    </p>
+  </AuthShell>
+
+  <AuthShell
+    v-else
+    back
+    compact
+    title="Müştəri qeydiyyatı"
+    subtitle="Bir dəqiqəyə hesab açın və saraylara sorğu göndərin."
+    @back="mode = ''"
+  >
+    <el-form @submit.prevent="register">
+      <div class="auth-row">
+        <label class="auth-field">
+          <span class="auth-label">Ad</span>
+          <el-input v-model="form.firstName" autocomplete="given-name" placeholder="Adınız" />
+        </label>
+        <label class="auth-field">
+          <span class="auth-label">Soyad</span>
+          <el-input v-model="form.lastName" autocomplete="family-name" placeholder="Soyadınız" />
+        </label>
       </div>
 
-      <p class="switch-link">
-        Artıq hesabınız var? <router-link to="/login">Daxil olun</router-link>
+      <label class="auth-field">
+        <span class="auth-label">E-poçt</span>
+        <el-input
+          v-model="form.email"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="ad@numune.az"
+          :prefix-icon="Mail"
+        />
+      </label>
+
+      <label class="auth-field">
+        <span class="auth-label">Telefon</span>
+        <el-input
+          v-model="form.phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          placeholder="+994 50 000 00 00"
+          :prefix-icon="Phone"
+        />
+      </label>
+
+      <label class="auth-field">
+        <span class="auth-label">Şifrə</span>
+        <el-input
+          v-model="form.password"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Şifrə seçin"
+          show-password
+          :prefix-icon="Lock"
+        />
+      </label>
+
+      <p v-if="errorMessage" class="auth-error" role="alert">
+        <CircleAlert :size="17" />
+        {{ errorMessage }}
       </p>
-    </div>
 
-    <div v-else class="auth-card">
-      <button class="back-link" @click="mode = ''">← Geri</button>
-
-      <h1 class="title">Müştəri qeydiyyatı</h1>
-      <p class="subtitle">Şadlıq Sarayları-na qoşulun</p>
-
-      <el-form @submit.prevent="register">
-        <div class="name-row">
-          <el-form-item>
-            <el-input v-model="form.firstName" placeholder="Ad" />
-          </el-form-item>
-          <el-form-item>
-            <el-input v-model="form.lastName" placeholder="Soyad" />
-          </el-form-item>
-        </div>
-        <el-form-item>
-          <el-input v-model="form.email" placeholder="E-poçt" />
-        </el-form-item>
-        <el-form-item>
-          <el-input v-model="form.phone" placeholder="Telefon" />
-        </el-form-item>
-        <el-form-item>
-          <el-input v-model="form.password" type="password" placeholder="Şifrə" show-password />
-        </el-form-item>
-        <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
-
-        <el-button
-          class="submit-btn"
-          type="primary"
-          native-type="submit"
-          :loading="isLoading"
-          @click.prevent="register"
-        >
+      <button class="auth-submit" type="submit" :disabled="isLoading">
+        <span v-if="isLoading" class="auth-spinner"></span>
+        <template v-else>
           Qeydiyyatdan keç
-        </el-button>
-      </el-form>
+          <ArrowRight :size="18" />
+        </template>
+      </button>
+    </el-form>
 
-      <p class="switch-link">
-        Artıq hesabınız var? <router-link to="/login">Daxil olun</router-link>
-      </p>
-    </div>
-  </div>
+    <p class="auth-switch">
+      Artıq hesabınız var?
+      <router-link to="/login" class="auth-link">Daxil olun</router-link>
+    </p>
+  </AuthShell>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ArrowRight, Building2, CircleAlert, Lock, Mail, Phone, UserRound } from 'lucide-vue-next'
 import { useAuthStore } from '@/store/auth'
 import { toast } from '@/utils/toast'
+import AuthShell from '@/components/AuthShell.vue'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -116,96 +156,93 @@ const register = async () => {
 </script>
 
 <style scoped>
-.auth-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #fdf6e3, #f3e2c7);
-}
-
-.auth-card {
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 10px 40px rgba(184, 134, 11, 0.15);
-  padding: 44px 36px;
-  width: 100%;
-  max-width: 400px;
-}
-
-/* Seçim ekranı iki karta yer verməli olduğu üçün daha genişdir */
-.choice-card {
-  max-width: 720px;
-}
-
 .choices {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-  margin: 22px 0 18px;
 }
 
 .choice {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
   text-align: left;
+  padding: 20px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid #e6dccd;
   background: #fff;
-  border: 1px solid var(--line-2);
-  border-radius: 14px;
-  padding: 20px 18px;
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: border-color var(--t), transform var(--t), box-shadow var(--t);
 }
 
 .choice:hover {
-  border-color: var(--gold);
+  border-color: var(--brand);
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(184, 134, 11, 0.14);
+  box-shadow: 0 14px 30px rgba(43, 7, 20, 0.1);
+}
+
+.choice-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 4px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
 /* Sahibkar axını platformanın böyüməsi üçün əsasdır — vurğulanır */
 .choice.owner {
-  background: linear-gradient(135deg, #fffdf7, #fff);
-  border-color: #f0e0bd;
+  border-color: #ead6a6;
+  background: linear-gradient(160deg, #fffaf0, #fff 60%);
 }
 
-.choice-icon {
-  font-size: 1.7rem;
+.choice.owner .choice-icon {
+  background: var(--gold-soft);
+  color: #8f6410;
 }
 
 .choice b {
-  font-size: 1rem;
+  font-size: 1.04rem;
+  font-weight: 600;
   color: var(--ink);
 }
 
 .choice-text {
-  font-size: 0.82rem;
-  color: #6c757d;
-  line-height: 1.55;
   flex: 1;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.choice-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 6px;
 }
 
 .choice-meta {
-  font-size: 0.72rem;
-  color: #b08d3a;
-  background: #fdf6e3;
-  padding: 3px 10px;
-  border-radius: 20px;
-  align-self: flex-start;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #8f6410;
+  background: var(--gold-soft);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
 }
 
-.back-link {
-  background: none;
-  border: none;
-  color: #6c757d;
-  font-size: 0.82rem;
-  cursor: pointer;
-  padding: 0 0 10px;
+.choice-arrow {
+  flex: none;
+  color: var(--faint);
+  transition: color var(--t), transform var(--t);
 }
 
-.back-link:hover {
+.choice:hover .choice-arrow {
   color: var(--brand);
+  transform: translateX(3px);
 }
 
 @media (max-width: 640px) {
@@ -214,64 +251,50 @@ const register = async () => {
   }
 }
 
-.title {
-  text-align: center;
-  color: #b8860b;
-  font-size: 26px;
-  margin-bottom: 4px;
-}
+/* Alçaq telefonda iki kart sığsın: ikon başlıqla bir sətirə keçir */
+@media (max-width: 640px) and (max-height: 770px) {
+  .choices {
+    gap: 10px;
+  }
 
-.subtitle {
-  text-align: center;
-  color: #999;
-  margin-bottom: 28px;
-  font-size: 14px;
-}
+  .choice {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 12px;
+    row-gap: 5px;
+    align-items: center;
+    padding: 13px 14px 12px;
+  }
 
-.name-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
+  .choice-icon {
+    width: 38px;
+    height: 38px;
+    margin: 0;
+    border-radius: 12px;
+  }
 
-.form-error {
-  color: #d93025;
-  font-size: 13px;
-  margin: 0 0 12px;
-  text-align: center;
-  white-space: pre-line;
-}
+  .choice-text,
+  .choice-foot {
+    grid-column: 1 / -1;
+  }
 
-.submit-btn {
-  width: 100%;
-  margin-top: 8px;
-  background: #b8860b;
-  border-color: #b8860b;
-}
+  .choice-text {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
 
-.submit-btn:hover {
-  background: #a3760a;
-  border-color: #a3760a;
+  .choice-foot {
+    margin-top: 2px;
+  }
 }
+/* Ən alçaq telefonda izah mətni gizlənir — başlıq və müddət kifayətdir */
+@media (max-width: 640px) and (max-height: 620px) {
+  .choice-text {
+    display: none;
+  }
 
-.switch-link {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 14px;
-  color: #666;
-}
-
-.switch-link a {
-  color: #b8860b;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-/* Səhifə altındakı keçidlər 17–19px hündürlüyündə idi — barmaqla dəqiq
-   vurmaq çətindir. Yazı ölçüsü eyni qalır, yalnız sahə böyüyür. */
-a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
+  .choice {
+    padding: 11px 13px 10px;
+  }
 }
 </style>

@@ -43,14 +43,14 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     // Backend-ə login sorğusu göndərir, uğurlu olarsa token-i saxlayıb profili çəkir
     async login(payload) {
-      const { data } = await api.post('/Auth/Login', payload)
+      const { data } = await api.post('/Auth/Login', payload, { silentError: true })
       this.setToken(data.data.token)
       await this.fetchMe()
     },
 
     // Yeni istifadəçi qeydiyyatı (Customer/Owner)
     async register(payload) {
-      await api.post('/Auth/Register', payload)
+      await api.post('/Auth/Register', payload, { silentError: true })
     },
 
     // Hazır token ilə sessiyanı başladır — saray müraciəti sahibkarı
