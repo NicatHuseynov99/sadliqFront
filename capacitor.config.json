@@ -1,0 +1,9 @@
+{
+  "appId": "az.toyun.app",
+  "appName": "TOYUN",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true
+  }
+}

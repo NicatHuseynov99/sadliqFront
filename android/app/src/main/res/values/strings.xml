@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TOYUN</string>
+    <string name="title_activity_main">TOYUN</string>
+    <string name="package_name">az.toyun.app</string>
+    <string name="custom_url_scheme">az.toyun.app</string>
+</resources>
