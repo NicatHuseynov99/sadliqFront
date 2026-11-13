@@ -16,26 +16,15 @@
 
         <div class="hero-side">
           <span class="admin-tag" :class="{ support: auth.isSupport }">
-            {{ auth.isSupport ? '🛟 Dəstək admini' : '⚙️ SuperAdmin' }}
+            <template v-if="auth.isSupport"><IcoLifeBuoy class="ico" /> Dəstək admini</template>
+            <template v-else><IcoSettings class="ico" /> SuperAdmin</template>
           </span>
           <span class="hero-name">{{ auth.user?.fullName }}</span>
         </div>
       </header>
 
       <!-- Bölmələr -->
-      <div class="section-tabs">
-        <button
-          v-for="t in tabs"
-          :key="t.value"
-          class="section-tab"
-          :class="{ active: section === t.value }"
-          @click="section = t.value"
-        >
-          <i class="tab-icon">{{ t.icon }}</i>
-          {{ t.label }}
-          <em v-if="t.badge" class="tab-badge">{{ t.badge }}</em>
-        </button>
-      </div>
+      <SectionNav v-model="section" :tabs="tabs" />
 
       <DisputesView v-if="section === 'disputes'" />
       <AdminChatsView v-else-if="section === 'chats'" />
@@ -125,6 +114,10 @@
 </template>
 
 <script setup>
+import {
+  CalendarDays, ChartColumn, Database, Footprints, Landmark, Megaphone, MessageCircle, Scale, ScrollText, Settings, Star,
+} from 'lucide-vue-next'
+import SectionNav from '@/components/SectionNav.vue'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useCountUp } from '@/composables/useCountUp'
 import { toast } from '@/utils/toast'
@@ -182,19 +175,19 @@ const todoText = computed(() => {
 })
 
 const tabs = computed(() => [
-  { value: 'overview', label: 'İcmal', icon: '📊' },
-  { value: 'venues', label: 'Saraylar', icon: '🏛', badge: stats.value.pendingVenues || 0 },
-  { value: 'bookings', label: 'Rezervlər', icon: '📅', badge: stats.value.pendingReservations || 0 },
-  { value: 'reviews', label: 'Rəylər', icon: '⭐' },
-  { value: 'visitors', label: 'Ziyarətçilər', icon: '👣' },
-  { value: 'disputes', label: 'Şikayətlər', icon: '⚖️' },
-  { value: 'chats', label: 'Yazışmalar', icon: '💬' },
-  { value: 'notify', label: 'Bildiriş göndər', icon: '📣' },
-  { value: 'audit', label: 'Jurnal', icon: '📜' },
-  { value: 'settings', label: 'Parametrlər', icon: '⚙️' },
+  { value: 'overview', label: 'İcmal', icon: ChartColumn },
+  { value: 'venues', label: 'Saraylar', icon: Landmark, badge: stats.value.pendingVenues || 0 },
+  { value: 'bookings', label: 'Rezervlər', icon: CalendarDays, badge: stats.value.pendingReservations || 0 },
+  { value: 'reviews', label: 'Rəylər', icon: Star },
+  { value: 'visitors', label: 'Ziyarətçilər', icon: Footprints },
+  { value: 'disputes', label: 'Şikayətlər', icon: Scale },
+  { value: 'chats', label: 'Yazışmalar', icon: MessageCircle },
+  { value: 'notify', label: 'Bildiriş göndər', icon: Megaphone },
+  { value: 'audit', label: 'Jurnal', icon: ScrollText },
+  { value: 'settings', label: 'Parametrlər', icon: Settings },
 
   // Baza bölməsi bütün cədvəllərə birbaşa çıxış verir — yalnız platforma sahibinə
-  ...(auth.isSuperAdmin ? [{ value: 'data', label: 'Baza', icon: '🗄' }] : []),
+  ...(auth.isSuperAdmin ? [{ value: 'data', label: 'Baza', icon: Database }] : []),
 ])
 
 // Dəstək admini SuperAdmin hesablarını görmür — həm süzgəcdən, həm də
@@ -233,7 +226,7 @@ onMounted(load)
 <style scoped>
 .admin-page {
   min-height: calc(100vh - 61px);
-  background: #f4f6f8;
+  background: var(--bg);
   padding: 30px 40px 60px;
   font-family: var(--font);
 }
@@ -363,7 +356,7 @@ onMounted(load)
   gap: 7px;
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 9px 17px;
   border-radius: 10px;
   font-size: 0.88rem;
@@ -421,7 +414,7 @@ onMounted(load)
 .stat-card {
   position: relative;
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 16px 18px;
   display: flex;
@@ -464,24 +457,24 @@ button.stat-card:hover {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   font-weight: 700;
 }
 
 .stat-sub {
   font-size: 0.76rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .stat-sub.warn {
-  color: #b07d2b;
+  color: var(--gold-ink);
   font-weight: 600;
 }
 
 /* Bloklar */
 .block {
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 20px 22px;
   margin-bottom: 20px;
@@ -557,7 +550,7 @@ button.stat-card:hover {
 }
 
 .approve-btn {
-  background: #1e7e34;
+  background: var(--ok);
   color: #fff;
   border: none;
   padding: 8px 16px;
@@ -569,7 +562,7 @@ button.stat-card:hover {
 }
 
 .approve-btn:hover {
-  background: #17692b;
+  background: var(--ok);
 }
 
 .pending-actions {
@@ -580,7 +573,7 @@ button.stat-card:hover {
 
 .mini-btn {
   background: #fff;
-  border: 1px solid #ece5e8;
+  border: 1px solid var(--line);
   color: var(--ink-2);
   padding: 5px 11px;
   border-radius: 8px;
@@ -609,6 +602,19 @@ button.stat-card:hover {
 
   .section-tab {
     white-space: nowrap;
+  }
+}
+
+/* Telefon: başlıq yığcamdır. Rol nişanı və ad təkrardır — ad yuxarıdakı
+   başlıqda, rol isə «Platforma sahibi paneli» sətrində onsuz da var. */
+@media (max-width: 600px) {
+  .hero {
+    padding: 18px 18px 20px;
+    border-radius: 20px;
+  }
+
+  .hero-side {
+    display: none;
   }
 }
 </style>

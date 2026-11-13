@@ -31,49 +31,7 @@
       </div>
 
       <!-- Bölmə seçimi — administratorda yalnız rezervlər və zallar görünür -->
-      <div class="section-tabs">
-        <button class="section-tab" :class="{ active: section === 'reservations' }" @click="section = 'reservations'">
-          Rezerv sorğuları
-        </button>
-        <button class="section-tab" :class="{ active: section === 'stats' }" @click="section = 'stats'">
-          Statistika
-        </button>
-        <button class="section-tab" :class="{ active: section === 'requests' }" @click="section = 'requests'">
-          Açıq sorğular
-        </button>
-        <button class="section-tab" :class="{ active: section === 'offers' }" @click="section = 'offers'">
-          Təkliflərim
-        </button>
-        <button class="section-tab" :class="{ active: section === 'venues' }" @click="section = 'venues'">
-          {{ auth.canEditVenues ? 'Saraylarım' : 'Zallarım' }} <em>{{ venues.length }}</em>
-        </button>
-        <button
-          v-if="auth.canEditVenues"
-          class="section-tab"
-          :class="{ active: section === 'staff' }"
-          @click="section = 'staff'"
-        >
-          Administratorlar
-        </button>
-        <!-- Rəylər həm sahibə, həm administratora lazımdır -->
-        <button
-          class="section-tab"
-          :class="{ active: section === 'reviews' }"
-          @click="section = 'reviews'"
-        >
-          Rəylər
-        </button>
-        <!-- Jurnal yalnız sahibə görünür: administrator öz üzərindəki
-             nəzarəti görməməlidir -->
-        <button
-          v-if="auth.canEditVenues"
-          class="section-tab"
-          :class="{ active: section === 'activity' }"
-          @click="section = 'activity'"
-        >
-          Jurnal
-        </button>
-      </div>
+      <SectionNav v-model="section" :tabs="sectionTabs" />
 
       <UiEmpty
         v-if="!isLoading && venues.length === 0"
@@ -279,6 +237,8 @@
 </template>
 
 <script setup>
+import { ChartColumn, Inbox, Landmark, Megaphone, ScrollText, Send, Star, Users } from 'lucide-vue-next'
+import SectionNav from '@/components/SectionNav.vue'
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { useCountUp } from '@/composables/useCountUp'
 import { toast } from '@/utils/toast'
@@ -319,6 +279,19 @@ const activeTab = ref(0)
 
 // Panelin bölmələri: rezervlər / administratorlar
 const section = ref('reservations')
+
+// Administratorda yalnız rezervlər, zallar və rəylər görünür; jurnal yalnız
+// sahibədir — administrator öz üzərindəki nəzarəti görməməlidir
+const sectionTabs = computed(() => [
+  { value: 'reservations', label: 'Rezerv sorğuları', icon: Inbox },
+  { value: 'stats', label: 'Statistika', icon: ChartColumn },
+  { value: 'requests', label: 'Açıq sorğular', icon: Megaphone },
+  { value: 'offers', label: 'Təkliflərim', icon: Send },
+  { value: 'venues', label: auth.canEditVenues ? 'Saraylarım' : 'Zallarım', icon: Landmark, count: venues.value.length },
+  ...(auth.canEditVenues ? [{ value: 'staff', label: 'Administratorlar', icon: Users }] : []),
+  { value: 'reviews', label: 'Rəylər', icon: Star },
+  ...(auth.canEditVenues ? [{ value: 'activity', label: 'Jurnal', icon: ScrollText }] : []),
+])
 
 const tabs = [
   { value: 0, label: 'Gözləyir' },
@@ -486,7 +459,7 @@ onMounted(load)
 <style scoped>
 .panel-page {
   min-height: calc(100vh - 61px);
-  background: #f4f6f8;
+  background: var(--bg);
   padding: 30px 40px 60px;
   font-family: var(--font);
 }
@@ -512,7 +485,7 @@ onMounted(load)
 
 .page-sub {
   margin: 0;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.92rem;
 }
 
@@ -536,7 +509,7 @@ onMounted(load)
 
 .stat-card {
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 16px 18px;
   display: flex;
@@ -570,7 +543,7 @@ onMounted(load)
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   font-weight: 700;
 }
 
@@ -598,7 +571,7 @@ onMounted(load)
   white-space: nowrap;
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 9px 20px;
   border-radius: 10px;
   font-size: 0.9rem;
@@ -642,7 +615,7 @@ onMounted(load)
 
 .venue-list {
   background: #fff;
-  border: 1px solid #f2ecee;
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 14px;
   max-height: 640px;
@@ -655,7 +628,7 @@ onMounted(load)
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   margin-bottom: 10px;
   padding-left: 4px;
 }
@@ -710,7 +683,7 @@ onMounted(load)
 .vi-text em {
   font-style: normal;
   font-size: 0.73rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .vi-badge {
@@ -769,7 +742,7 @@ onMounted(load)
   white-space: nowrap;
   background: #fff;
   border: 1px solid var(--line-2);
-  color: #6c757d;
+  color: var(--muted);
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.82rem;
@@ -796,8 +769,8 @@ onMounted(load)
 
 .res-card {
   background: #fff;
-  border: 1px solid #eaeaea;
-  border-left: 4px solid #eaeaea;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line);
   border-radius: 14px;
   padding: 16px 20px;
   margin-bottom: 14px;
@@ -805,9 +778,9 @@ onMounted(load)
 }
 
 .res-card.pending { border-left-color: var(--gold); }
-.res-card.confirmed { border-left-color: #1e7e34; }
-.res-card.rejected { border-left-color: #c0392b; }
-.res-card.cancelled { border-left-color: #ced4da; }
+.res-card.confirmed { border-left-color: var(--ok); }
+.res-card.rejected { border-left-color: var(--danger); }
+.res-card.cancelled { border-left-color: var(--faint); }
 .res-card.expired { border-left-color: #d8c39a; }
 .res-card.offered { border-left-color: #7ba1d0; }
 
@@ -827,7 +800,7 @@ onMounted(load)
 
 .res-meta {
   font-size: 0.8rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .status-tag {
@@ -838,10 +811,10 @@ onMounted(load)
   white-space: nowrap;
 }
 
-.status-tag.pending { background: #fff6e0; color: #b07d2b; }
-.status-tag.confirmed { background: #e3f6e8; color: #1e7e34; }
-.status-tag.rejected { background: var(--danger-soft); color: #c0392b; }
-.status-tag.cancelled { background: #f1f3f5; color: var(--muted); }
+.status-tag.pending { background: #fff6e0; color: var(--gold-ink); }
+.status-tag.confirmed { background: #e3f6e8; color: var(--ok); }
+.status-tag.rejected { background: var(--danger-soft); color: var(--danger); }
+.status-tag.cancelled { background: var(--surface-2); color: var(--muted); }
 .status-tag.expired { background: #f4efe6; color: #8a6d3b; }
 .status-tag.offered { background: #eaf1fa; color: var(--info); }
 
@@ -865,7 +838,7 @@ onMounted(load)
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #b8a3ab;
+  color: var(--muted-2);
   font-weight: 700;
 }
 
@@ -903,7 +876,7 @@ onMounted(load)
 
 .res-date {
   font-size: 0.78rem;
-  color: #adb5bd;
+  color: var(--muted-2);
 }
 
 .res-actions {
@@ -956,7 +929,7 @@ onMounted(load)
   display: block;
   font-style: normal;
   font-size: 0.76rem;
-  color: #6c757d;
+  color: var(--muted);
   margin-top: 4px;
 }
 
@@ -1031,7 +1004,7 @@ onMounted(load)
 }
 
 .confirm-btn {
-  background: #1e7e34;
+  background: var(--ok);
   color: #fff;
   border: none;
   padding: 8px 20px;
@@ -1043,12 +1016,12 @@ onMounted(load)
 }
 
 .confirm-btn:hover {
-  background: #17692b;
+  background: var(--ok);
 }
 
 .reject-btn {
   background: #fff;
-  color: #c0392b;
+  color: var(--danger);
   border: 1px solid #e5b4ae;
   padding: 8px 18px;
   border-radius: 8px;
@@ -1059,8 +1032,8 @@ onMounted(load)
 }
 
 .reject-btn:hover {
-  background: #c0392b;
-  border-color: #c0392b;
+  background: var(--danger);
+  border-color: var(--danger);
   color: #fff;
 }
 
