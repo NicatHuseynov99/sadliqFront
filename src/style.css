@@ -255,3 +255,16 @@ textarea {
 .el-message-box__content {
   overscroll-behavior: contain;
 }
+
+/* ————— Sürüşmə zolaqları —————
+   Brauzerin öz zolağı (boz, enli, oxlu) saytın qalanına yad idi. İncə,
+   fonla qaynayan zolaq: üstünə gələndə tündləşir. Telefonda zolaq onsuz
+   da görünmür. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d8cdd1 transparent;
+}
+
+*:hover {
+  scrollbar-color: #b9aab0 transparent;
+}
