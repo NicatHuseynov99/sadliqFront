@@ -1,6 +1,6 @@
 <template>
   <div class="ui-empty">
-    <span class="ui-empty-icon">{{ icon }}</span>
+    <span class="ui-empty-icon"><component :is="iconComponent" :size="30" :stroke-width="1.6" /></span>
     <h3>{{ title }}</h3>
     <p v-if="text">{{ text }}</p>
     <slot />
@@ -8,12 +8,30 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import {
+  ArrowLeft, CalendarRange, ChartColumn, DoorOpen, Heart, Inbox, Landmark, MailOpen, Megaphone, MessageCircle,
+  NotebookText, Scale, ScrollText, Search, Star, UserRound, Utensils,
+} from 'lucide-vue-next'
+
+// Səhifələr işarəni emoji kimi ötürür (icon="📣"). Emoji hər telefonda
+// fərqli çəkilir və brend rənginə uyğunlaşmır, ona görə burada xətt
+// ikonuna çevrilir — çağıran yerlərə toxunmaq lazım gəlmir.
+const ICONS = {
+  '📭': Inbox, '⚖': Scale, '⭐': Star, '🍽': Utensils, '🏛': Landmark, '👈': ArrowLeft, '💬': MessageCircle,
+  '📊': ChartColumn, '📜': ScrollText, '📣': Megaphone, '📨': MailOpen, '🔍': Search, '🗒': NotebookText,
+  '🗓': CalendarRange, '🚪': DoorOpen, '🤍': Heart, '🧑': UserRound,
+}
+
 // Boş hallar hər səhifədə eyni quruluşda: işarə, bir cümlə, bir addım
-defineProps({
+const props = defineProps({
   icon: { type: String, default: '📭' },
   title: { type: String, required: true },
   text: { type: String, default: '' },
 })
+
+// İlk simvola görə: «⚖️» və «🧑‍💼» kimi emojilər bir neçə kod nöqtəsindən ibarətdir
+const iconComponent = computed(() => ICONS[[...props.icon][0]] ?? Inbox)
 </script>
 
 <style scoped>
@@ -39,6 +57,7 @@ defineProps({
 /* İşarə brend rəngli dairənin içindədir: emoji tək qalanda səhifəyə
    düşmüş kimi görünür, çərçivə onu tərtibatın bir hissəsi edir. */
 .ui-empty-icon {
+  color: var(--brand);
   font-size: 2.1rem;
   display: grid;
   place-items: center;
