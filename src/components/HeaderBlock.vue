@@ -229,6 +229,10 @@ watch(
 .burger {
   display: none;
   flex-direction: column;
+  /* Düymənin minimum hündürlüyü var (toxunma sahəsi) — xətlər ortada
+     dayanmasa yuxarıya yapışır və yanındakı ad aşağı sallanmış görünür */
+  justify-content: center;
+  align-items: center;
   gap: 4px;
   background: none;
   border: none;
