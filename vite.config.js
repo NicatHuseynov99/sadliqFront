@@ -13,6 +13,15 @@ const appUpdate = () => {
   }
 
   const handler = (req, res, next) => {
+    // Sınaq APK-sı kompüteri şəbəkədə bu ünvanla tapır: 3000 portunda başqa
+    // cihaz da ola bilər, cavab bizim server olduğunu təsdiqləyir
+    if ((req.url || '').split('?')[0] === '/ping') {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8')
+      res.setHeader('Cache-Control', 'no-store')
+      res.setHeader('Access-Control-Allow-Origin', '*')
+      return res.end('{"app":"toyun"}')
+    }
+
     // basename — qovluqdan kənara çıxmağın qarşısını alır
     const name = path.basename(decodeURIComponent((req.url || '').split('?')[0]))
     const type = types[path.extname(name)]
@@ -43,6 +52,16 @@ export default ({ mode }) => {
     server: {
       host: process.env.VITE_HOST,
       port: Number(process.env.VITE_PORT),
+
+      // Telefon kompüterə adı ilə də qoşula bilir (kompüter-adı.local) —
+      // Vite tanımadığı host adını təhlükəsizlik üçün rədd edir
+      allowedHosts: ['.local'],
+
+      // APK yığılanda android/ və releases/ içində yüzlərlə fayl dəyişir —
+      // dev server bunları izləyib açıq səhifələri boş yerə yeniləməsin
+      watch: {
+        ignored: ['**/android/**', '**/releases/**', '**/AAAA/**'],
+      },
 
       // Telefondan yoxlamaq üçün. Telefon `/api/...` ünvanına öz
       // qoşulduğu host üzərindən müraciət edir, Vite isə sorğunu bu

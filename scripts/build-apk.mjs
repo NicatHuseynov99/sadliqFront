@@ -2,17 +2,19 @@
 //
 //   npm run apk                    — Wi-Fi ünvanını özü tapır
 //   npm run apk -- --host=10.0.0.7 — ünvanı əl ilə ver
-//   npm run apk -- --live          — canlı rejim (səhifələr dev serverdən)
+//   npm run apk -- --live          — canlı rejim: səhifələr dev serverdən,
+//                                    kompüteri şəbəkədə özü tapır
 //
 // Nəticə: releases/toyun.apk və releases/version.json. Dev server
 // (npm run dev) bunları /app-update altında paylayır; quraşdırılmış
 // tətbiq oradakı version.json-a baxıb yeniləmə təklif edir.
 //
-// APK kompüterin şəbəkə ünvanına bağlıdır: ünvan dəyişəndə yenidən yığın.
+// Adi (canlı olmayan) APK kompüterin şəbəkə ünvanına bağlıdır: ünvan
+// dəyişəndə yenidən yığın. Canlı rejimdə buna ehtiyac yoxdur.
 
 import { execSync } from 'node:child_process'
-import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
-import { homedir, networkInterfaces } from 'node:os'
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { homedir, hostname, networkInterfaces } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -67,15 +69,32 @@ run('npx cap sync android')
 
 // Canlı rejim (--live): tətbiq səhifələri APK-nın içindən yox, birbaşa
 // dev serverdən oxuyur — kod dəyişən kimi telefonda özü yenilənir.
-// Kompüter sönülü və ya başqa şəbəkədədirsə tətbiq açılmır.
-// Mağaza yığımında istifadə olunmur.
+//
+// APK heç bir ünvana bağlı deyil. İçində yalnız başlanğıc səhifə var
+// (mobile/launcher.html): tətbiq hər açılanda kompüteri Wi-Fi-da özü tapır
+// (adı ilə, sonra şəbəkəni skan edərək) və ora keçir. Ona görə eyni APK
+// istənilən telefonda işləyir və kompüterin ünvanı dəyişəndə yenidən
+// yığmaq lazım deyil. Mağaza yığımında istifadə olunmur.
 const live = process.argv.includes('--live')
 if (live) {
-  const nativeConfig = path.join(root, 'android', 'app', 'src', 'main', 'assets', 'capacitor.config.json')
+  const assets = path.join(root, 'android', 'app', 'src', 'main', 'assets')
+
+  const launcher = readFileSync(path.join(root, 'mobile', 'launcher.html'), 'utf8')
+    .replaceAll('__HOSTNAME__', hostname())
+    .replaceAll('__BUILD_IP__', host)
+    .replaceAll('__PORT__', port)
+  rmSync(path.join(assets, 'public'), { recursive: true, force: true })
+  mkdirSync(path.join(assets, 'public'), { recursive: true })
+  writeFileSync(path.join(assets, 'public', 'index.html'), launcher)
+
+  // allowNavigation "*": başlanğıc səhifə tapdığı ünvana tətbiqin içində
+  // keçə bilsin (əks halda Capacitor onu telefonun brauzerində açır)
+  const nativeConfig = path.join(assets, 'capacitor.config.json')
   const config = JSON.parse(readFileSync(nativeConfig, 'utf8'))
-  config.server = { ...config.server, url: base, cleartext: true }
+  config.server = { ...config.server, cleartext: true, allowNavigation: ['*'] }
+  delete config.server.url
   writeFileSync(nativeConfig, JSON.stringify(config, null, 2))
-  console.log(`\nCanlı rejim: tətbiq ${base} ünvanından yüklənəcək`)
+  console.log(`\nCanlı rejim: tətbiq kompüteri şəbəkədə özü tapacaq (${hostname()}.local, ${host})`)
 }
 
 const gradlew = path.join(root, 'android', 'gradlew.bat')

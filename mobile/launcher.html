@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="az">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TOYUN</title>
+    <!--
+      Sınaq (canlı rejim) APK-sının başlanğıc səhifəsi.
+
+      APK heç bir ünvana bağlı deyil: tətbiq hər açılanda dev serveri işləyən
+      kompüteri Wi-Fi şəbəkəsində özü tapır və ora keçir. Ona görə eyni APK
+      istənilən telefonda və istənilən şəbəkədə işləyir — kompüterin ünvanı
+      dəyişəndə yenidən yığmaq lazım deyil.
+
+      Axtarış sırası: əvvəl yadda qalan ünvan və kompüterin adı (.local),
+      sonra şəbəkənin skanı. Tapılmasa ünvanı əl ilə yazmaq olur.
+
+      __HOSTNAME__, __BUILD_IP__, __PORT__ yığım zamanı əvəz olunur
+      (scripts/build-apk.mjs). Mağaza yığımında bu səhifə yoxdur.
+    -->
+    <style>
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 22px;
+        padding: 28px 24px;
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+        color: #fff;
+        background: linear-gradient(160deg, #2b0714 0%, #5a0f2c 62%, #7b1a3f 100%);
+        text-align: center;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mark { color: #dfb15b; }
+      h1 { margin: 0; font-size: 1.9rem; font-weight: 600; letter-spacing: 0.08em; }
+      h1 b { color: #dfb15b; font-weight: 600; }
+      #status { margin: 0; min-height: 2.8em; max-width: 300px; color: rgba(255, 255, 255, 0.82); line-height: 1.45; }
+      .bar { width: 220px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.16); overflow: hidden; }
+      .bar i { display: block; height: 100%; width: 0; background: #dfb15b; transition: width 0.25s ease; }
+      .manual { display: none; width: 100%; max-width: 320px; flex-direction: column; gap: 10px; }
+      .manual.show { display: flex; }
+      .manual label { font-size: 0.82rem; color: rgba(255, 255, 255, 0.7); text-align: left; }
+      input {
+        width: 100%; height: 50px; padding: 0 14px; border-radius: 13px;
+        border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.1);
+        color: #fff; font-size: 1.05rem; outline: none;
+      }
+      input:focus { border-color: #dfb15b; }
+      input::placeholder { color: rgba(255, 255, 255, 0.45); }
+      button {
+        height: 50px; border: none; border-radius: 13px; font-size: 1rem; font-weight: 600; cursor: pointer;
+      }
+      .primary { background: #dfb15b; color: #2b0714; }
+      .ghost { background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
+      small { color: rgba(255, 255, 255, 0.55); line-height: 1.5; max-width: 300px; }
+    </style>
+  </head>
+  <body>
+    <svg class="mark" width="56" height="56" viewBox="0 0 32 32" aria-hidden="true">
+      <path d="M16 2L20.1 6.1L25.9 6.1L25.9 11.9L30 16L25.9 20.1L25.9 25.9L20.1 25.9L16 30L11.9 25.9L6.1 25.9L6.1 20.1L2 16L6.1 11.9L6.1 6.1L11.9 6.1Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
+      <path d="M16 10.4 21.6 16 16 21.6 10.4 16Z" fill="currentColor" />
+    </svg>
+    <h1>TOY<b>UN</b></h1>
+
+    <p id="status">Kompüter axtarılır…</p>
+    <div class="bar"><i id="progress"></i></div>
+
+    <form class="manual" id="manual">
+      <label for="address">Kompüterin ünvanı (kompüterdə <b>ipconfig</b> → IPv4)</label>
+      <input id="address" inputmode="decimal" autocomplete="off" placeholder="192.168.1.5" />
+      <button class="primary" type="submit">Qoşul</button>
+      <button class="ghost" type="button" id="retry">Yenidən axtar</button>
+    </form>
+
+    <small id="hint"></small>
+
+    <script>
+      const PORT = '__PORT__'
+      const HOSTNAME = '__HOSTNAME__'
+      const BUILD_IP = '__BUILD_IP__'
+      const SAVED_KEY = 'toyun_dev_host'
+
+      const statusEl = document.getElementById('status')
+      const progressEl = document.getElementById('progress')
+      const manualEl = document.getElementById('manual')
+      const hintEl = document.getElementById('hint')
+      const addressEl = document.getElementById('address')
+
+      let found = false
+      let runId = 0
+
+      // Serverin bizim dev server olduğunu təsdiqləyir (başqa cihaz 3000 portunda ola bilər)
+      const probe = (host, timeout) =>
+        new Promise((resolve, reject) => {
+          const controller = new AbortController()
+          const timer = setTimeout(() => controller.abort(), timeout)
+          fetch(`http://${host}:${PORT}/app-update/ping`, { signal: controller.signal, cache: 'no-store' })
+            .then((r) => (r.ok ? r.json() : Promise.reject()))
+            .then((j) => (j && j.app === 'toyun' ? resolve(host) : reject()))
+            .catch(reject)
+            .finally(() => clearTimeout(timer))
+        })
+
+      const open = (host) => {
+        if (found) return
+        found = true
+        try { localStorage.setItem(SAVED_KEY, host) } catch (e) { /* yaddaş bağlıdırsa keçirik */ }
+        statusEl.textContent = 'Tapıldı, açılır…'
+        progressEl.style.width = '100%'
+        window.location.replace(`http://${host}:${PORT}/`)
+      }
+
+      const subnetOf = (ip) => (/^\d+\.\d+\.\d+\.\d+$/.test(ip || '') ? ip.split('.').slice(0, 3).join('.') : null)
+
+      // Telefonun öz ünvanı — hansı şəbəkəni skan edəcəyimizi göstərir.
+      // Əsas mənbə tətbiqin özüdür (MainActivity → ToyunNet); brauzerdə
+      // sınaq üçün WebRTC ehtiyat yoludur.
+      const nativeSubnets = () => {
+        try {
+          return (window.ToyunNet.addresses() || '').split(',').map(subnetOf).filter(Boolean)
+        } catch (e) {
+          return []
+        }
+      }
+
+      const localSubnets = () =>
+        new Promise((resolve) => {
+          const result = new Set(nativeSubnets())
+          if (result.size) return resolve([...result])
+          let pc
+          try {
+            pc = new RTCPeerConnection({ iceServers: [] })
+            pc.createDataChannel('x')
+            pc.onicecandidate = (event) => {
+              const match = /(\d+\.\d+\.\d+)\.\d+/.exec((event.candidate && event.candidate.candidate) || '')
+              if (match && !match[1].startsWith('127.')) result.add(match[1])
+            }
+            pc.createOffer().then((offer) => pc.setLocalDescription(offer)).catch(() => {})
+          } catch (e) { /* WebRTC yoxdursa siyahı boş qalır */ }
+          setTimeout(() => { try { pc && pc.close() } catch (e) {} resolve([...result]) }, 700)
+        })
+
+      // Bir /24 şəbəkəsini paralel yoxlayır; ilk cavab verəni qaytarır
+      const scanSubnet = (subnet, id, onStep, parallel = 24, timeout = 1100) =>
+        new Promise((resolve) => {
+          let next = 1, active = 0, done = 0, hit = null
+          const pump = () => {
+            if (hit || id !== runId) return resolve(hit)
+            while (active < parallel && next <= 254) {
+              const host = `${subnet}.${next++}`
+              active++
+              probe(host, timeout)
+                .then((h) => { hit = h })
+                .catch(() => {})
+                .finally(() => { active--; done++; onStep(done / 254); pump() })
+            }
+            if (next > 254 && active === 0) resolve(hit)
+          }
+          pump()
+        })
+
+      const search = async () => {
+        const id = ++runId
+        found = false
+        manualEl.classList.remove('show')
+        hintEl.textContent = ''
+        progressEl.style.width = '4%'
+        statusEl.textContent = 'Kompüter axtarılır…'
+
+        let saved = null
+        try { saved = localStorage.getItem(SAVED_KEY) } catch (e) {}
+
+        // 1) Sürətli yol: yadda qalan ünvan, kompüterin adı, yığım vaxtındakı ünvan
+        const quick = [saved, HOSTNAME && `${HOSTNAME.toLowerCase()}.local`, BUILD_IP].filter(Boolean)
+        const first = await Promise.any(quick.map((h) => probe(h, 1800))).catch(() => null)
+        if (id !== runId) return
+        if (first) return open(first)
+
+        // Sürətli yol alınmadı — əl ilə yazmaq imkanı dərhal açılır, skan davam edir
+        manualEl.classList.add('show')
+
+        // 2) Skan. Telefonun öz şəbəkəsi məlumdursa yalnız o yoxlanılır.
+        // Naməlum şəbəkələri ardıcıl skan etmək olmur: brauzer ölü ünvanlara
+        // açılan bağlantıları dərhal buraxmır, növbə tıxanır və düzgün ünvana
+        // sorğu çatmır (ölçülüb: 3-cü şəbəkədə kompüter tapılmırdı). Ona görə
+        // ünvan məlum deyilsə ən çox üç ehtimal, asta templə yoxlanılır.
+        const own = await localSubnets()
+        const guesses = [...new Set([subnetOf(saved), subnetOf(BUILD_IP), '192.168.1', '192.168.0'].filter(Boolean))]
+        const subnets = own.length ? own : guesses.slice(0, 3)
+        const [parallel, timeout] = own.length ? [24, 1100] : [14, 1500]
+
+        for (let i = 0; i < subnets.length; i++) {
+          if (id !== runId) return
+          statusEl.textContent = `Şəbəkə yoxlanılır: ${subnets[i]}.x`
+          const hit = await scanSubnet(subnets[i], id, (part) => {
+            progressEl.style.width = `${Math.round(((i + part) / subnets.length) * 100)}%`
+          }, parallel, timeout)
+          if (hit) return open(hit)
+        }
+
+        if (id !== runId) return
+        statusEl.textContent = 'Kompüter tapılmadı.'
+        progressEl.style.width = '0'
+        manualEl.classList.add('show')
+        hintEl.textContent = 'Telefon və kompüter eyni Wi-Fi-da olmalı, kompüterdə layihə işləməlidir (npm run dev).'
+      }
+
+      manualEl.addEventListener('submit', (event) => {
+        event.preventDefault()
+        const host = addressEl.value.trim().replace(/^https?:\/\//, '').replace(/[:/].*$/, '')
+        if (!host) return
+        runId++
+        statusEl.textContent = `${host} yoxlanılır…`
+        probe(host, 3000)
+          .then(open)
+          .catch(() => { statusEl.textContent = `${host} cavab vermir. Ünvanı və Wi-Fi-ı yoxlayın.` })
+      })
+
+      document.getElementById('retry').addEventListener('click', search)
+
+      // ToyunNet səhifə yüklənəndən sonra qoşulubsa ilk açılışda görünmür —
+      // bir dəfə yeniləmək kifayətdir (sonsuz dövrə düşməsin deyə nişanlanır)
+      const isApp = /; wv\)/.test(navigator.userAgent)
+      if (isApp && !window.ToyunNet && !sessionStorage.getItem('toyun_reloaded')) {
+        sessionStorage.setItem('toyun_reloaded', '1')
+        window.location.reload()
+      } else {
+        search()
+      }
+    </script>
+  </body>
+</html>
